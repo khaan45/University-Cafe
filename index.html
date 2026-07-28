@@ -1586,6 +1586,7 @@
 
 <!-- SheetJS: reads Excel (.xlsx/.xls) and CSV files client-side, for Customer import -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 /* =====================================================================
@@ -3153,7 +3154,7 @@ function renderInvoicesTable(){
     btn.addEventListener('click', ()=> openPaymentModal(Number(btn.dataset.id)));
   });
   $$('#invoicesTable .del-entry[data-action="whatsapp"]').forEach(btn=>{
-    btn.addEventListener('click', ()=> sendInvoiceWhatsApp(Number(btn.dataset.id)));
+    btn.addEventListener('click', ()=> sendInvoiceWhatsApp(Number(btn.dataset.id), btn));
   });
   $$('#invoicesTable .del-entry[data-action="view"]').forEach(btn=>{
     btn.addEventListener('click', ()=> openInvoicePrintModal(Number(btn.dataset.id)));
@@ -3203,13 +3204,17 @@ const PAYMENT_INFO = {
 };
 
 /* ---------------------------------------------------------------------
-   WhatsApp — "click to send" links only.
-   This is a static file with no backend, so there's no way to send
-   messages automatically or in the background — that needs the WhatsApp
-   Business API plus a server to hold the credentials securely, neither
-   of which exist here. What this DOES do: build a wa.me link with the
-   message pre-filled, so a staff member taps it, reviews the message in
-   WhatsApp, and presses send themselves. No API keys, no setup.
+   WhatsApp — sends the actual invoice/receipt image, not just text.
+   Uses html2canvas to snapshot the printable document, then the Web
+   Share API (navigator.share with a files array) to hand that image
+   straight to WhatsApp's native share sheet — this works on phones
+   (Android Chrome, iOS Safari 15+) where the person taps "Send via
+   WhatsApp" and WhatsApp opens with the image already attached.
+   There's still no backend here, so this can't send silently in the
+   background — a person still has to tap the final Send inside
+   WhatsApp themselves. On desktop browsers (no file-sharing support),
+   it falls back to downloading the image and opening a text-only
+   wa.me link, with a note to attach the downloaded image manually.
 --------------------------------------------------------------------- */
 function normalizePhoneForWhatsApp(phone){
   if(!phone) return '';
@@ -3238,6 +3243,58 @@ function openWhatsApp(phone, message){
     return;
   }
   window.open(waLink(phone, message), '_blank');
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 5000);
+}
+
+/* Renders docHtml (the same markup buildInvoiceDocHtml/buildPosReceiptHtml
+   produce) off-screen using the real .invoice-doc styling, snapshots it
+   with html2canvas, and returns a PNG Blob. */
+async function renderDocToImageBlob(docHtml, receiptMode){
+  const wrap = document.createElement('div');
+  wrap.className = 'invoice-doc' + (receiptMode ? ' receipt-mode' : '');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;' + (receiptMode ? 'width:300px;' : 'width:800px;');
+  wrap.innerHTML = receiptMode ? `<div class="receipt-doc">${docHtml}</div>` : docHtml;
+  document.body.appendChild(wrap);
+  try{
+    const canvas = await html2canvas(wrap, { scale:2, backgroundColor:'#ffffff', useCORS:true });
+    return await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  }finally{
+    wrap.remove();
+  }
+}
+
+/* Shares an image Blob to WhatsApp via the native share sheet where
+   supported; otherwise downloads the image and opens a text-only
+   wa.me link as a fallback so the person can attach it by hand. */
+async function shareImageToWhatsApp(blob, filename, phone, message){
+  if(!blob){
+    openWhatsApp(phone, message);
+    return;
+  }
+  const file = new File([blob], filename, { type: 'image/png' });
+  if(navigator.canShare && navigator.canShare({ files:[file] })){
+    try{
+      await navigator.share({ files:[file], title: filename, text: message || '' });
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return; // person cancelled the share sheet — not an error
+      // fall through to the download+link fallback below
+    }
+  }
+  downloadBlob(blob, filename);
+  if(phone || confirm('Your browser can\'t attach the image to WhatsApp directly, so it was downloaded instead. Open WhatsApp now to attach it manually?')){
+    openWhatsApp(phone, message);
+  }
 }
 
 function buildInvoiceDocHtml(inv){
@@ -3303,7 +3360,7 @@ function buildInvoiceDocHtml(inv){
   `;
 }
 
-function sendInvoiceWhatsApp(invoiceId){
+async function sendInvoiceWhatsApp(invoiceId, triggerBtn){
   const inv = invoices.find(i=>i.id===invoiceId);
   if(!inv) return;
   const customer = customers.find(c=>c.id===inv.customerId);
@@ -3315,11 +3372,22 @@ function sendInvoiceWhatsApp(invoiceId){
   }else{
     message = `Hi ${inv.customerName}, this is ${BUSINESS_INFO.name}. Invoice ${inv.invoiceNo} dated ${inv.invoiceDate} for ${fmt(owed)} Sl.sh is due ${inv.dueDate}. Balance remaining: ${fmt(balance)} Sl.sh. Thank you!`;
   }
-  openWhatsApp(customer ? customer.phone : null, message);
+  const originalLabel = triggerBtn ? triggerBtn.textContent : null;
+  if(triggerBtn){ triggerBtn.disabled = true; triggerBtn.textContent = '⏳'; }
+  try{
+    const blob = await renderDocToImageBlob(buildInvoiceDocHtml(inv), false);
+    await shareImageToWhatsApp(blob, `Invoice-${inv.invoiceNo}.png`, customer ? customer.phone : null, message);
+  }catch(e){
+    console.error('Invoice image share failed:', e);
+    openWhatsApp(customer ? customer.phone : null, message); // fall back to text-only rather than fail silently
+  }finally{
+    if(triggerBtn){ triggerBtn.disabled = false; triggerBtn.textContent = originalLabel; }
+  }
 }
 
 let currentDocPhone = null;
 let currentDocWaMessage = null;
+let currentDocFilename = null;
 
 function openInvoicePrintModal(invoiceId){
   const inv = invoices.find(i=>i.id===invoiceId);
@@ -3328,6 +3396,7 @@ function openInvoicePrintModal(invoiceId){
   const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
   currentDocPhone = customer ? customer.phone : null;
   currentDocWaMessage = `Hi ${inv.customerName}, here's your invoice ${inv.invoiceNo} from ${BUSINESS_INFO.name} — ${fmt(owed)} Sl.sh, due ${inv.dueDate}.`;
+  currentDocFilename = `Invoice-${inv.invoiceNo}.png`;
   $('#invoiceDocContent').classList.remove('receipt-mode');
   $('#invoiceDocContent').innerHTML = buildInvoiceDocHtml(inv);
   $('#invoicePrintModal').classList.add('active');
@@ -3408,16 +3477,31 @@ function openReceiptPrintModal(sale){
     currentDocPhone = null;
     currentDocWaMessage = `Thank you for your purchase at ${BUSINESS_INFO.name}! Receipt ${sale.receiptNo} — ${fmt(sale.total)} Sl.sh, paid.`;
   }
+  currentDocFilename = `Receipt-${sale.receiptNo}.png`;
   $('#invoiceDocContent').classList.add('receipt-mode');
   $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildPosReceiptHtml(sale)}</div>`;
   $('#invoicePrintModal').classList.add('active');
 }
 
-$('#sendDocWhatsAppBtn').addEventListener('click', ()=>{
+$('#sendDocWhatsAppBtn').addEventListener('click', async ()=>{
   if(!currentDocPhone){
     if(!confirm("No phone number on file for this contact. Open WhatsApp anyway to pick a contact manually?")) return;
   }
-  window.open(waLink(currentDocPhone, currentDocWaMessage || 'Hello from ' + BUSINESS_INFO.name), '_blank');
+  const btn = $('#sendDocWhatsAppBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Preparing image…';
+  try{
+    const canvas = await html2canvas($('#invoiceDocContent'), { scale:2, backgroundColor:'#ffffff', useCORS:true });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    await shareImageToWhatsApp(blob, currentDocFilename || 'Document.png', currentDocPhone, currentDocWaMessage || 'Hello from ' + BUSINESS_INFO.name);
+  }catch(e){
+    console.error('Document image share failed:', e);
+    window.open(waLink(currentDocPhone, currentDocWaMessage || 'Hello from ' + BUSINESS_INFO.name), '_blank');
+  }finally{
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
 });
 
 $('#printInvoiceDocBtn').addEventListener('click', ()=>{
