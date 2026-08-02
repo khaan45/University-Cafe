@@ -3,218 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UB Cafe — Staff Portal</title>
+<title>UB Cafe — Staff Check-In</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#15201B;
-    --ink-soft:#5B6B62;
-    --paper:#EFEAE0;
-    --card:#FFFFFF;
-    --line:#DCD5C4;
+    --paper:#F7F2E4;
+    --paper-line:#E4D9BC;
+    --ink:#1E2A24;
+    --ink-soft:#4B5A50;
     --brass:#B8892B;
-    --amber:#C77D2E;
-    --amber-bg:#FBF0DE;
+    --brass-dark:#8C6A20;
     --credit:#2C6E63;
-    --credit-bg:#E1EEE9;
     --debit:#A63D2F;
-    --debit-bg:#F6E3DF;
-    --shadow: 0 2px 4px rgba(21,32,27,0.06), 0 10px 28px rgba(21,32,27,0.12);
+    --card:#FFFDF7;
+    --danger-bg:#F6E3DF;
+    --ok-bg:#E1EEE9;
+    --shadow: 0 1px 2px rgba(30,42,36,0.06), 0 4px 14px rgba(30,42,36,0.08);
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--ink);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
-  @media (prefers-reduced-motion: reduce){ *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:480px;margin:0 auto;padding:32px 18px 60px;}
 
-  .wrap{max-width:440px;margin:0 auto;min-height:100vh;background:var(--paper);box-shadow:0 0 60px rgba(0,0,0,.3);}
-
-  /* ---------- Top badge bar ---------- */
-  .badge-bar{
-    background:var(--ink);color:var(--paper);padding:24px 22px 20px;text-align:center;
-    border-radius:0 0 22px 22px;
+  .header{text-align:center;margin-bottom:22px;}
+  .crest{
+    width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;
+    align-items:center;justify-content:center;margin:0 auto 10px;font-family:'Fraunces',serif;font-weight:700;font-size:18px;
   }
-  .badge-bar .crest{
-    width:42px;height:42px;border-radius:50%;background:var(--brass);color:var(--ink);display:flex;
-    align-items:center;justify-content:center;margin:0 auto 10px;font-family:'Fraunces',serif;font-weight:800;font-size:15px;
+  .header h1{font-family:'Fraunces',serif;font-weight:700;font-size:24px;margin:0;}
+  .header .sub{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+  .header .now{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft);margin-top:8px;}
+
+  .panel{background:var(--card);border:1px solid var(--ink);border-radius:10px;padding:22px;box-shadow:var(--shadow);}
+  .panel + .panel{margin-top:16px;}
+
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .field label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  select{
+    font-family:'Inter',sans-serif;font-size:15px;padding:11px 12px;border:1px solid var(--paper-line);
+    border-radius:7px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box;
   }
-  .badge-bar h1{font-family:'Fraunces',serif;font-weight:800;font-size:20px;margin:0;letter-spacing:-0.01em;}
-  .badge-bar .sub{font-size:10.5px;color:#B9C2BC;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
-  .badge-bar .clock{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass);margin-top:12px;font-weight:600;}
-
-  .content{padding:22px 20px 50px;}
-  .screen{display:none;animation:fadeSlide .35s cubic-bezier(.2,.8,.3,1) both;}
-  .screen.active{display:block;}
-  @keyframes fadeSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
-  .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:12px;}
-
-  /* ---------- Employee picker ---------- */
-  .emp-list{display:flex;flex-direction:column;gap:8px;}
-  .emp-row{
-    display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease;-webkit-tap-highlight-color:transparent;
-  }
-  .emp-row:hover{box-shadow:var(--shadow);transform:translateY(-1px);}
-  .emp-row:active{transform:translateY(0) scale(.98);}
-  .emp-avatar{
-    width:38px;height:38px;border-radius:50%;background:var(--paper);color:var(--ink);flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:13px;
-  }
-  .emp-row .emp-name{font-weight:600;font-size:14px;flex:1;}
-  .emp-row .emp-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;}
-  .emp-row .emp-tag.in{background:var(--amber-bg);color:var(--amber);}
-  .emp-row .emp-tag.done{background:var(--credit-bg);color:var(--credit);}
-  .empty{text-align:center;padding:30px 10px;color:var(--ink-soft);font-size:13px;}
-
-  /* ---------- PIN pad ---------- */
-  .pin-header{text-align:center;margin-bottom:22px;}
-  .pin-header .pin-emp-avatar{
-    width:56px;height:56px;border-radius:50%;background:var(--ink);color:var(--paper);margin:0 auto 10px;
-    display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:19px;
-  }
-  .pin-header h2{font-family:'Fraunces',serif;font-weight:700;font-size:18px;margin:0;}
-  .pin-header .pin-hint{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
-
-  .pin-dots{display:flex;justify-content:center;gap:14px;margin:22px 0;}
-  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink-soft);transition:all .15s ease;}
-  .pin-dot.filled{background:var(--ink);border-color:var(--ink);transform:scale(1.1);}
-  .pin-dot.shake{animation:shakeDot .4s ease;}
-  @keyframes shakeDot{0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);}}
-
-  .keypad{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;max-width:280px;margin:0 auto;}
-  .key{
-    aspect-ratio:1;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);
-    font-family:'Inter',sans-serif;font-weight:700;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-    transition:transform .1s ease, background .1s ease;-webkit-tap-highlight-color:transparent;
-  }
-  .key:active{transform:scale(.92);background:var(--paper);}
-  .key.wide{font-size:13px;font-weight:600;color:var(--ink-soft);border:none;background:none;}
-
-  .pin-msg{text-align:center;font-size:12.5px;color:var(--debit);margin-top:14px;min-height:18px;}
-  .pin-back{display:block;text-align:center;margin-top:18px;color:var(--ink-soft);font-size:13px;cursor:pointer;background:none;border:none;width:100%;padding:8px;text-decoration:underline;}
-
-  /* ---------- Shift status ---------- */
-  .status-card{
-    background:var(--card);border-radius:18px;padding:26px 22px;text-align:center;box-shadow:var(--shadow);
-  }
-  .status-icon{font-size:38px;line-height:1;margin-bottom:10px;}
-  .status-title{font-family:'Fraunces',serif;font-weight:700;font-size:18px;}
-  .status-sub{font-size:12.5px;color:var(--ink-soft);margin-top:4px;}
-  .status-times{display:flex;justify-content:center;gap:22px;margin-top:18px;}
-  .status-times .st-item{text-align:center;}
-  .status-times .st-label{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
-  .status-times .st-value{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;margin-top:3px;}
-  .elapsed{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;color:var(--amber);margin-top:16px;}
+  select:focus{outline:2px solid var(--brass);outline-offset:1px;border-color:var(--brass);}
 
   button.primary{
     font-family:'Inter',sans-serif;font-weight:700;font-size:15px;background:var(--ink);color:var(--paper);
-    border:none;padding:15px 20px;border-radius:12px;cursor:pointer;width:100%;margin-top:20px;
-    transition:background .15s ease, transform .1s ease;
+    border:none;padding:13px 20px;border-radius:8px;cursor:pointer;width:100%;
   }
-  button.primary.checkout{background:var(--amber);}
   button.primary:disabled{background:#B7BDB8;cursor:not-allowed;}
-  button.primary:active:not(:disabled){transform:scale(.98);}
-  button.secondary{
-    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;background:none;color:var(--ink-soft);
-    border:1.5px solid var(--line);padding:11px 16px;border-radius:10px;cursor:pointer;width:100%;margin-top:10px;
-  }
+  button.primary:hover:not(:disabled){background:#0f1913;}
+  button.primary.checked-in{background:var(--credit);}
 
-  .msg{font-size:13px;margin-top:12px;padding:10px 12px;border-radius:9px;text-align:center;}
-  .msg.err{background:var(--debit-bg);color:var(--debit);}
-  .msg.ok{background:var(--credit-bg);color:var(--credit);}
+  .msg{font-size:13px;margin-top:10px;padding:9px 12px;border-radius:6px;display:none;text-align:center;}
+  .msg.show{display:block;}
+  .msg.err{background:var(--danger-bg);color:var(--debit);}
+  .msg.ok{background:var(--ok-bg);color:var(--credit);}
 
-  /* ---------- History ---------- */
-  .hist-row{
-    display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--card);
-    border:1px solid var(--line);border-radius:11px;margin-bottom:8px;
-  }
-  .hist-row .hr-date{font-weight:700;font-size:13px;font-family:'IBM Plex Mono',monospace;}
-  .hist-row .hr-times{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .hist-row .hr-hours{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--credit);}
-  .hist-row .hr-hours.open{color:var(--amber);}
+  .status-banner{text-align:center;padding:14px;border-radius:9px;margin-bottom:16px;}
+  .status-banner.in{background:var(--ok-bg);}
+  .status-banner .sb-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  .status-banner .sb-value{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;margin-top:2px;color:var(--credit);}
 
-  .stamp-overlay{
-    position:fixed;inset:0;background:rgba(21,32,27,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;
-  }
-  .stamp-overlay.show{display:flex;}
-  .stamp{
-    width:190px;height:190px;border-radius:50%;border:5px solid var(--credit);color:var(--credit);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-    background:rgba(225,238,233,.97);transform:scale(.3) rotate(-20deg);opacity:0;
-    animation:stampDown .5s cubic-bezier(.17,.85,.35,1.25) forwards;
-  }
-  .stamp.out{border-color:var(--amber);color:var(--amber);background:rgba(251,240,222,.97);}
-  @keyframes stampDown{
-    0%{transform:scale(.3) rotate(-20deg);opacity:0;}
-    60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
-    100%{transform:scale(1) rotate(-7deg);opacity:1;}
-  }
-  .stamp .stamp-check{font-size:38px;}
-  .stamp .stamp-title{font-family:'Fraunces',serif;font-weight:800;font-size:15px;margin-top:4px;}
-  .stamp .stamp-time{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:5px;color:var(--ink-soft);}
-  .stamp-dismiss{
-    margin-top:18px;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:9px;
-    padding:9px 22px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;
-  }
+  .today-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin-bottom:10px;}
+  .checkin-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--paper-line);font-size:13.5px;}
+  .checkin-row:last-child{border-bottom:none;}
+  .checkin-row .time{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);}
+  .empty{text-align:center;padding:20px 10px;color:var(--ink-soft);font-size:13px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="badge-bar">
+  <div class="header">
     <div class="crest">UB</div>
     <h1>UB Cafe</h1>
-    <div class="sub">Staff Portal</div>
-    <div class="clock" id="clockLine"></div>
+    <div class="sub">Staff Check-In</div>
+    <div class="now" id="nowLine"></div>
   </div>
 
-  <div class="content">
-
-    <!-- ===== Screen 1: pick employee ===== -->
-    <div class="screen active" id="screen-pick">
-      <div class="section-label">Who are you?</div>
-      <div class="emp-list" id="empList"><div class="empty">Loading…</div></div>
+  <div class="panel" id="checkinPanel">
+    <div class="field">
+      <label for="employeeSelect">Who are you?</label>
+      <select id="employeeSelect"><option value="">Loading…</option></select>
     </div>
-
-    <!-- ===== Screen 2: PIN entry ===== -->
-    <div class="screen" id="screen-pin">
-      <div class="pin-header">
-        <div class="pin-emp-avatar" id="pinAvatar"></div>
-        <h2 id="pinEmpName"></h2>
-        <div class="pin-hint" id="pinHint">Enter your 4-digit PIN</div>
-      </div>
-      <div class="pin-dots" id="pinDots"></div>
-      <div class="keypad" id="keypad"></div>
-      <div class="pin-msg" id="pinMsg"></div>
-      <button class="pin-back" id="pinBackBtn">← Not you? Go back</button>
-    </div>
-
-    <!-- ===== Screen 3: shift status ===== -->
-    <div class="screen" id="screen-status">
-      <div class="status-card" id="statusCard"></div>
-      <button class="secondary" id="viewHistoryBtn">📋 View My History</button>
-      <button class="secondary" id="statusBackBtn">← Switch User</button>
-    </div>
-
-    <!-- ===== Screen 4: history ===== -->
-    <div class="screen" id="screen-history">
-      <div class="section-label" id="historyTitle">My Attendance History</div>
-      <div id="historyList"></div>
-      <button class="secondary" id="historyBackBtn">← Back</button>
-    </div>
-
+    <button class="primary" id="checkinBtn" disabled>Check In</button>
+    <div class="msg" id="checkinMsg"></div>
   </div>
-</div>
 
-<div class="stamp-overlay" id="stampOverlay">
-  <div style="text-align:center;">
-    <div class="stamp" id="stampEl">
-      <div class="stamp-check" id="stampIcon">✓</div>
-      <div class="stamp-title" id="stampTitle">CHECKED IN</div>
-      <div class="stamp-time" id="stampTime"></div>
-    </div>
-    <button class="stamp-dismiss" id="stampDismissBtn">Done</button>
+  <div class="panel">
+    <div class="today-title">Checked In Today</div>
+    <div id="todayList"></div>
   </div>
+
 </div>
 
 <script>
@@ -243,28 +122,14 @@ async function storageSet(key, value, shared){
 }
 
 const $ = sel => document.querySelector(sel);
-function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const EMPLOYEES_KEY = "ubcafe_employees";
 const ATTENDANCE_KEY = "ubcafe_attendance";
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function nowTimeStr(){ return new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}); }
-function initials(name){
-  const parts = String(name||'').trim().split(/\s+/);
-  return ((parts[0]?.[0]||'') + (parts[1]?.[0]||'')).toUpperCase() || '?';
-}
-function formatHours(ms){
-  const totalMin = Math.round(ms / 60000);
-  const h = Math.floor(totalMin/60), m = totalMin%60;
-  return h > 0 ? `${h}h ${m}m` : `${m}m`;
-}
 
 let employees = [];
-let attendance = []; // [{id, employeeId, employeeName, date, checkInTime, checkInTs, checkOutTime, checkOutTs, lat?, lng?}]
-let selectedEmployee = null;
-let pinBuffer = '';
-let pinMode = null; // 'verify' | 'create' | 'confirm'
-let pinFirstEntry = '';
+let attendance = []; // [{id, employeeId, employeeName, date, time}]
 
 async function loadData(){
   const eVal = await storageGet(EMPLOYEES_KEY, true);
@@ -272,166 +137,52 @@ async function loadData(){
   const aVal = await storageGet(ATTENDANCE_KEY, true);
   try{ attendance = aVal ? JSON.parse(aVal) : []; }catch(e){ attendance = []; }
 }
-async function saveAttendance(){ await storageSet(ATTENDANCE_KEY, JSON.stringify(attendance), true); }
-async function saveEmployees(){ await storageSet(EMPLOYEES_KEY, JSON.stringify(employees), true); }
+async function saveAttendance(){
+  await storageSet(ATTENDANCE_KEY, JSON.stringify(attendance), true);
+}
 
-function todaysRecord(employeeId){
+function populateEmployeeSelect(){
+  const sel = $('#employeeSelect');
+  const active = employees.filter(e=>e.status==='Active');
+  sel.innerHTML = active.length
+    ? '<option value="">Select your name…</option>' + active.map(e=>`<option value="${e.id}">${e.fullName}</option>`).join('')
+    : '<option value="">No active employees on file</option>';
+}
+
+function alreadyCheckedInToday(employeeId){
   return attendance.find(a => a.employeeId===employeeId && a.date===todayStr());
 }
 
-/* ---------------------------------------------------------------------
-   Device identity — same device-lock mechanism as before, layered
-   underneath the PIN (not replacing it). A random ID stored in this
-   browser's own localStorage, never synced.
---------------------------------------------------------------------- */
-const DEVICE_ID_KEY = 'ubcafe_device_id';
-function getDeviceId(){
-  try{
-    let id = window.localStorage.getItem(DEVICE_ID_KEY);
-    if(!id){
-      id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('dev-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-      window.localStorage.setItem(DEVICE_ID_KEY, id);
-    }
-    return id;
-  }catch(e){ return null; }
+function updateCheckinButtonState(){
+  const empId = Number($('#employeeSelect').value);
+  const btn = $('#checkinBtn');
+  const msg = $('#checkinMsg');
+  msg.className = 'msg';
+  if(!empId){ btn.disabled = true; btn.textContent = 'Check In'; btn.classList.remove('checked-in'); return; }
+  const existing = alreadyCheckedInToday(empId);
+  if(existing){
+    btn.disabled = true;
+    btn.textContent = `✓ Checked in at ${existing.time}`;
+    btn.classList.add('checked-in');
+  }else{
+    btn.disabled = false;
+    btn.textContent = 'Check In';
+    btn.classList.remove('checked-in');
+  }
 }
 
-/* ---------------------------------------------------------------------
-   Screen navigation
---------------------------------------------------------------------- */
-function showScreen(id){
-  $$('.screen').forEach(s=>s.classList.remove('active'));
-  $('#'+id).classList.add('active');
-}
-
-/* ---------------------------------------------------------------------
-   Screen 1 — employee picker
---------------------------------------------------------------------- */
-function renderEmpList(){
-  const active = employees.filter(e=>e.status==='Active');
-  const list = $('#empList');
-  if(active.length===0){
-    list.innerHTML = '<div class="empty">No active employees on file.</div>';
+function renderTodayList(){
+  const el = $('#todayList');
+  const todays = attendance.filter(a=>a.date===todayStr()).sort((a,b)=> a.time < b.time ? -1 : 1);
+  if(todays.length===0){
+    el.innerHTML = '<div class="empty">No one has checked in yet today.</div>';
     return;
   }
-  list.innerHTML = active.map(e=>{
-    const rec = todaysRecord(e.id);
-    let tag = '';
-    if(rec && rec.checkOutTime) tag = '<span class="emp-tag done">Done</span>';
-    else if(rec) tag = '<span class="emp-tag in">On Shift</span>';
-    return `<div class="emp-row" data-id="${e.id}">
-      <div class="emp-avatar">${initials(e.fullName)}</div>
-      <div class="emp-name">${e.fullName}</div>
-      ${tag}
-    </div>`;
-  }).join('');
-  $$('.emp-row').forEach(row=>{
-    row.addEventListener('click', ()=>{
-      selectedEmployee = employees.find(e=>e.id===Number(row.dataset.id));
-      if(!selectedEmployee) return;
-      const deviceId = getDeviceId();
-      if(selectedEmployee.registeredDeviceId && deviceId && selectedEmployee.registeredDeviceId !== deviceId){
-        alert(`${selectedEmployee.fullName} is registered to a different phone. Ask a manager to reset it if this is a new phone.`);
-        return;
-      }
-      openPinScreen();
-    });
-  });
+  el.innerHTML = todays.map(a=>`<div class="checkin-row"><span>${a.employeeName}</span><span class="time">${a.time}</span></div>`).join('');
 }
 
-/* ---------------------------------------------------------------------
-   Screen 2 — PIN pad
---------------------------------------------------------------------- */
-function buildKeypad(){
-  const layout = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
-  $('#keypad').innerHTML = layout.map(k=>{
-    if(k==='') return '<div></div>';
-    const wide = k==='⌫';
-    return `<button class="key ${wide?'wide':''}" data-key="${k}">${k}</button>`;
-  }).join('');
-  $$('.key[data-key]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const k = btn.dataset.key;
-      if(k==='⌫'){ pinBuffer = pinBuffer.slice(0,-1); }
-      else if(pinBuffer.length < 4){ pinBuffer += k; }
-      renderPinDots();
-      if(pinBuffer.length === 4) handlePinComplete();
-    });
-  });
-}
-function renderPinDots(){
-  const dots = $('#pinDots');
-  dots.innerHTML = '';
-  for(let i=0;i<4;i++){
-    const dot = document.createElement('div');
-    dot.className = 'pin-dot' + (i < pinBuffer.length ? ' filled' : '');
-    dots.appendChild(dot);
-  }
-}
-function shakeDots(){
-  $$('.pin-dot').forEach(d=>d.classList.add('shake'));
-  setTimeout(()=> $$('.pin-dot').forEach(d=>d.classList.remove('shake')), 400);
-}
+$('#employeeSelect').addEventListener('change', updateCheckinButtonState);
 
-function openPinScreen(){
-  pinBuffer = '';
-  pinFirstEntry = '';
-  $('#pinAvatar').textContent = initials(selectedEmployee.fullName);
-  $('#pinEmpName').textContent = selectedEmployee.fullName;
-  $('#pinMsg').textContent = '';
-  if(selectedEmployee.pin){
-    pinMode = 'verify';
-    $('#pinHint').textContent = 'Enter your 4-digit PIN';
-  }else{
-    pinMode = 'create';
-    $('#pinHint').textContent = "First time — create a 4-digit PIN you'll use to check in from now on";
-  }
-  renderPinDots();
-  showScreen('screen-pin');
-}
-
-async function handlePinComplete(){
-  const msg = $('#pinMsg');
-  if(pinMode === 'verify'){
-    if(pinBuffer === selectedEmployee.pin){
-      msg.textContent = '';
-      openStatusScreen();
-    }else{
-      msg.textContent = 'Incorrect PIN — try again.';
-      shakeDots();
-      pinBuffer = '';
-      setTimeout(renderPinDots, 300);
-    }
-  }else if(pinMode === 'create'){
-    pinFirstEntry = pinBuffer;
-    pinBuffer = '';
-    pinMode = 'confirm';
-    $('#pinHint').textContent = 'Enter it once more to confirm';
-    renderPinDots();
-  }else if(pinMode === 'confirm'){
-    if(pinBuffer === pinFirstEntry){
-      selectedEmployee.pin = pinBuffer;
-      await saveEmployees();
-      msg.textContent = '';
-      openStatusScreen();
-    }else{
-      msg.textContent = "Those didn't match — let's start over.";
-      shakeDots();
-      pinBuffer = '';
-      pinFirstEntry = '';
-      pinMode = 'create';
-      setTimeout(()=>{
-        $('#pinHint').textContent = "First time — create a 4-digit PIN you'll use to check in from now on";
-        renderPinDots();
-      }, 400);
-    }
-  }
-}
-$('#pinBackBtn').addEventListener('click', ()=>{ selectedEmployee = null; showScreen('screen-pick'); });
-
-/* ---------------------------------------------------------------------
-   Screen 3 — shift status (check in / check out)
---------------------------------------------------------------------- */
 function getLocationPromise(){
   return new Promise((resolve)=>{
     if(!navigator.geolocation){ resolve(null); return; }
@@ -443,186 +194,55 @@ function getLocationPromise(){
   });
 }
 
-function openStatusScreen(){
-  renderStatusCard();
-  showScreen('screen-status');
-}
-
-function renderStatusCard(){
-  const card = $('#statusCard');
-  const rec = todaysRecord(selectedEmployee.id);
-
-  if(!rec){
-    card.innerHTML = `
-      <div class="status-icon">👋</div>
-      <div class="status-title">Ready to start your shift?</div>
-      <div class="status-sub">You haven't checked in today.</div>
-      <button class="primary" id="actionBtn">Check In</button>
-      <div class="msg" id="statusMsg" style="display:none;"></div>
-    `;
-    $('#actionBtn').addEventListener('click', doCheckIn);
-  }else if(!rec.checkOutTime){
-    card.innerHTML = `
-      <div class="status-icon">⏱</div>
-      <div class="status-title">You're on shift</div>
-      <div class="status-sub">Checked in at ${rec.checkInTime}</div>
-      <div class="elapsed" id="elapsedTime">—</div>
-      <button class="primary checkout" id="actionBtn">Check Out</button>
-      <div class="msg" id="statusMsg" style="display:none;"></div>
-    `;
-    updateElapsed(rec.checkInTs);
-    if(window._elapsedTimer) clearInterval(window._elapsedTimer);
-    window._elapsedTimer = setInterval(()=> updateElapsed(rec.checkInTs), 1000);
-    $('#actionBtn').addEventListener('click', doCheckOut);
-  }else{
-    if(window._elapsedTimer) clearInterval(window._elapsedTimer);
-    const hoursWorked = formatHours(rec.checkOutTs - rec.checkInTs);
-    card.innerHTML = `
-      <div class="status-icon">✅</div>
-      <div class="status-title">Shift complete</div>
-      <div class="status-sub">Great work today!</div>
-      <div class="status-times">
-        <div class="st-item"><div class="st-label">In</div><div class="st-value">${rec.checkInTime}</div></div>
-        <div class="st-item"><div class="st-label">Out</div><div class="st-value">${rec.checkOutTime}</div></div>
-        <div class="st-item"><div class="st-label">Hours</div><div class="st-value">${hoursWorked}</div></div>
-      </div>
-    `;
+$('#checkinBtn').addEventListener('click', async ()=>{
+  const empId = Number($('#employeeSelect').value);
+  const emp = employees.find(e=>e.id===empId);
+  const msg = $('#checkinMsg');
+  if(!emp) return;
+  if(alreadyCheckedInToday(empId)){
+    msg.textContent = "You're already checked in for today.";
+    msg.className = 'msg show err';
+    return;
   }
-}
-function updateElapsed(sinceTs){
-  const el = $('#elapsedTime');
-  if(!el) return;
-  const ms = Date.now() - sinceTs;
-  const totalSec = Math.max(0, Math.floor(ms/1000));
-  const h = String(Math.floor(totalSec/3600)).padStart(2,'0');
-  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,'0');
-  const s = String(totalSec%60).padStart(2,'0');
-  el.textContent = `${h}:${m}:${s}`;
-}
-
-function showStamp(kind, time){
-  $('#stampIcon').textContent = kind==='out' ? '👋' : '✓';
-  $('#stampTitle').textContent = kind==='out' ? 'CHECKED OUT' : 'CHECKED IN';
-  $('#stampTime').textContent = time;
-  $('#stampEl').classList.toggle('out', kind==='out');
-  const stamp = $('#stampEl');
-  stamp.style.animation = 'none';
-  void stamp.offsetWidth;
-  stamp.style.animation = '';
-  $('#stampOverlay').classList.add('show');
-}
-$('#stampDismissBtn').addEventListener('click', ()=> $('#stampOverlay').classList.remove('show'));
-$('#stampOverlay').addEventListener('click', (e)=>{ if(e.target.id==='stampOverlay') $('#stampOverlay').classList.remove('show'); });
-
-async function doCheckIn(){
-  const btn = $('#actionBtn');
-  const msg = $('#statusMsg');
+  const btn = $('#checkinBtn');
   btn.disabled = true;
   btn.textContent = 'Getting your location…';
   try{
     const location = await getLocationPromise();
-    const time = nowTimeStr();
-    const ts = Date.now();
+    btn.textContent = 'Checking in…';
     attendance.push({
       id: Date.now(),
-      employeeId: selectedEmployee.id,
-      employeeName: selectedEmployee.fullName,
+      employeeId: empId,
+      employeeName: emp.fullName,
       date: todayStr(),
-      checkInTime: time,
-      checkInTs: ts,
+      time: nowTimeStr(),
       ...(location ? { lat: location.lat, lng: location.lng } : {})
     });
     await saveAttendance();
-    if(!selectedEmployee.registeredDeviceId){
-      const deviceId = getDeviceId();
-      if(deviceId){ selectedEmployee.registeredDeviceId = deviceId; await saveEmployees(); }
-    }
-    showStamp('in', time);
-    renderStatusCard();
+    msg.textContent = location
+      ? `You're checked in, ${emp.fullName}! Have a great shift.`
+      : `You're checked in, ${emp.fullName}! (Location wasn't available — check-in still recorded.)`;
+    msg.className = 'msg show ok';
+    updateCheckinButtonState();
+    renderTodayList();
   }catch(e){
-    msg.style.display = 'block';
-    msg.textContent = 'Something went wrong: ' + e.message;
-    msg.className = 'msg err';
+    msg.textContent = "Something went wrong: " + e.message;
+    msg.className = 'msg show err';
     btn.disabled = false;
     btn.textContent = 'Check In';
   }
-}
-
-async function doCheckOut(){
-  const btn = $('#actionBtn');
-  const msg = $('#statusMsg');
-  const rec = todaysRecord(selectedEmployee.id);
-  if(!rec) return;
-  btn.disabled = true;
-  btn.textContent = 'Getting your location…';
-  try{
-    const location = await getLocationPromise();
-    const time = nowTimeStr();
-    rec.checkOutTime = time;
-    rec.checkOutTs = Date.now();
-    if(location){ rec.checkOutLat = location.lat; rec.checkOutLng = location.lng; }
-    await saveAttendance();
-    showStamp('out', time);
-    renderStatusCard();
-  }catch(e){
-    msg.style.display = 'block';
-    msg.textContent = 'Something went wrong: ' + e.message;
-    msg.className = 'msg err';
-    btn.disabled = false;
-    btn.textContent = 'Check Out';
-  }
-}
-
-$('#statusBackBtn').addEventListener('click', ()=>{
-  if(window._elapsedTimer) clearInterval(window._elapsedTimer);
-  selectedEmployee = null;
-  renderEmpList();
-  showScreen('screen-pick');
 });
 
-/* ---------------------------------------------------------------------
-   Screen 4 — my history
---------------------------------------------------------------------- */
-$('#viewHistoryBtn').addEventListener('click', ()=>{
-  $('#historyTitle').textContent = `${selectedEmployee.fullName}'s Attendance History`;
-  const mine = attendance
-    .filter(a=>a.employeeId===selectedEmployee.id)
-    .sort((a,b)=> b.date < a.date ? -1 : (b.date > a.date ? 1 : 0))
-    .slice(0, 30);
-  const list = $('#historyList');
-  if(mine.length===0){
-    list.innerHTML = '<div class="empty">No history yet.</div>';
-  }else{
-    list.innerHTML = mine.map(rec=>{
-      const hoursText = rec.checkOutTs
-        ? formatHours(rec.checkOutTs - rec.checkInTs)
-        : 'In progress';
-      return `<div class="hist-row">
-        <div>
-          <div class="hr-date">${rec.date}</div>
-          <div class="hr-times">${rec.checkInTime}${rec.checkOutTime ? ' – ' + rec.checkOutTime : ' – still on shift'}</div>
-        </div>
-        <div class="hr-hours ${!rec.checkOutTs ? 'open' : ''}">${hoursText}</div>
-      </div>`;
-    }).join('');
-  }
-  showScreen('screen-history');
-});
-$('#historyBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
-
-/* ---------------------------------------------------------------------
-   Live clock line
---------------------------------------------------------------------- */
-function updateClockLine(){
-  $('#clockLine').textContent = new Date().toLocaleString('en-US', { weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', second:'2-digit' });
+function updateNowLine(){
+  $('#nowLine').textContent = new Date().toLocaleString('en-US', { weekday:'long', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
 }
 
 (async function init(){
-  updateClockLine();
-  setInterval(updateClockLine, 1000);
-  buildKeypad();
+  updateNowLine();
+  setInterval(updateNowLine, 30000);
   await loadData();
-  renderEmpList();
+  populateEmployeeSelect();
+  renderTodayList();
 })();
 </script>
 </body>
