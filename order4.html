@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UB Cafe — Order & Check Your Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F2E4;
+    --paper-line:#E4D9BC;
+    --ink:#1E2A24;
+    --ink-soft:#4B5A50;
+    --brass:#B8892B;
+    --brass-dark:#8C6A20;
+    --debit:#A63D2F;
+    --credit:#2C6E63;
+    --card:#FFFDF7;
+    --danger-bg:#F6E3DF;
+    --ok-bg:#E1EEE9;
+    --shadow: 0 1px 2px rgba(30,42,36,0.06), 0 8px 24px rgba(30,42,36,0.10);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+  body{
+    background-image: radial-gradient(var(--paper-line) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  @media (prefers-reduced-motion: reduce){ *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+
+  @keyframes dropIn{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
+
+  .wrap{max-width:560px;margin:0 auto;padding:36px 18px 60px;}
+
+  /* ---------- Illustrated banner ---------- */
+  .banner{
+    position:relative;border-radius:18px;overflow:hidden;margin-bottom:22px;
+    background:var(--ink);box-shadow:var(--shadow);
+    animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) both;
+  }
+  .banner svg{display:block;width:100%;height:auto;}
+
+  .header{display:none;}
+
+  /* ---------- Navigation bar ---------- */
+  .nav-bar{
+    display:flex;gap:8px;margin-bottom:20px;position:sticky;top:12px;z-index:10;
+    animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) .05s both;
+  }
+  .nav-item{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px 11px;border-radius:13px;
+    border:1.5px solid var(--paper-line);background:var(--card);color:var(--ink-soft);cursor:pointer;text-align:center;
+    transition:all .18s cubic-bezier(.2,.8,.3,1);-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(30,42,36,.04);
+  }
+  .nav-item .nav-icon{font-size:20px;line-height:1;}
+  .nav-item .nav-label{font-family:'Inter',sans-serif;font-weight:700;font-size:12px;margin-top:3px;}
+  .nav-item .nav-desc{font-size:9.5px;color:var(--ink-soft);margin-top:1px;letter-spacing:.01em;}
+  .nav-item.active{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:var(--shadow);transform:translateY(-1px);}
+  .nav-item.active .nav-desc{color:var(--paper-line);}
+  .nav-item:hover:not(.active){border-color:var(--brass);transform:translateY(-1px);}
+  .nav-item:active{transform:translateY(0) scale(.98);}
+
+  .intro{text-align:center;font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:-6px 0 20px;
+    animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) .08s both;}
+
+  .section{display:none;animation:riseIn .4s cubic-bezier(.2,.8,.3,1) both;}
+  .section.active{display:block;}
+  @keyframes riseIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+  .panel{background:var(--card);border:1px solid var(--ink);border-radius:14px;padding:20px;box-shadow:var(--shadow);}
+  .panel + .panel{margin-top:14px;}
+
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .field label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);}
+  input[type=text]{
+    font-family:'Inter',sans-serif;font-size:15px;padding:12px 13px;border:1.5px solid var(--paper-line);
+    border-radius:9px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box;
+    transition:border-color .15s ease;
+  }
+  input[type=text]:focus{outline:2px solid var(--brass);outline-offset:1px;border-color:var(--brass);}
+
+  button.primary{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:15px;background:var(--ink);color:var(--paper);
+    border:none;padding:14px 20px;border-radius:10px;cursor:pointer;width:100%;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button.primary:disabled{background:#B7BDB8;cursor:not-allowed;}
+  button.primary:hover:not(:disabled){background:#0f1913;}
+  button.primary:active:not(:disabled){transform:scale(.98);}
+  button.secondary{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;background:var(--paper);color:var(--ink);
+    border:1.5px solid var(--ink);padding:11px 16px;border-radius:9px;cursor:pointer;width:100%;
+  }
+
+  .msg{font-size:13px;margin-top:10px;padding:9px 12px;border-radius:8px;display:none;text-align:center;}
+  .msg.show{display:block;}
+  .msg.err{background:var(--danger-bg);color:var(--debit);}
+  .msg.ok{background:var(--ok-bg);color:var(--credit);}
+
+  .hint{font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:12px;line-height:1.6;}
+  .empty{text-align:center;padding:24px 10px;color:var(--ink-soft);font-size:13px;}
+
+  /* ---------- Menu / category chips ---------- */
+  .cat-bar{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;}
+  .cat-chip{
+    flex:0 0 auto;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:8px 14px;
+    border-radius:999px;border:1.5px solid var(--paper-line);background:#fff;color:var(--ink-soft);cursor:pointer;
+    white-space:nowrap;transition:all .15s ease;
+  }
+  .cat-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));gap:9px;margin-bottom:6px;}
+  .item-card{
+    border:1.5px solid var(--paper-line);border-radius:11px;padding:12px 10px;background:#fff;cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;-webkit-tap-highlight-color:transparent;
+  }
+  .item-card:hover{border-color:var(--brass);transform:translateY(-2px);box-shadow:0 4px 10px rgba(30,42,36,.08);}
+  .item-card:active{transform:translateY(0) scale(.97);}
+  .item-card.out-of-stock{opacity:.4;cursor:not-allowed;}
+  .item-card .i-name{font-weight:600;font-size:13px;margin-bottom:4px;}
+  .item-card .i-price{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass-dark);}
+
+  /* ---------- Cart ---------- */
+  .cart-section{margin-top:18px;padding-top:16px;border-top:1px dashed var(--paper-line);}
+  .cart-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--paper-line);font-size:13px;}
+  .cart-row:last-child{border-bottom:none;}
+  .cart-row .cr-name{flex:1;}
+  .cart-row .cr-qty{display:flex;align-items:center;gap:6px;}
+  .qty-btn{
+    width:26px;height:26px;border-radius:7px;border:1px solid var(--paper-line);background:#fff;cursor:pointer;
+    font-size:14px;font-weight:700;color:var(--ink);display:flex;align-items:center;justify-content:center;
+  }
+  .cart-row .cr-total{font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:60px;text-align:right;}
+  .cart-row .cr-remove{background:none;border:none;color:var(--debit);cursor:pointer;font-size:15px;padding:2px 4px;}
+  .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-weight:700;font-size:15px;}
+  .cart-total-row .ct-value{font-family:'IBM Plex Mono',monospace;color:var(--brass-dark);}
+
+  /* ---------- Confirmation ---------- */
+  .confirm-wrap{text-align:center;padding:20px 10px;}
+  .confirm-seal{
+    width:100px;height:100px;border-radius:50%;border:4px solid var(--credit);color:var(--credit);
+    display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 16px;
+    transform:scale(.4) rotate(-20deg);opacity:0;animation:sealDown .55s cubic-bezier(.17,.85,.35,1.25) .1s forwards;
+  }
+  @keyframes sealDown{
+    0%{transform:scale(.4) rotate(-20deg);opacity:0;}
+    60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
+    100%{transform:scale(1) rotate(-7deg);opacity:1;}
+  }
+  .confirm-wrap h2{font-family:'Fraunces',serif;font-weight:700;font-size:19px;margin:0 0 8px;}
+  .confirm-status{font-weight:700;font-size:14.5px;margin-top:12px;}
+
+  .track-card{background:var(--card);border:1px solid var(--paper-line);border-radius:11px;padding:14px;margin-bottom:10px;}
+  .track-card .tc-top{font-size:13px;margin-bottom:4px;}
+  .track-card .tc-items{font-size:12px;color:var(--ink-soft);}
+  .track-card .tc-status{font-weight:700;margin-top:8px;font-size:13px;}
+
+  /* ---------- Payment info ---------- */
+  .payment-info{font-size:12px;line-height:1.9;color:var(--ink-soft);}
+  .payment-info b{color:var(--ink);}
+
+  /* ---------- Balance seal (Check My Balance) ---------- */
+  .seal-wrap{display:flex;justify-content:center;margin-bottom:16px;}
+  .seal{
+    width:150px;height:150px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;border:4px solid var(--credit);color:var(--credit);
+    transform:scale(.4) rotate(-20deg);opacity:0;animation:sealDown .55s cubic-bezier(.17,.85,.35,1.25) .1s forwards;
+  }
+  .seal.owing{border-color:var(--debit);color:var(--debit);}
+  .seal .seal-icon{font-size:26px;line-height:1;}
+  .seal .seal-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:5px;color:var(--ink-soft);}
+  .seal .seal-value{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:700;margin-top:2px;}
+  .cust-name{text-align:center;margin-bottom:16px;}
+  .cust-name .cn-name{font-family:'Fraunces',serif;font-weight:700;font-size:17px;}
+  .cust-name .cn-phone{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+  .order-card{background:var(--card);border:1px solid var(--paper-line);border-radius:12px;padding:16px;margin-bottom:12px;
+    opacity:0;transform:translateY(10px);animation:cardIn .4s cubic-bezier(.2,.8,.3,1) forwards;}
+  @keyframes cardIn{to{opacity:1;transform:translateY(0);}}
+  .order-card .oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:10px;}
+  .order-card .oc-title{font-weight:700;font-size:14.5px;font-family:'IBM Plex Mono',monospace;}
+  .order-card .oc-date{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .status-pill.paid{background:var(--ok-bg);color:var(--credit);}
+  .status-pill.partial{background:#FBF0D9;color:var(--brass-dark);}
+  .status-pill.unpaid{background:var(--danger-bg);color:var(--debit);}
+  .status-pill.overdue{background:var(--debit);color:#fff;}
+  .order-card .oc-items{font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;line-height:1.6;}
+  .order-card .oc-amounts{display:flex;justify-content:space-between;font-size:13px;border-top:1px dashed var(--paper-line);padding-top:8px;}
+  .order-card .oc-amounts .oc-balance{font-weight:700;}
+  .back-link{
+    display:block;text-align:center;margin-top:14px;color:var(--ink-soft);font-size:13px;cursor:pointer;
+    text-decoration:underline;background:none;border:none;font-family:'Inter',sans-serif;width:100%;padding:8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="banner">
+    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="UB Cafe — University Cafeteria and Snack Bar">
+      <defs>
+        <radialGradient id="bgGlow" cx="50%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#2A3A32"/>
+          <stop offset="100%" stop-color="#1E2A24"/>
+        </radialGradient>
+        <pattern id="dotPattern" width="26" height="26" patternUnits="userSpaceOnUse">
+          <circle cx="1.5" cy="1.5" r="1.5" fill="#F7F2E4" opacity="0.06"/>
+        </pattern>
+      </defs>
+
+      <rect width="800" height="220" fill="url(#bgGlow)"/>
+      <rect width="800" height="220" fill="url(#dotPattern)"/>
+
+      <!-- top & bottom brass double-rule, matching the ledger aesthetic -->
+      <line x1="0" y1="10" x2="800" y2="10" stroke="#B8892B" stroke-width="1.5" opacity="0.55"/>
+      <line x1="0" y1="14" x2="800" y2="14" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
+      <line x1="0" y1="206" x2="800" y2="206" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
+      <line x1="0" y1="210" x2="800" y2="210" stroke="#B8892B" stroke-width="1.5" opacity="0.55"/>
+
+      <!-- steaming cup, left -->
+      <g transform="translate(108,108)" opacity="0.92">
+        <path d="M -34 6 Q -34 34 -6 34 L 6 34 Q 34 34 34 6 L 34 -14 L -34 -14 Z" fill="none" stroke="#B8892B" stroke-width="2.5"/>
+        <path d="M 34 -6 Q 50 -6 50 8 Q 50 22 34 20" fill="none" stroke="#B8892B" stroke-width="2.5"/>
+        <line x1="-34" y1="-14" x2="34" y2="-14" stroke="#B8892B" stroke-width="2.5"/>
+        <path d="M -14 -28 Q -20 -40 -12 -50" fill="none" stroke="#F7F2E4" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+        <path d="M 2 -28 Q -4 -40 4 -50" fill="none" stroke="#F7F2E4" stroke-width="2" opacity="0.4" stroke-linecap="round"/>
+        <path d="M 18 -28 Q 12 -40 20 -50" fill="none" stroke="#F7F2E4" stroke-width="2" opacity="0.3" stroke-linecap="round"/>
+      </g>
+
+      <!-- plate with sambusa, right -->
+      <g transform="translate(692,120)" opacity="0.92">
+        <ellipse cx="0" cy="18" rx="52" ry="13" fill="none" stroke="#B8892B" stroke-width="2.5"/>
+        <ellipse cx="0" cy="14" rx="38" ry="9" fill="none" stroke="#B8892B" stroke-width="1.5" opacity="0.6"/>
+        <path d="M -16 8 L 12 8 L -2 -20 Z" fill="none" stroke="#F7F2E4" stroke-width="2.25" stroke-linejoin="round" opacity="0.85"/>
+        <circle cx="20" cy="4" r="5" fill="none" stroke="#F7F2E4" stroke-width="2" opacity="0.6"/>
+      </g>
+
+      <!-- center crest + wordmark -->
+      <g transform="translate(400,78)" text-anchor="middle">
+        <circle r="30" fill="#1E2A24" stroke="#F7F2E4" stroke-width="2"/>
+        <text y="8" font-family="Fraunces, serif" font-weight="700" font-size="19" fill="#F7F2E4">UB</text>
+      </g>
+      <text x="400" y="150" text-anchor="middle" font-family="Fraunces, serif" font-weight="800" font-size="34" fill="#F7F2E4" letter-spacing="-0.5">UB Cafe</text>
+      <text x="400" y="174" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#E4D9BC" letter-spacing="2.5">UNIVERSITY CAFETERIA &amp; SNACK BAR</text>
+    </svg>
+  </div>
+
+  <div class="header">
+    <div class="crest">UB</div>
+    <h1>UB Cafe</h1>
+    <div class="sub">University Cafeteria &amp; Snack Bar</div>
+  </div>
+
+  <div class="intro">Order ahead, check if it's ready, or see what you owe — pick one below.</div>
+
+  <div class="nav-bar" id="navBar">
+    <div class="nav-item active" data-section="place">
+      <span class="nav-icon">🍽</span>
+      <span class="nav-label">Order</span>
+      <span class="nav-desc">Browse &amp; buy</span>
+    </div>
+    <div class="nav-item" data-section="track">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">Track</span>
+      <span class="nav-desc">Is it ready?</span>
+    </div>
+    <div class="nav-item" data-section="balance">
+      <span class="nav-icon">💳</span>
+      <span class="nav-label">Balance</span>
+      <span class="nav-desc">What I owe</span>
+    </div>
+  </div>
+
+  <!-- ===================== PLACE AN ORDER ===================== -->
+  <div class="section active" id="section-place">
+    <div class="panel" id="orderForm">
+      <div class="cat-bar" id="catBar"></div>
+      <div class="item-grid" id="itemGrid"></div>
+
+      <div class="cart-section">
+        <div class="field" style="margin-bottom:10px;"><label>Your Cart</label></div>
+        <div id="cartList"></div>
+        <div class="cart-total-row"><span>Total</span><span class="ct-value" id="cartTotal">0 Sl.sh</span></div>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div class="field">
+          <label for="custName">Your Name</label>
+          <input type="text" id="custName" placeholder="e.g. Ahmed">
+        </div>
+        <div class="field">
+          <label for="custPhone">Your Phone Number</label>
+          <input type="text" id="custPhone" placeholder="e.g. 0634449111" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="orderNote">Note (optional)</label>
+          <input type="text" id="orderNote" placeholder="e.g. Table 5">
+        </div>
+      </div>
+
+      <button class="primary" id="submitOrderBtn" disabled>Send Order to Counter</button>
+      <div class="msg" id="orderMsg"></div>
+    </div>
+
+    <div class="panel" id="confirmPanel" style="display:none;">
+      <div class="confirm-wrap">
+        <div class="confirm-seal">✓</div>
+        <h2>Order Sent!</h2>
+        <p id="confirmText" style="color:var(--ink-soft);font-size:13.5px;"></p>
+        <div class="confirm-status" id="confirmStatusTracker"></div>
+        <button class="secondary" id="newOrderBtn" style="margin-top:18px;">Place Another Order</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:14px;">
+      <div class="field" style="margin-bottom:8px;"><label>Payment Info</label></div>
+      <div class="payment-info" id="paymentInfo"></div>
+    </div>
+  </div>
+
+  <!-- ===================== TRACK ORDER ===================== -->
+  <div class="section" id="section-track">
+    <div class="panel">
+      <div class="field">
+        <label for="trackPhone">The phone number you ordered with</label>
+        <input type="text" id="trackPhone" placeholder="e.g. 0634449111" inputmode="tel">
+      </div>
+      <button class="primary" id="trackCheckBtn">Check Status</button>
+      <div id="trackResult" style="margin-top:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ===================== CHECK BALANCE ===================== -->
+  <div class="section" id="section-balance">
+    <div class="panel" id="searchPanel">
+      <div class="field">
+        <label for="phoneInput">Your Phone Number</label>
+        <input type="text" id="phoneInput" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel">
+      </div>
+      <button class="primary" id="searchBtn">Check My Orders</button>
+      <div class="msg" id="searchMsg"></div>
+      <div class="hint">Enter the phone number UB Cafe has on file for you to see your invoices and what you owe.</div>
+    </div>
+    <div id="resultsArea"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------------------
+   Storage shim — identical to the main app, so this reads/writes the
+   same shared data when hosted on the same site.
+--------------------------------------------------------------------- */
+const memoryStore = {};
+const hasRealStorage = (typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function');
+
+async function storageGet(key, shared){
+  if(hasRealStorage){
+    try{ const res = await window.storage.get(key, !!shared); return res ? res.value : null; }
+    catch(e){ return null; }
+  }
+  try{ const v = window.localStorage.getItem(key); return v === null ? null : v; }
+  catch(e){ return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null; }
+}
+async function storageSet(key, value, shared){
+  if(hasRealStorage){
+    try{ await window.storage.set(key, value, !!shared); return true; }
+    catch(e){ return false; }
+  }
+  try{ window.localStorage.setItem(key, value); return true; }
+  catch(e){ memoryStore[key] = value; return true; }
+}
+
+const $ = sel => document.querySelector(sel);
+function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
+const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
+
+const POS_ITEMS_KEY = "ubcafe_pos_items";
+const CUSTOMERS_KEY = "ubcafe_customers";
+const INVOICES_KEY = "ubcafe_invoices";
+const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
+
+let posItems = [];
+let customers = [];
+let saleRequests = [];
+
+async function loadPosItems(){
+  const val = await storageGet(POS_ITEMS_KEY, true);
+  try{ posItems = val ? JSON.parse(val) : []; }catch(e){ posItems = []; }
+}
+async function loadCustomers(){
+  const val = await storageGet(CUSTOMERS_KEY, true);
+  try{ customers = val ? JSON.parse(val) : []; }catch(e){ customers = []; }
+}
+async function saveCustomers(){ await storageSet(CUSTOMERS_KEY, JSON.stringify(customers), true); }
+async function loadSaleRequests(){
+  const val = await storageGet(SALE_REQUESTS_KEY, true);
+  try{ saleRequests = val ? JSON.parse(val) : []; }catch(e){ saleRequests = []; }
+}
+async function saveSaleRequests(){ await storageSet(SALE_REQUESTS_KEY, JSON.stringify(saleRequests), true); }
+
+/* Keep these in sync with PAYMENT_INFO in index.html */
+const PAYMENT_INFO = {
+  bankName: "Darasalam",
+  accountNumber: "61341021",
+  zaad: "634449111",
+  edahab: "654449111",
+  waafi: "252634449111",
+  dahabplus: "252654449111",
+  premierWallet: "252634449111",
+  zaadMerchant: "476934",
+  edahabMerchant: "730854",
+  helpPhone: "0634449111"
+};
+
+/* ---------------------------------------------------------------------
+   Navigation bar
+--------------------------------------------------------------------- */
+$$('.nav-item').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    $$('.nav-item').forEach(t=>t.classList.remove('active'));
+    $$('.section').forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    $('#section-'+tab.dataset.section).classList.add('active');
+    if(tab.dataset.section==='place') renderOrderScreen();
+  });
+});
+
+/* ---------------------------------------------------------------------
+   PLACE AN ORDER
+--------------------------------------------------------------------- */
+let cart = [];
+let activeCategory = 'All';
+
+function renderCatBar(){
+  const cats = ['All', ...new Set(posItems.map(it=>it.category||'General'))];
+  $('#catBar').innerHTML = cats.map(c=>
+    `<button class="cat-chip ${c===activeCategory?'active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  $$('#catBar .cat-chip').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeCategory = btn.dataset.cat;
+      renderCatBar();
+      renderItemGrid();
+    });
+  });
+}
+
+function renderItemGrid(){
+  const items = activeCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===activeCategory);
+  if(items.length===0){
+    $('#itemGrid').innerHTML = '<div class="empty">Nothing on the menu yet — please check with the counter.</div>';
+    return;
+  }
+  $('#itemGrid').innerHTML = items.map(it=>{
+    const outOfStock = it.trackStock && (it.stock||0) <= 0;
+    return `
+    <div class="item-card ${outOfStock ? 'out-of-stock' : ''}" data-id="${it.id}">
+      <div class="i-name">${it.name}</div>
+      <div class="i-price">${fmt(it.price)} Sl.sh</div>
+    </div>`;
+  }).join('');
+  $$('#itemGrid .item-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('out-of-stock')) return;
+      addToCart(Number(card.dataset.id));
+    });
+  });
+}
+
+function addToCart(itemId){
+  const item = posItems.find(it=>it.id===itemId);
+  if(!item) return;
+  const line = cart.find(c=>c.itemId===itemId);
+  if(line){ line.qty += 1; } else { cart.push({ itemId, name: item.name, price: item.price, qty: 1 }); }
+  renderCart();
+}
+
+function renderCart(){
+  if(cart.length===0){
+    $('#cartList').innerHTML = '<div class="empty" style="padding:10px 0;">Tap items above to add them to your order.</div>';
+  }else{
+    $('#cartList').innerHTML = cart.map((c,i)=>`
+      <div class="cart-row">
+        <span class="cr-name">${c.name}</span>
+        <span class="cr-qty">
+          <button class="qty-btn" data-action="dec" data-i="${i}">−</button>
+          <span>${c.qty}</span>
+          <button class="qty-btn" data-action="inc" data-i="${i}">+</button>
+        </span>
+        <span class="cr-total">${fmt(c.price*c.qty)}</span>
+        <button class="cr-remove" data-action="rm" data-i="${i}">✕</button>
+      </div>
+    `).join('');
+    $$('#cartList [data-action]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.i);
+        if(btn.dataset.action==='inc') cart[i].qty += 1;
+        if(btn.dataset.action==='dec'){ cart[i].qty -= 1; if(cart[i].qty<=0) cart.splice(i,1); }
+        if(btn.dataset.action==='rm') cart.splice(i,1);
+        renderCart();
+      });
+    });
+  }
+  const total = cart.reduce((s,c)=>s+c.price*c.qty, 0);
+  $('#cartTotal').textContent = fmt(total) + ' Sl.sh';
+  $('#submitOrderBtn').disabled = cart.length===0;
+}
+
+function renderPaymentInfo(){
+  $('#paymentInfo').innerHTML = `
+    <b>Pay Ahead or At the Counter</b><br>
+    Zaad: ${PAYMENT_INFO.zaad} &nbsp;·&nbsp; eDahab: ${PAYMENT_INFO.edahab}<br>
+    Waafi: ${PAYMENT_INFO.waafi} &nbsp;·&nbsp; DahabPlus: ${PAYMENT_INFO.dahabplus}<br>
+    Premier Wallet: ${PAYMENT_INFO.premierWallet}<br>
+    ${PAYMENT_INFO.bankName} — ${PAYMENT_INFO.accountNumber}<br>
+    Zaad Merchant: ${PAYMENT_INFO.zaadMerchant} &nbsp;·&nbsp; eDahab Merchant: ${PAYMENT_INFO.edahabMerchant}<br>
+    <span style="opacity:.85;">Need help? Call ${PAYMENT_INFO.helpPhone}</span>
+  `;
+}
+
+async function renderOrderScreen(){
+  stopStatusPolling();
+  await loadPosItems();
+  cart = [];
+  activeCategory = 'All';
+  $('#orderForm').style.display = '';
+  $('#confirmPanel').style.display = 'none';
+  $('#custName').value = '';
+  $('#custPhone').value = '';
+  $('#orderNote').value = '';
+  $('#orderMsg').className = 'msg';
+  renderCatBar();
+  renderItemGrid();
+  renderCart();
+  renderPaymentInfo();
+}
+
+/* ---------------------------------------------------------------------
+   Order status polling — describes a sale request's status in plain
+   language and checks storage every few seconds so the confirmation
+   screen updates on its own once staff act on it.
+--------------------------------------------------------------------- */
+function describeRequestStatus(req){
+  if(req.status === 'ready') return { text: '✅ Your order is ready for pickup!', color: 'var(--credit)' };
+  return { text: "⏳ We're preparing your order…", color: 'var(--brass-dark)' };
+}
+
+let trackedRequestId = null;
+let statusPollTimer = null;
+function stopStatusPolling(){
+  if(statusPollTimer){ clearInterval(statusPollTimer); statusPollTimer = null; }
+  trackedRequestId = null;
+}
+async function updateTrackedOrderStatus(){
+  const el = $('#confirmStatusTracker');
+  if(!el || !trackedRequestId) return;
+  await loadSaleRequests();
+  const req = saleRequests.find(r=>r.id===trackedRequestId);
+  if(!req){
+    el.textContent = '🎉 Order completed — thanks for visiting!';
+    el.style.color = 'var(--credit)';
+    stopStatusPolling();
+    return;
+  }
+  const status = describeRequestStatus(req);
+  el.textContent = status.text;
+  el.style.color = status.color;
+}
+function startStatusPolling(requestId){
+  stopStatusPolling();
+  trackedRequestId = requestId;
+  updateTrackedOrderStatus();
+  statusPollTimer = setInterval(updateTrackedOrderStatus, 8000);
+}
+
+$('#submitOrderBtn').addEventListener('click', async ()=>{
+  if(cart.length===0) return;
+  const btn = $('#submitOrderBtn');
+  const msg = $('#orderMsg');
+  const name = $('#custName').value.trim();
+  const phone = $('#custPhone').value.trim();
+  if(!name){ msg.textContent='Please enter your name.'; msg.className='msg show err'; return; }
+  btn.disabled = true;
+  try{
+    await loadSaleRequests(); // refresh so we don't clobber requests submitted elsewhere in the meantime
+    await loadCustomers();
+
+    // Match an existing customer ONLY by exact phone (never search/browse the list) so we
+    // don't create duplicate records for a returning customer, without exposing others' data.
+    const normalizedPhone = phone.replace(/[^\d]/g,'');
+    let customerId;
+    const existing = normalizedPhone ? customers.find(c => (c.phone||'').replace(/[^\d]/g,'') === normalizedPhone) : null;
+    if(existing){
+      customerId = existing.id;
+      if(name && existing.name !== name){ existing.name = name; await saveCustomers(); }
+    }else{
+      const newCustomer = { id: Date.now(), name, phone, address: '' };
+      customers.push(newCustomer);
+      await saveCustomers();
+      customerId = newCustomer.id;
+    }
+
+    const note = $('#orderNote').value.trim();
+    const request = {
+      id: Date.now(),
+      source: 'customer',
+      customerId,
+      customerName: name,
+      items: cart.map(c=>({ itemId:c.itemId, name:c.name, price:c.price, qty:c.qty })),
+      note,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+    saleRequests.push(request);
+    await saveSaleRequests();
+
+    $('#orderForm').style.display = 'none';
+    $('#confirmPanel').style.display = '';
+    $('#confirmText').textContent = `Thanks ${name}! Your order has been sent to the counter${note ? ' (' + note + ')' : ''}. Please pay when it's ready.`;
+    startStatusPolling(request.id);
+  }catch(e){
+    console.error('Customer order failed:', e);
+    msg.textContent = 'Something went wrong sending your order — please tell a staff member.';
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = cart.length===0;
+  }
+});
+$('#newOrderBtn').addEventListener('click', renderOrderScreen);
+
+/* ---------------------------------------------------------------------
+   TRACK ORDER
+--------------------------------------------------------------------- */
+$('#trackCheckBtn').addEventListener('click', async ()=>{
+  const resultEl = $('#trackResult');
+  const phone = $('#trackPhone').value.trim();
+  if(!phone){ resultEl.innerHTML = '<div class="empty">Enter the phone number you ordered with.</div>'; return; }
+  await loadCustomers();
+  // Only ever look up the ONE customer record matching this phone — never expose the full list.
+  const match = customers.find(c => (c.phone||'').replace(/[^\d]/g,'') === phone.replace(/[^\d]/g,'') && phone.replace(/[^\d]/g,''));
+  if(!match){
+    resultEl.innerHTML = '<div class="empty">No order found for that phone number.</div>';
+    return;
+  }
+  await loadSaleRequests();
+  const mine = saleRequests.filter(r=>r.customerId===match.id);
+  if(mine.length===0){
+    resultEl.innerHTML = '<div class="empty">No active order found for that phone number.</div>';
+    return;
+  }
+  resultEl.innerHTML = mine.map(r=>{
+    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const status = describeRequestStatus(r);
+    return `<div class="track-card">
+      <div class="tc-top">${r.note ? r.note + ' — ' : ''}${fmt(r.items.reduce((s,it)=>s+it.price*it.qty,0))} Sl.sh</div>
+      <div class="tc-items">${itemSummary}</div>
+      <div class="tc-status" style="color:${status.color};">${status.text}</div>
+    </div>`;
+  }).join('');
+});
+
+/* ---------------------------------------------------------------------
+   CHECK BALANCE (invoices already billed, separate from live orders)
+--------------------------------------------------------------------- */
+let invoices = [];
+async function loadInvoices(){
+  const val = await storageGet(INVOICES_KEY, true);
+  try{ invoices = val ? JSON.parse(val) : []; }catch(e){ invoices = []; }
+}
+function normalizePhone(p){ return String(p||'').replace(/[^\d]/g, ''); }
+function invoiceBalance(inv){
+  const paid = (inv.payments||[]).reduce((s,p)=>s+p.amount, 0);
+  const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+  return owed - paid;
+}
+function invoiceStatus(inv){
+  const balance = invoiceBalance(inv);
+  const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+  if(balance <= 0.005) return 'paid';
+  const todayStr = new Date().toISOString().slice(0,10);
+  if(inv.dueDate && inv.dueDate < todayStr) return 'overdue';
+  if(balance < owed) return 'partial';
+  return 'unpaid';
+}
+const STATUS_LABEL = { paid:'Paid', partial:'Partially Paid', unpaid:'Unpaid', overdue:'Overdue' };
+
+async function findOrders(phoneQuery){
+  await loadCustomers();
+  await loadInvoices();
+  const q = normalizePhone(phoneQuery);
+  if(!q) return { customer: null, invoices: [] };
+  const customer = customers.find(c => normalizePhone(c.phone).includes(q) && q.length >= 6);
+  if(!customer) return { customer: null, invoices: [] };
+  const custInvoices = invoices.filter(inv => inv.customerId === customer.id);
+  return { customer, invoices: custInvoices };
+}
+
+function renderBalanceResults(customer, custInvoices){
+  const area = $('#resultsArea');
+  if(!customer){
+    area.innerHTML = '';
+    $('#searchMsg').textContent = "We couldn't find any orders for that phone number. Double-check the number, or contact UB Cafe directly.";
+    $('#searchMsg').className = 'msg show err';
+    return;
+  }
+  $('#searchMsg').className = 'msg';
+
+  const totalOwed = custInvoices.reduce((s,inv)=>s+Math.max(0,invoiceBalance(inv)), 0);
+  const owing = totalOwed > 0.005;
+
+  let html = `
+    <div class="panel">
+      <div class="cust-name">
+        <div class="cn-name">${customer.name}</div>
+        <div class="cn-phone">${customer.phone||''}</div>
+      </div>
+      <div class="seal-wrap">
+        <div class="seal ${owing ? 'owing' : ''}">
+          <div class="seal-icon">${owing ? '⚠' : '✓'}</div>
+          <div class="seal-label">${owing ? 'You Owe' : "You're Paid Up"}</div>
+          <div class="seal-value">${fmt(totalOwed)}</div>
+        </div>
+      </div>
+  `;
+
+  if(custInvoices.length === 0){
+    html += `<div class="empty">No invoices on file yet.</div>`;
+  }else{
+    [...custInvoices].sort((a,b)=> b.invoiceNo.localeCompare(a.invoiceNo)).forEach((inv, i)=>{
+      const balance = invoiceBalance(inv);
+      const status = invoiceStatus(inv);
+      const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+      const itemsText = (inv.items||[]).map(it=>`${it.desc} × ${fmt(it.qty)}`).join(', ');
+      html += `
+        <div class="order-card" style="animation-delay:${0.05 + i*0.06}s;">
+          <div class="oc-top">
+            <div>
+              <div class="oc-title">${inv.invoiceNo}</div>
+              <div class="oc-date">${inv.invoiceDate}${inv.dueDate ? ' · due ' + inv.dueDate : ''}</div>
+            </div>
+            <span class="status-pill ${status}">${STATUS_LABEL[status]}</span>
+          </div>
+          <div class="oc-items">${itemsText}</div>
+          <div class="oc-amounts">
+            <span>Total: ${fmt(owed)} Sl.sh</span>
+            <span class="oc-balance">${balance > 0.005 ? 'Owe: ' + fmt(balance) + ' Sl.sh' : 'Paid in full'}</span>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  html += `<button class="back-link" id="searchAgainLink">Search a different number</button></div>`;
+  area.innerHTML = html;
+
+  $('#searchAgainLink').addEventListener('click', ()=>{
+    area.innerHTML = '';
+    $('#phoneInput').value = '';
+    $('#phoneInput').focus();
+  });
+}
+
+$('#searchBtn').addEventListener('click', async ()=>{
+  const btn = $('#searchBtn');
+  const phone = $('#phoneInput').value.trim();
+  const msg = $('#searchMsg');
+  if(!phone){
+    msg.textContent = 'Enter your phone number first.';
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = 'Checking…';
+  try{
+    const { customer, invoices: custInvoices } = await findOrders(phone);
+    renderBalanceResults(customer, custInvoices);
+  }catch(e){
+    msg.textContent = 'Something went wrong: ' + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+$('#phoneInput').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#searchBtn').click(); });
+
+/* ---------------------------------------------------------------------
+   Init
+--------------------------------------------------------------------- */
+renderOrderScreen();
+</script>
+</body>
+</html>
