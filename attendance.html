@@ -300,6 +300,15 @@ async function storageSet(key, value, shared){
   catch(e){ memoryStore[key] = value; return true; }
 }
 
+function subscribeToKey(key, onChange){
+  if(!firestoreDb) return () => {};
+  return firestoreDb.collection('ubcafe_data').doc(key).onSnapshot(doc => {
+    onChange(doc.exists ? doc.data().value : null);
+  }, err => {
+    console.error(`Live subscription to ${key} failed:`, err);
+  });
+}
+
 const $ = sel => document.querySelector(sel);
 function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const EMPLOYEES_KEY = "ubcafe_employees";
@@ -744,8 +753,15 @@ $('#syncTestBtn').addEventListener('click', async ()=>{
   updateClockLine();
   setInterval(updateClockLine, 1000);
   buildKeypad();
-  await loadData();
-  renderEmpList();
+  subscribeToKey(EMPLOYEES_KEY, (value)=>{
+    try{ employees = value ? JSON.parse(value) : []; }catch(e){ employees = []; }
+    renderEmpList();
+  });
+  subscribeToKey(ATTENDANCE_KEY, (value)=>{
+    try{ attendance = value ? JSON.parse(value) : []; }catch(e){ attendance = []; }
+    renderEmpList();
+    renderTodayList();
+  });
 })();
 </script>
 </body>

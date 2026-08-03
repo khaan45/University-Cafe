@@ -1999,6 +1999,22 @@ async function storageSet(key, value, shared){
   }
 }
 
+/* Live updates — subscribes to a Firestore document and calls onChange every
+   time it changes (including immediately with whatever's there now), so the
+   UI updates on its own without needing a manual page reload. Only works
+   when actually connected to Firestore (real deployment, not the Claude
+   preview or an offline fallback); callers should keep working fine without
+   it, just without the auto-refresh. Returns an unsubscribe function — call
+   it when leaving a view so listeners don't pile up over time. */
+function subscribeToKey(key, onChange){
+  if(!firestoreDb) return () => {};
+  return firestoreDb.collection('ubcafe_data').doc(key).onSnapshot(doc => {
+    onChange(doc.exists ? doc.data().value : null);
+  }, err => {
+    console.error(`Live subscription to ${key} failed:`, err);
+  });
+}
+
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
@@ -3349,15 +3365,35 @@ function renderPayrollHistory(){
 }
 
 /* ---------------- HR sub-tabs ---------------- */
+let unsubEmployeesLive = null;
+function startEmployeesLiveSync(){
+  if(unsubEmployeesLive) unsubEmployeesLive();
+  unsubEmployeesLive = subscribeToKey(EMPLOYEES_KEY, (value)=>{
+    try{ employees = value ? JSON.parse(value) : []; }catch(e){ employees = []; }
+    renderEmployeesTable();
+    populatePayEmployeeDropdown();
+    populatePosWaiterDropdown();
+  });
+}
+let unsubAttendanceLive = null;
+function startAttendanceLiveSync(){
+  if(unsubAttendanceLive) unsubAttendanceLive();
+  unsubAttendanceLive = subscribeToKey(ATTENDANCE_KEY, (value)=>{
+    try{ attendance = value ? JSON.parse(value) : []; }catch(e){ attendance = []; }
+    renderAttendanceTable();
+  });
+}
+
 $$('.hr-subtab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
     $$('.hr-subtab').forEach(t=>t.classList.remove('active'));
     $$('.hr-view').forEach(v=>v.classList.remove('active'));
     tab.classList.add('active');
     $('#hr-'+tab.dataset.hrview).classList.add('active');
+    if(tab.dataset.hrview==='employees') startEmployeesLiveSync();
     if(tab.dataset.hrview==='history') renderPayrollHistory();
     if(tab.dataset.hrview==='holidays'){ renderHolidaysTable(); renderAbsencesTable(); }
-    if(tab.dataset.hrview==='attendance'){ loadAttendance().then(renderAttendanceTable); renderWorkplaceLocationStatus(); }
+    if(tab.dataset.hrview==='attendance'){ startAttendanceLiveSync(); renderWorkplaceLocationStatus(); }
   });
 });
 
@@ -3381,6 +3417,7 @@ async function renderHR(){
   populatePayMethodDropdown();
   if(!$('#payDate').value) $('#payDate').value = todayStr();
   renderPayrollHistory();
+  startEmployeesLiveSync();
 }
 
 function populatePayMethodDropdown(){
