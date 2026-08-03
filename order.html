@@ -406,6 +406,15 @@ async function storageSet(key, value, shared){
   catch(e){ memoryStore[key] = value; return true; }
 }
 
+function subscribeToKey(key, onChange){
+  if(!firestoreDb) return () => {};
+  return firestoreDb.collection('ubcafe_data').doc(key).onSnapshot(doc => {
+    onChange(doc.exists ? doc.data().value : null);
+  }, err => {
+    console.error(`Live subscription to ${key} failed:`, err);
+  });
+}
+
 const $ = sel => document.querySelector(sel);
 function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
@@ -484,7 +493,15 @@ function renderCatBar(){
 function renderItemGrid(){
   const items = activeCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===activeCategory);
   if(items.length===0){
-    $('#itemGrid').innerHTML = '<div class="empty">Nothing on the menu yet — please check with the counter.</div>';
+    let diag = '';
+    try{
+      const raw = window.localStorage.getItem(POS_ITEMS_KEY);
+      diag = `<div style="margin-top:12px;font-size:10px;color:#9AA69D;font-family:'IBM Plex Mono',monospace;word-break:break-all;">`
+        + `Diagnostics — storage key "${POS_ITEMS_KEY}" raw length: ${raw ? raw.length : 0} | in-memory items: ${posItems.length} | `
+        + `firestore connected: ${!!firestoreDb} | origin: ${location.origin} | path: ${location.pathname}`
+        + `</div>`;
+    }catch(e){}
+    $('#itemGrid').innerHTML = '<div class="empty">Nothing on the menu yet — please check with the counter.</div>' + diag;
     return;
   }
   $('#itemGrid').innerHTML = items.map(it=>{
@@ -555,8 +572,7 @@ function renderPaymentInfo(){
 }
 
 async function renderOrderScreen(){
-  stopStatusPolling();
-  await loadPosItems();
+  stopStatusTracking();
   cart = [];
   activeCategory = 'All';
   $('#orderForm').style.display = '';
@@ -582,31 +598,32 @@ function describeRequestStatus(req){
 }
 
 let trackedRequestId = null;
-let statusPollTimer = null;
-function stopStatusPolling(){
-  if(statusPollTimer){ clearInterval(statusPollTimer); statusPollTimer = null; }
+let unsubStatusTracking = null;
+function stopStatusTracking(){
+  if(unsubStatusTracking){ unsubStatusTracking(); unsubStatusTracking = null; }
   trackedRequestId = null;
 }
-async function updateTrackedOrderStatus(){
+function handleTrackedStatusUpdate(value){
   const el = $('#confirmStatusTracker');
   if(!el || !trackedRequestId) return;
-  await loadSaleRequests();
+  try{ saleRequests = value ? JSON.parse(value) : []; }catch(e){ saleRequests = []; }
   const req = saleRequests.find(r=>r.id===trackedRequestId);
   if(!req){
     el.textContent = '🎉 Order completed — thanks for visiting!';
     el.style.color = 'var(--credit)';
-    stopStatusPolling();
+    stopStatusTracking();
     return;
   }
   const status = describeRequestStatus(req);
   el.textContent = status.text;
   el.style.color = status.color;
 }
-function startStatusPolling(requestId){
-  stopStatusPolling();
+function startStatusTracking(requestId){
+  stopStatusTracking();
   trackedRequestId = requestId;
-  updateTrackedOrderStatus();
-  statusPollTimer = setInterval(updateTrackedOrderStatus, 8000);
+  // Instant, push-based updates via Firestore instead of polling every few
+  // seconds — staff marking an order ready shows up here immediately.
+  unsubStatusTracking = subscribeToKey(SALE_REQUESTS_KEY, handleTrackedStatusUpdate);
 }
 
 $('#submitOrderBtn').addEventListener('click', async ()=>{
@@ -653,7 +670,7 @@ $('#submitOrderBtn').addEventListener('click', async ()=>{
     $('#orderForm').style.display = 'none';
     $('#confirmPanel').style.display = '';
     $('#confirmText').textContent = `Thanks ${name}! Your order has been sent to the counter${note ? ' (' + note + ')' : ''}. Please pay when it's ready.`;
-    startStatusPolling(request.id);
+    startStatusTracking(request.id);
   }catch(e){
     console.error('Customer order failed:', e);
     msg.textContent = 'Something went wrong sending your order — please tell a staff member.';
@@ -667,19 +684,11 @@ $('#newOrderBtn').addEventListener('click', renderOrderScreen);
 /* ---------------------------------------------------------------------
    TRACK ORDER
 --------------------------------------------------------------------- */
-$('#trackCheckBtn').addEventListener('click', async ()=>{
+let trackedCustomerId = null;
+let unsubTrackResults = null;
+function renderTrackResults(customerId){
   const resultEl = $('#trackResult');
-  const phone = $('#trackPhone').value.trim();
-  if(!phone){ resultEl.innerHTML = '<div class="empty">Enter the phone number you ordered with.</div>'; return; }
-  await loadCustomers();
-  // Only ever look up the ONE customer record matching this phone — never expose the full list.
-  const match = customers.find(c => (c.phone||'').replace(/[^\d]/g,'') === phone.replace(/[^\d]/g,'') && phone.replace(/[^\d]/g,''));
-  if(!match){
-    resultEl.innerHTML = '<div class="empty">No order found for that phone number.</div>';
-    return;
-  }
-  await loadSaleRequests();
-  const mine = saleRequests.filter(r=>r.customerId===match.id);
+  const mine = saleRequests.filter(r=>r.customerId===customerId);
   if(mine.length===0){
     resultEl.innerHTML = '<div class="empty">No active order found for that phone number.</div>';
     return;
@@ -693,6 +702,27 @@ $('#trackCheckBtn').addEventListener('click', async ()=>{
       <div class="tc-status" style="color:${status.color};">${status.text}</div>
     </div>`;
   }).join('');
+}
+
+$('#trackCheckBtn').addEventListener('click', async ()=>{
+  const resultEl = $('#trackResult');
+  const phone = $('#trackPhone').value.trim();
+  if(!phone){ resultEl.innerHTML = '<div class="empty">Enter the phone number you ordered with.</div>'; return; }
+  await loadCustomers();
+  // Only ever look up the ONE customer record matching this phone — never expose the full list.
+  const match = customers.find(c => (c.phone||'').replace(/[^\d]/g,'') === phone.replace(/[^\d]/g,'') && phone.replace(/[^\d]/g,''));
+  if(!match){
+    resultEl.innerHTML = '<div class="empty">No order found for that phone number.</div>';
+    return;
+  }
+  // Once matched, keep results live — no need to tap Check Status again to see
+  // an order move from "preparing" to "ready".
+  if(unsubTrackResults) unsubTrackResults();
+  trackedCustomerId = match.id;
+  unsubTrackResults = subscribeToKey(SALE_REQUESTS_KEY, (value)=>{
+    try{ saleRequests = value ? JSON.parse(value) : []; }catch(e){ saleRequests = []; }
+    renderTrackResults(trackedCustomerId);
+  });
 });
 
 /* ---------------------------------------------------------------------
@@ -824,6 +854,16 @@ $('#phoneInput').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#search
 /* ---------------------------------------------------------------------
    Init
 --------------------------------------------------------------------- */
+let unsubPosItemsLive = null;
+function startPosItemsLiveSync(){
+  if(unsubPosItemsLive) return; // already subscribed — never stack duplicate listeners
+  unsubPosItemsLive = subscribeToKey(POS_ITEMS_KEY, (value)=>{
+    try{ posItems = value ? JSON.parse(value) : []; }catch(e){ posItems = []; }
+    renderCatBar();
+    renderItemGrid();
+  });
+}
+startPosItemsLiveSync();
 renderOrderScreen();
 </script>
 </body>
