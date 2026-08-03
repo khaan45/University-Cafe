@@ -192,6 +192,11 @@
 
   <div class="content">
 
+    <div style="text-align:center;margin-bottom:14px;">
+      <button class="secondary" id="syncTestBtn" style="font-size:11px;padding:8px 12px;width:auto;margin:0;">🔄 Sync Test</button>
+      <div id="syncTestResult" style="font-size:10.5px;color:var(--ink-soft);margin-top:8px;font-family:'IBM Plex Mono',monospace;word-break:break-all;"></div>
+    </div>
+
     <!-- ===== Screen 1: pick employee ===== -->
     <div class="screen active" id="screen-pick">
       <div class="section-label">Who are you?</div>
@@ -706,6 +711,26 @@ function isMobileDevice(){
   const laptopOrLargerScreen = Math.min(window.screen.width, window.screen.height) >= 700;
   return !(looksLikeDesktopOS && !hasTouch && laptopOrLargerScreen);
 }
+
+$('#syncTestBtn').addEventListener('click', async ()=>{
+  const resultEl = $('#syncTestResult');
+  resultEl.textContent = 'Testing…';
+  try{
+    if(!firestoreDb){
+      resultEl.textContent = `Not connected to Firestore — using ${hasRealStorage ? 'window.storage' : 'localStorage'} instead. Won't sync with other devices.`;
+      return;
+    }
+    const myLabel = prompt('Name this device (e.g. "Phone" or "Computer"):', 'Device') || 'Device';
+    const beforeDoc = await firestoreDb.collection('ubcafe_data').doc('SYNC_TEST').get();
+    const before = beforeDoc.exists ? JSON.parse(beforeDoc.data().value) : null;
+    const now = new Date().toLocaleString('en-US');
+    await firestoreDb.collection('ubcafe_data').doc('SYNC_TEST').set({ value: JSON.stringify({ label: myLabel, time: now }) });
+    const previousText = before ? `Found from last tap: "${before.label}" at ${before.time}.` : 'Nothing found from before.';
+    resultEl.textContent = `✅ ${previousText} Wrote this device's stamp: "${myLabel}" at ${now}. Now tap this on your OTHER device.`;
+  }catch(e){
+    resultEl.textContent = `❌ Sync test failed: ${e.message}`;
+  }
+});
 
 (async function init(){
   if(!isMobileDevice()){

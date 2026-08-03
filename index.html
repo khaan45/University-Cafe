@@ -622,6 +622,8 @@
         <button class="secondary" id="goReports">View Financial Reports</button>
         <button class="secondary" id="goCopyCustomerLink">🔗 Copy Customer Order Link</button>
         <button class="secondary" id="goCopyAttendanceLink">🔗 Copy Staff Check-In Link</button>
+        <button class="secondary" id="syncTestBtn">🔄 Sync Test (tap on each device)</button>
+        <div class="msg" id="syncTestResult" style="text-align:left;"></div>
         <button class="secondary" id="goShowAttendanceQr">📱 Show Check-In QR Code</button>
         <div class="msg" id="linkCopyMsg" style="text-align:left;"></div>
         <button class="secondary" id="enableBiometricBtn" style="display:none;">🔓 Enable Fingerprint Unlock on This Device</button>
@@ -2952,22 +2954,43 @@ function formatHoursWorked(ms){
   const h = Math.floor(totalMin/60), m = totalMin%60;
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
+async function runAttendanceDiagnostic(){
+  const el = () => document.getElementById('attDiagLine');
+  try{
+    if(!firestoreDb){
+      if(el()) el().textContent = `Diagnostics — in-memory attendance records: ${attendance.length} | Firestore not connected (using ${hasRealStorage ? 'window.storage' : 'localStorage'} instead) | origin: ${location.origin}`;
+      return;
+    }
+    const doc = await firestoreDb.collection('ubcafe_data').doc(ATTENDANCE_KEY).get();
+    const rawValue = doc.exists ? doc.data().value : null;
+    let freshCount = 0;
+    try{ freshCount = rawValue ? JSON.parse(rawValue).length : 0; }catch(e){}
+    if(el()){
+      el().textContent = `Diagnostics — in-memory (what's shown below): ${attendance.length} records | fresh direct Firestore read RIGHT NOW: ${freshCount} records | doc exists: ${doc.exists} | origin: ${location.origin}`;
+    }
+  }catch(e){
+    if(el()) el().textContent = `Diagnostics — Firestore read failed: ${e.message}`;
+  }
+}
+
 function renderAttendanceTable(){
   const q = ($('#attendanceSearch').value || '').trim().toLowerCase();
+  let diag = `<div id="attDiagLine" style="margin-bottom:10px;font-size:10px;color:#9AA69D;font-family:'IBM Plex Mono',monospace;word-break:break-all;">Diagnostics — in-memory attendance records: ${attendance.length} | checking Firestore directly…</div>`;
+  runAttendanceDiagnostic();
   if(attendance.length===0){
-    $('#attendanceTable').innerHTML = '<div class="empty">No check-ins recorded yet.</div>';
+    $('#attendanceTable').innerHTML = diag + '<div class="empty">No check-ins recorded yet.</div>';
     return;
   }
   const filtered = q
     ? attendance.filter(a => [a.employeeName, a.date].some(v => (v||'').toLowerCase().includes(q)))
     : attendance;
   if(filtered.length===0){
-    $('#attendanceTable').innerHTML = `<div class="empty">No check-ins match "${q}".</div>`;
+    $('#attendanceTable').innerHTML = diag + `<div class="empty">No check-ins match "${q}".</div>`;
     return;
   }
   const checkInOf = a => a.checkInTime || a.time || '';
   const sorted = [...filtered].sort((a,b)=> (b.date+checkInOf(b)) < (a.date+checkInOf(a)) ? -1 : 1);
-  let html = `<div class="table-scroll"><table><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Employee</th><th>Distance from Workplace</th><th></th></tr></thead><tbody>`;
+  let html = diag + `<div class="table-scroll"><table><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Hours</th><th>Employee</th><th>Distance from Workplace</th><th></th></tr></thead><tbody>`;
   sorted.forEach(a=>{
     let distanceCell = '—';
     let rowClass = '';
@@ -6773,6 +6796,33 @@ $('#goCopyCustomerLink').addEventListener('click', async ()=>{
     msg.className = 'msg show err';
   }
   setTimeout(()=>{ btn.textContent = originalLabel; }, 2000);
+});
+$('#syncTestBtn').addEventListener('click', async ()=>{
+  const resultEl = $('#syncTestResult');
+  resultEl.className = 'msg show';
+  resultEl.textContent = 'Testing…';
+  try{
+    if(!firestoreDb){
+      resultEl.textContent = `Not connected to Firestore at all — using ${hasRealStorage ? 'window.storage' : 'localStorage'} instead. This device will never sync with others.`;
+      resultEl.className = 'msg show err';
+      return;
+    }
+    const myLabel = prompt('Name this device (e.g. "Phone" or "Computer"):', 'Device') || 'Device';
+    // First, read whatever is CURRENTLY there — if a different device tapped this
+    // button earlier, this should show THEIR label, proving this device can see
+    // what the other one wrote.
+    const beforeDoc = await firestoreDb.collection('ubcafe_data').doc('SYNC_TEST').get();
+    const before = beforeDoc.exists ? JSON.parse(beforeDoc.data().value) : null;
+    // Then write THIS device's own stamp for the next device to find.
+    const now = new Date().toLocaleString('en-US');
+    await firestoreDb.collection('ubcafe_data').doc('SYNC_TEST').set({ value: JSON.stringify({ label: myLabel, time: now }) });
+    const previousText = before ? `Found from last tap: "${before.label}" at ${before.time}.` : 'Nothing found from before (this is the first tap anywhere).';
+    resultEl.textContent = `✅ ${previousText} Just wrote this device's own stamp: "${myLabel}" at ${now}. Now go tap this SAME button on your OTHER device — it should show "${myLabel}" and ${now} as the "found from last tap" part, proving both devices share the same data.`;
+    resultEl.className = 'msg show ok';
+  }catch(e){
+    resultEl.textContent = `❌ Sync test failed: ${e.message}`;
+    resultEl.className = 'msg show err';
+  }
 });
 $('#goCopyAttendanceLink').addEventListener('click', async ()=>{
   const btn = $('#goCopyAttendanceLink');
