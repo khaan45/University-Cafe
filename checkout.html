@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Checkout</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f4f3ef; display: flex; justify-content: center; padding: 40px 16px; }
+  .card { background: #fff; border-radius: 16px; padding: 24px; width: 320px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; font-size: 14px; margin-bottom: 10px; cursor: pointer; text-align: left; }
+  button:hover { background: #f7f7f5; }
+  input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px; margin-bottom: 16px; box-sizing: border-box; }
+  .primary { background: #1a1a1a; color: #fff; text-align: center; }
+  .hidden { display: none; }
+  .muted { color: #888; font-size: 12px; }
+  .amount { font-size: 26px; font-weight: 600; margin: 4px 0 16px; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div id="step-method">
+    <p class="muted">Total due</p>
+    <p class="amount">$24.00</p>
+    <button onclick="selectMethod('edahab')">Pay with eDahab</button>
+    <button onclick="selectMethod('zaad')">Pay with Zaad</button>
+  </div>
+
+  <div id="step-phone" class="hidden">
+    <p class="muted" id="method-label"></p>
+    <p class="amount">$24.00</p>
+    <input id="phone-input" type="tel" placeholder="63 xxx xxxx" />
+    <button class="primary" onclick="submitPhone()">Request payment</button>
+  </div>
+
+  <div id="step-status" class="hidden">
+    <p id="status-text">Check your phone to approve the payment.</p>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'http://localhost:4000';
+  let provider = 'edahab';
+
+  function show(id) {
+    ['step-method', 'step-phone', 'step-status'].forEach(s =>
+      document.getElementById(s).classList.toggle('hidden', s !== id)
+    );
+  }
+
+  function selectMethod(p) {
+    provider = p;
+    document.getElementById('method-label').textContent =
+      'Pay with ' + (p === 'edahab' ? 'eDahab' : 'Zaad');
+    show('step-phone');
+  }
+
+  async function submitPhone() {
+    const phone = document.getElementById('phone-input').value.trim();
+    const res = await fetch(API_BASE + '/api/checkout/charge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, amount: 24.0, provider })
+    });
+    const data = await res.json();
+    show('step-status');
+
+    if (data.status === 'manual_required') {
+      document.getElementById('status-text').textContent =
+        'Dial *712#, choose "pay merchant", and confirm to complete this payment.';
+      return;
+    }
+
+    document.getElementById('status-text').textContent = 'Check your phone to approve the payment.';
+    pollStatus(data.invoiceId);
+  }
+
+  function pollStatus(invoiceId) {
+    const timer = setInterval(async () => {
+      const res = await fetch(API_BASE + '/api/checkout/status/' + invoiceId);
+      const data = await res.json();
+      if (data.status === 'paid') {
+        clearInterval(timer);
+        document.getElementById('status-text').textContent = 'Payment confirmed.';
+      }
+    }, 1500);
+  }
+</script>
+
+</body>
+</html>
