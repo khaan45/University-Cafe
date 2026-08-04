@@ -136,6 +136,34 @@
   .hist-row .hr-hours{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--credit);}
   .hist-row .hr-hours.open{color:var(--amber);}
 
+  /* ---------- Request Advance ---------- */
+  .field-label{font-size:12px;font-weight:600;color:var(--ink-soft);margin:14px 0 6px;display:block;}
+  .text-input{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);
+    font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);box-sizing:border-box;
+  }
+  .text-input:focus{outline:none;border-color:var(--brass);}
+  .adv-row{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--card);
+    border:1px solid var(--line);border-radius:11px;margin-bottom:8px;
+  }
+  .adv-row .adv-amt{font-weight:700;font-size:14px;font-family:'IBM Plex Mono',monospace;}
+  .adv-row .adv-reason{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
+  .adv-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;flex:0 0 auto;margin-left:10px;}
+  .adv-tag.pending{background:var(--amber-bg);color:var(--amber);}
+  .adv-tag.approved{background:var(--credit-bg);color:var(--credit);}
+  .adv-tag.declined{background:var(--debit-bg);color:var(--debit);}
+
+  /* ---------- My Schedule ---------- */
+  .sched-row{
+    display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;background:var(--card);
+    border:1px solid var(--line);border-radius:11px;margin-bottom:8px;gap:14px;
+  }
+  .sched-row .sr-day{font-weight:700;font-size:13px;padding-top:1px;}
+  .sched-row .sr-time{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--credit);text-align:right;line-height:1.7;}
+  .sched-row.off .sr-time{color:var(--ink-soft);font-style:italic;}
+  .sched-row.today{border-color:var(--brass);}
+
   .stamp-overlay{
     position:fixed;inset:0;background:rgba(21,32,27,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;
   }
@@ -147,6 +175,7 @@
     animation:stampDown .5s cubic-bezier(.17,.85,.35,1.25) forwards;
   }
   .stamp.out{border-color:var(--amber);color:var(--amber);background:rgba(251,240,222,.97);}
+  .stamp.warn{border-color:var(--debit);color:var(--debit);background:rgba(246,227,223,.97);}
   @keyframes stampDown{
     0%{transform:scale(.3) rotate(-20deg);opacity:0;}
     60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
@@ -155,6 +184,7 @@
   .stamp .stamp-check{font-size:38px;}
   .stamp .stamp-title{font-family:'Fraunces',serif;font-weight:800;font-size:15px;margin-top:4px;}
   .stamp .stamp-time{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:5px;color:var(--ink-soft);}
+  .stamp .stamp-warn-text{font-size:10.5px;font-weight:700;margin-top:8px;padding:0 14px;line-height:1.4;}
   .stamp-dismiss{
     margin-top:18px;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:9px;
     padding:9px 22px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;
@@ -220,6 +250,8 @@
     <div class="screen" id="screen-status">
       <div class="status-card" id="statusCard"></div>
       <button class="secondary" id="viewHistoryBtn">📋 View My History</button>
+      <button class="secondary" id="viewScheduleBtn">📅 My Schedule</button>
+      <button class="secondary" id="requestAdvanceBtn">💵 Request an Advance</button>
       <button class="secondary" id="statusBackBtn">← Switch User</button>
     </div>
 
@@ -228,6 +260,28 @@
       <div class="section-label" id="historyTitle">My Attendance History</div>
       <div id="historyList"></div>
       <button class="secondary" id="historyBackBtn">← Back</button>
+    </div>
+
+    <!-- ===== Screen 6: my schedule ===== -->
+    <div class="screen" id="screen-schedule">
+      <div class="section-label">My Weekly Schedule</div>
+      <div id="myScheduleList"></div>
+      <button class="secondary" id="scheduleBackBtn">← Back</button>
+    </div>
+
+    <!-- ===== Screen 5: request advance ===== -->
+    <div class="screen" id="screen-advance">
+      <div class="section-label">Request an Advance</div>
+      <label class="field-label" for="advAmount">Amount (Sl.sh)</label>
+      <input type="number" id="advAmount" class="text-input" min="0" step="1" inputmode="numeric" placeholder="0">
+      <label class="field-label" for="advReason">Reason (optional)</label>
+      <input type="text" id="advReason" class="text-input" placeholder="e.g. school fees">
+      <div class="msg" id="advMsg" style="display:none;"></div>
+      <button class="primary" id="advSendBtn">Send Request</button>
+
+      <div class="section-label" style="margin-top:26px;">Your Requests</div>
+      <div id="advHistoryList"></div>
+      <button class="secondary" id="advBackBtn">← Back</button>
     </div>
 
   </div>
@@ -239,6 +293,7 @@
       <div class="stamp-check" id="stampIcon">✓</div>
       <div class="stamp-title" id="stampTitle">CHECKED IN</div>
       <div class="stamp-time" id="stampTime"></div>
+      <div class="stamp-warn-text" id="stampWarnText" style="display:none;"></div>
     </div>
     <button class="stamp-dismiss" id="stampDismissBtn">Done</button>
   </div>
@@ -313,9 +368,13 @@ const $ = sel => document.querySelector(sel);
 function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const EMPLOYEES_KEY = "ubcafe_employees";
 const ATTENDANCE_KEY = "ubcafe_attendance";
+const ADVANCE_REQUESTS_KEY = "ubcafe_advance_requests";
+const SCHEDULE_KEY = "ubcafe_schedule";
+const SCHEDULE_DAYS = ['Sat','Sun','Mon','Tue','Wed','Thu']; // Friday is the off day, same as everywhere else in the app
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function nowTimeStr(){ return new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}); }
+const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
 function initials(name){
   const parts = String(name||'').trim().split(/\s+/);
   return ((parts[0]?.[0]||'') + (parts[1]?.[0]||'')).toUpperCase() || '?';
@@ -328,6 +387,8 @@ function formatHours(ms){
 
 let employees = [];
 let attendance = []; // [{id, employeeId, employeeName, date, checkInTime, checkInTs, checkOutTime, checkOutTs, lat?, lng?}]
+let advanceRequests = []; // [{id, employeeId, employeeName, amount, reason, status:'pending'|'approved'|'declined', createdAt}]
+let schedule = []; // [{id, employeeId, employeeName, day:'Mon'..'Sun', startTime, endTime}] — read-only here, set from the main app
 let selectedEmployee = null;
 let pinBuffer = '';
 let pinMode = null; // 'verify' | 'create' | 'confirm'
@@ -341,6 +402,32 @@ async function loadData(){
 }
 async function saveAttendance(){ await storageSet(ATTENDANCE_KEY, JSON.stringify(attendance), true); }
 async function saveEmployees(){ await storageSet(EMPLOYEES_KEY, JSON.stringify(employees), true); }
+
+const WORKPLACE_LOCATION_KEY = "ubcafe_workplace_location";
+let workplaceLocation = null; // {lat, lng, radiusMeters} — set by an Admin in the main app
+async function loadWorkplaceLocation(){
+  const val = await storageGet(WORKPLACE_LOCATION_KEY, true);
+  try{ workplaceLocation = val ? JSON.parse(val) : null; }catch(e){ workplaceLocation = null; }
+}
+function distanceMeters(lat1, lng1, lat2, lng2){
+  // Haversine formula — great-circle distance between two lat/lng points, in meters.
+  // Identical to the copy in the main app so a check-in is judged the same way here as it is there.
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+async function loadAdvanceRequests(){
+  const val = await storageGet(ADVANCE_REQUESTS_KEY, true);
+  try{ advanceRequests = val ? JSON.parse(val) : []; }catch(e){ advanceRequests = []; }
+}
+async function saveAdvanceRequests(){ await storageSet(ADVANCE_REQUESTS_KEY, JSON.stringify(advanceRequests), true); }
+async function loadSchedule(){
+  const val = await storageGet(SCHEDULE_KEY, true);
+  try{ schedule = val ? JSON.parse(val) : []; }catch(e){ schedule = []; }
+}
 
 function todaysRecord(employeeId){
   return attendance.find(a => a.employeeId===employeeId && a.date===todayStr());
@@ -579,11 +666,15 @@ function updateElapsed(sinceTs){
   el.textContent = `${h}:${m}:${s}`;
 }
 
-function showStamp(kind, time){
+function showStamp(kind, time, warnText){
   $('#stampIcon').textContent = kind==='out' ? '👋' : '✓';
   $('#stampTitle').textContent = kind==='out' ? 'CHECKED OUT' : 'CHECKED IN';
   $('#stampTime').textContent = time;
-  $('#stampEl').classList.toggle('out', kind==='out');
+  $('#stampEl').classList.toggle('out', kind==='out' && !warnText);
+  $('#stampEl').classList.toggle('warn', !!warnText);
+  const warnEl = $('#stampWarnText');
+  warnEl.textContent = warnText || '';
+  warnEl.style.display = warnText ? 'block' : 'none';
   const stamp = $('#stampEl');
   stamp.style.animation = 'none';
   void stamp.offsetWidth;
@@ -592,6 +683,17 @@ function showStamp(kind, time){
 }
 $('#stampDismissBtn').addEventListener('click', ()=> $('#stampOverlay').classList.remove('show'));
 $('#stampOverlay').addEventListener('click', (e)=>{ if(e.target.id==='stampOverlay') $('#stampOverlay').classList.remove('show'); });
+
+// Distance check against the workplace location an Admin set in the main app — never blocks
+// a check-in (GPS drifts, especially indoors, and wrongly locking out a real employee is worse
+// than rarely letting a genuinely-far one through), just surfaces a warning on their screen so
+// they know it's flagged, matching what a manager would already see in the Attendance table.
+function farFromWorkplaceWarning(location){
+  if(!location || !workplaceLocation) return null;
+  const dist = distanceMeters(location.lat, location.lng, workplaceLocation.lat, workplaceLocation.lng);
+  if(dist <= workplaceLocation.radiusMeters) return null;
+  return `⚠ You're ${Math.round(dist)}m from the workplace — this check-in will be flagged for review.`;
+}
 
 async function doCheckIn(){
   const btn = $('#actionBtn');
@@ -616,7 +718,7 @@ async function doCheckIn(){
       const deviceId = getDeviceId();
       if(deviceId){ selectedEmployee.registeredDeviceId = deviceId; await saveEmployees(); }
     }
-    showStamp('in', time);
+    showStamp('in', time, farFromWorkplaceWarning(location));
     renderStatusCard();
   }catch(e){
     msg.style.display = 'block';
@@ -690,6 +792,121 @@ $('#viewHistoryBtn').addEventListener('click', ()=>{
 $('#historyBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
 
 /* ---------------------------------------------------------------------
+   Screen 5 — request an advance
+--------------------------------------------------------------------- */
+$('#requestAdvanceBtn').addEventListener('click', async ()=>{
+  const btn = $('#requestAdvanceBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+  await loadAdvanceRequests();
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+  $('#advAmount').value = '';
+  $('#advReason').value = '';
+  $('#advMsg').style.display = 'none';
+  renderAdvanceHistory();
+  showScreen('screen-advance');
+});
+$('#advBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
+
+function renderAdvanceHistory(){
+  const el = $('#advHistoryList');
+  const mine = advanceRequests
+    .filter(r=>r.employeeId===selectedEmployee.id)
+    .sort((a,b)=> b.createdAt - a.createdAt)
+    .slice(0, 10);
+  if(mine.length===0){
+    el.innerHTML = '<div class="empty">No requests yet.</div>';
+    return;
+  }
+  el.innerHTML = mine.map(r=>{
+    const status = r.status || 'pending';
+    const tagLabel = status==='approved' ? 'Approved' : (status==='declined' ? 'Declined' : 'Pending');
+    return `<div class="adv-row">
+      <div>
+        <div class="adv-amt">${fmt(r.amount)} Sl.sh</div>
+        ${r.reason ? `<div class="adv-reason">${r.reason}</div>` : ''}
+      </div>
+      <span class="adv-tag ${status}">${tagLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+$('#advSendBtn').addEventListener('click', async ()=>{
+  const btn = $('#advSendBtn');
+  const msg = $('#advMsg');
+  const amount = parseFloat($('#advAmount').value)||0;
+  if(amount<=0){
+    msg.textContent = 'Enter an amount greater than 0.';
+    msg.className = 'msg err';
+    msg.style.display = 'block';
+    return;
+  }
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending…';
+  try{
+    advanceRequests.push({
+      id: Date.now(),
+      employeeId: selectedEmployee.id,
+      employeeName: selectedEmployee.fullName,
+      amount,
+      reason: $('#advReason').value.trim(),
+      status: 'pending',
+      createdAt: Date.now()
+    });
+    await saveAdvanceRequests();
+    $('#advAmount').value = '';
+    $('#advReason').value = '';
+    msg.textContent = 'Sent — management will review it.';
+    msg.className = 'msg ok';
+    msg.style.display = 'block';
+    renderAdvanceHistory();
+  }catch(e){
+    msg.textContent = 'Something went wrong: ' + e.message;
+    msg.className = 'msg err';
+    msg.style.display = 'block';
+  }finally{
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+  }
+});
+
+/* ---------------------------------------------------------------------
+   Screen 6 — my schedule (read-only; set by management in the main app)
+--------------------------------------------------------------------- */
+$('#viewScheduleBtn').addEventListener('click', async ()=>{
+  const btn = $('#viewScheduleBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading…';
+  await loadSchedule();
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+  renderMySchedule();
+  showScreen('screen-schedule');
+});
+$('#scheduleBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
+
+function renderMySchedule(){
+  const el = $('#myScheduleList');
+  const todayIdx = (new Date().getDay() + 1) % 7; // JS getDay(): Sun=0..Sat=6 → shift so Sat=0..Thu=5 (Fri lands on 6, off the list — no day highlights on a Friday)
+  el.innerHTML = SCHEDULE_DAYS.map((day, i)=>{
+    const shifts = schedule.filter(s=>s.employeeId===selectedEmployee.id && s.day===day).sort((a,b)=> a.startTime < b.startTime ? -1 : 1);
+    const isToday = i === todayIdx;
+    const rowClass = `sched-row${shifts.length ? '' : ' off'}${isToday ? ' today' : ''}`;
+    const timeText = shifts.length
+      ? shifts.map(s=>`${s.shiftType ? s.shiftType+' ' : ''}${s.startTime}–${s.endTime}`).join('<br>')
+      : 'Off';
+    return `<div class="${rowClass}">
+      <div class="sr-day">${day}${isToday ? ' · Today' : ''}</div>
+      <div class="sr-time">${timeText}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------------------------------------------------------------------
    Live clock line
 --------------------------------------------------------------------- */
 function updateClockLine(){
@@ -753,6 +970,7 @@ $('#syncTestBtn').addEventListener('click', async ()=>{
   updateClockLine();
   setInterval(updateClockLine, 1000);
   buildKeypad();
+  await loadWorkplaceLocation();
   subscribeToKey(EMPLOYEES_KEY, (value)=>{
     try{ employees = value ? JSON.parse(value) : []; }catch(e){ employees = []; }
     renderEmpList();

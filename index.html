@@ -102,6 +102,24 @@
   .wp-request-card .wpr-actions{display:flex;gap:8px;}
   .wp-request-card .wpr-actions button{font-size:12px;padding:5px 10px;}
 
+  .kitchen-order-card{
+    background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .kitchen-order-card.ready{opacity:.55;}
+  .kitchen-order-card .ko-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;margin-bottom:4px;}
+  .kitchen-order-card .ko-meta{font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
+  .kitchen-order-card .ko-items{margin-bottom:12px;}
+  .kitchen-order-card .ko-item{display:flex;gap:8px;font-size:14px;font-weight:600;padding:4px 0;border-bottom:1px dotted var(--paper-line);}
+  .kitchen-order-card .ko-item:last-child{border-bottom:none;}
+  .kitchen-order-card .ko-item .ko-qty{font-family:'IBM Plex Mono',monospace;min-width:28px;color:var(--brass-dark);}
+
+  #scheduleTable table td.sched-cell{text-align:center;font-size:12px;white-space:nowrap;}
+  #scheduleTable table td.sched-cell.off{color:var(--ink-soft);font-style:italic;}
+  #scheduleTable table td.sched-cell .del-entry{font-size:10px;padding:2px 7px;margin-top:4px;}
+  #scheduleTable table td.sched-cell .sched-cell-shift{padding:4px 0;}
+  #scheduleTable table td.sched-cell .sched-cell-shift + .sched-cell-shift{border-top:1px dashed var(--paper-line);margin-top:4px;}
+
   .pos-cart-panel{
     background:#FBF6EA;border:1px solid var(--paper-line);border-radius:10px;padding:16px;
     position:sticky;top:12px;
@@ -198,6 +216,12 @@
   .receipt-doc .rc-footer{text-align:center;margin-top:14px;font-size:11px;color:#555;line-height:1.6;}
   .receipt-doc .rc-footer .rc-thanks{font-weight:600;color:#1a1a1a;font-size:12px;margin-bottom:2px;}
   .receipt-doc .rc-snip{text-align:center;color:#bbb;font-size:13px;margin-top:16px;letter-spacing:.3em;}
+  .receipt-doc .rc-copy-label{text-align:center;font-weight:700;font-size:11px;letter-spacing:.18em;color:#8C6A20;margin-top:4px;}
+  .receipt-doc .rc-copy-label.kitchen{background:#1E2A24;color:#fff;padding:5px 0;border-radius:4px;margin:8px 0 0;font-size:12px;}
+  .receipt-doc .kt-items{margin:4px 0;}
+  .receipt-doc .kt-item{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px dotted #ddd;font-size:16px;font-weight:700;}
+  .receipt-doc .kt-item:last-child{border-bottom:none;}
+  .receipt-doc .kt-item .kt-qty{font-family:'IBM Plex Mono',monospace;min-width:32px;}
   .invoice-doc .idoc-paid-badge{
     display:inline-block;border:3px solid #2C6E63;color:#2C6E63;font-weight:700;font-size:15px;
     letter-spacing:.15em;padding:4px 14px;border-radius:6px;transform:rotate(-6deg);
@@ -665,7 +689,9 @@
     <div class="tabs main-tabs sidebar-nav">
       <button class="tab active" data-view="entry">📝 <span>New Entry</span></button>
       <button class="tab" data-view="pos">🛒 <span>POS</span></button>
+      <button class="tab" data-view="waiterorder">📋 <span>Place Order</span></button>
       <button class="tab" data-view="waiterdash">🧑‍🍳 <span>Waiter Dashboard</span></button>
+      <button class="tab" data-view="kitchen">🍳 <span>Kitchen</span></button>
       <button class="tab" data-view="journal">📖 <span>Journal</span></button>
       <button class="tab" data-view="hr">👥 <span>HR</span></button>
       <button class="tab" data-view="invoices">🧾 <span>Invoices</span></button>
@@ -741,7 +767,10 @@
 
     <!-- ============ POINT OF SALE ============ -->
     <div class="view" id="view-pos">
-      <div class="toolbar"><h2>Point of Sale</h2></div>
+      <div class="toolbar">
+        <h2>Point of Sale</h2>
+        <div class="actions"><button class="secondary" id="posRequestAdvanceBtn">💵 Request Advance</button></div>
+      </div>
 
       <div class="tabs" style="margin-bottom:16px;">
         <button class="tab pos-subtab active" data-posview="sell">Sell</button>
@@ -908,6 +937,53 @@
       </div>
     </div>
 
+    <!-- ============ PLACE ORDER (Waiter) ============ -->
+    <div class="view" id="view-waiterorder">
+      <div class="toolbar">
+        <h2>Place Order</h2>
+        <div class="actions"><button class="secondary" id="waiterRequestAdvanceBtn">💵 Request Advance</button></div>
+      </div>
+      <div class="hint" style="margin-bottom:14px;">Build the order, then send it — it goes straight to the Kitchen to prepare and to the Counter to collect payment. You don't handle money here.</div>
+
+      <div class="pos-layout">
+        <div class="pos-items-panel">
+          <div class="pos-category-bar" id="woCategoryBar"></div>
+          <div class="pos-item-grid" id="woItemGrid"></div>
+        </div>
+
+        <div class="pos-cart-panel">
+          <div class="pos-cart-title">This Order</div>
+          <div class="pos-cart-list" id="woCartList"></div>
+          <div class="pos-cart-total">
+            <span>Total</span>
+            <span id="woCartTotal">0 Sl.sh</span>
+          </div>
+
+          <div class="field" style="margin-top:12px;">
+            <label for="woWaiterSelect">Waiter</label>
+            <select id="woWaiterSelect"></select>
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label for="woTableName">Table / Customer</label>
+            <input type="text" id="woTableName" placeholder="e.g. Table 4, or a customer's name">
+          </div>
+          <div class="field" style="margin-top:10px;">
+            <label for="woNote">Note (optional)</label>
+            <input type="text" id="woNote" placeholder="e.g. no onions, extra spicy">
+          </div>
+
+          <div class="msg" id="woMsg"></div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <button class="primary" id="woSendBtn" style="flex:1;" disabled>📤 Send to Kitchen &amp; Counter</button>
+            <button class="secondary" id="woClearBtn">Clear</button>
+          </div>
+
+          <div class="pos-recent-title">Sent Orders (awaiting checkout)</div>
+          <div id="woSentOrders"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ============ WAITER DASHBOARD ============ -->
     <div class="view" id="view-waiterdash">
       <div class="toolbar"><h2>Waiter Dashboard</h2></div>
@@ -936,6 +1012,24 @@
       </div>
     </div>
 
+    <!-- ============ KITCHEN DASHBOARD ============ -->
+    <div class="view" id="view-kitchen">
+      <div class="toolbar">
+        <h2>Kitchen</h2>
+        <div class="actions">
+          <button class="secondary" id="kitchenRequestAdvanceBtn">💵 Request Advance</button>
+          <button class="secondary" id="kitchenRefreshBtn">🔄 Refresh Orders</button>
+        </div>
+      </div>
+      <div class="hint" style="margin-bottom:16px;">Today's orders only. Mark an order ready once it's plated so the front knows to serve it.</div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Pending (<span id="kitchenPendingCount">0</span>)</h3>
+      <div id="kitchenPendingWrap"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:24px 0 10px;">Ready</h3>
+      <div id="kitchenReadyWrap"></div>
+    </div>
+
     <!-- ============ JOURNAL ============ -->
     <div class="view" id="view-journal">
       <div class="toolbar">
@@ -958,6 +1052,8 @@
         <button class="tab hr-subtab" data-hrview="history">Payroll History</button>
         <button class="tab hr-subtab" data-hrview="holidays">Holidays</button>
         <button class="tab hr-subtab" data-hrview="attendance">Attendance</button>
+        <button class="tab hr-subtab" data-hrview="schedule">Schedule</button>
+        <button class="tab hr-subtab" data-hrview="advances">Advance Requests</button>
       </div>
 
       <!-- Employees -->
@@ -1197,6 +1293,62 @@
 
         <div class="search-box"><input type="text" id="attendanceSearch" placeholder="Search by employee name or date…"></div>
         <div id="attendanceTable"></div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="hr-view" id="hr-schedule">
+        <div class="toolbar"><h2>Schedule</h2></div>
+        <div class="hint" style="margin-bottom:14px;">Weekly recurring shifts — set the days and hours each employee normally works, Saturday through Thursday (Friday is always off, same as the rest of the app). Adding a shift for a day that already has one replaces it.</div>
+
+        <div class="voucher">
+          <div class="stmt-section-title" style="margin-top:0;">Add a Shift</div>
+          <div class="voucher-row">
+            <div class="field">
+              <label for="schedEmployee">Employee</label>
+              <select id="schedEmployee"></select>
+            </div>
+            <div class="field">
+              <label for="schedDay">Day</label>
+              <select id="schedDay">
+                <option value="Sat">Saturday</option>
+                <option value="Sun">Sunday</option>
+                <option value="Mon">Monday</option>
+                <option value="Tue">Tuesday</option>
+                <option value="Wed">Wednesday</option>
+                <option value="Thu">Thursday</option>
+              </select>
+            </div>
+          </div>
+          <div class="voucher-row">
+            <div class="field">
+              <label for="schedShiftType">Shift</label>
+              <select id="schedShiftType">
+                <option value="Morning">Morning (6:00 AM – 12:00 PM)</option>
+                <option value="Afternoon">Afternoon (4:00 PM – 10:00 PM)</option>
+                <option value="Both">Both (Morning &amp; Afternoon)</option>
+              </select>
+            </div>
+          </div>
+          <div class="msg" id="schedMsg"></div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="primary" id="addShiftBtn">Add Shift</button>
+            <button class="secondary" id="setFullWeekBtn" style="width:auto;margin-top:0;">🗓 Set Full Week — Both Shifts, All Days</button>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:20px 0 10px;">Weekly Schedule</h3>
+        <div id="scheduleTable"></div>
+      </div>
+
+      <!-- Advance Requests -->
+      <div class="hr-view" id="hr-advances">
+        <div class="toolbar"><h2>Advance Requests</h2></div>
+        <div class="hint" style="margin-bottom:14px;">
+          Sent by staff from the 💵 Request Advance button on the POS, Place Order, or Kitchen screens. Approving opens
+          Give Advance so you can record the actual payout; declining just dismisses the request.
+        </div>
+        <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Pending (<span id="advReqPendingCount">0</span>)</h3>
+        <div id="advanceRequestsTable"></div>
       </div>
     </div>
 
@@ -1634,6 +1786,30 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="requestAdvanceModal">
+  <div class="modal-card" style="max-width:380px;">
+    <h3>Request an Advance</h3>
+    <div class="field">
+      <label for="reqAdvanceEmployee">Employee</label>
+      <select id="reqAdvanceEmployee"></select>
+    </div>
+    <div class="field">
+      <label for="reqAdvanceAmount">Amount (Sl.sh)</label>
+      <input type="number" id="reqAdvanceAmount" min="0" step="1">
+    </div>
+    <div class="field">
+      <label for="reqAdvanceReason">Reason (optional)</label>
+      <input type="text" id="reqAdvanceReason" placeholder="e.g. school fees">
+    </div>
+    <div class="hint" style="margin-bottom:8px;">This sends a request to management — it isn't paid out until approved.</div>
+    <div class="msg" id="reqAdvanceMsg"></div>
+    <div class="modal-actions">
+      <button class="primary" id="reqAdvanceSendBtn" style="flex:1;">Send Request</button>
+      <button class="secondary" id="reqAdvanceCancelBtn" style="flex:1;">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="restockModal">
   <div class="modal-card" style="max-width:360px;">
     <h3>Restock Item</h3>
@@ -1686,6 +1862,10 @@
     <div class="modal-actions no-print">
       <button class="primary" id="printInvoiceDocBtn" style="flex:1;">🖨 Print</button>
       <button class="secondary" id="sendDocWhatsAppBtn" style="flex:1;">📱 Send via WhatsApp</button>
+    </div>
+    <div class="modal-actions no-print" id="posReceiptExtraActions" style="display:none;">
+      <button class="secondary" id="printKitchenCopyBtn" style="flex:1;">🍳 Kitchen Copy</button>
+      <button class="secondary" id="printCounterCopyBtn" style="flex:1;">🧾 Counter Copy</button>
     </div>
     <div class="modal-actions no-print">
       <button class="secondary" id="closeInvoiceDocBtn" style="flex:1;">Close</button>
@@ -1824,6 +2004,7 @@
           <option value="Staff">Staff</option>
           <option value="Cashier">Cashier</option>
           <option value="Waiter">Waiter</option>
+          <option value="Kitchen">Kitchen</option>
           <option value="Admin">Admin</option>
         </select>
       </div>
@@ -1885,6 +2066,11 @@
 ===================================================================== */
 const BASE_ACCOUNTS = [
   {name:"Cash", type:"Asset", normal:"debit"},
+  {name:"Zaad", type:"Asset", normal:"debit"},
+  {name:"Edahab", type:"Asset", normal:"debit"},
+  {name:"Waafi", type:"Asset", normal:"debit"},
+  {name:"DahabPlus", type:"Asset", normal:"debit"},
+  {name:"Premier Wallet", type:"Asset", normal:"debit"},
   {name:"A/Rec", type:"Asset", normal:"debit"},
   {name:"Supply", type:"Asset", normal:"debit"},
   {name:"Employee Advances", type:"Asset", normal:"debit"},
@@ -2051,7 +2237,9 @@ $$('.main-tabs .tab').forEach(tab=>{
     $('#view-'+tab.dataset.view).classList.add('active');
     if(tab.dataset.view==='journal') renderJournal();
     if(tab.dataset.view==='pos') renderPOS();
+    if(tab.dataset.view==='waiterorder') renderWaiterOrderView();
     if(tab.dataset.view==='waiterdash') renderWaiterDashboard();
+    if(tab.dataset.view==='kitchen') openKitchenDashboard();
     if(tab.dataset.view==='hr') renderHR();
     if(tab.dataset.view==='invoices') renderInvoices();
     if(tab.dataset.view==='vendors') renderVendors();
@@ -2477,11 +2665,7 @@ function renderCashFlow(){
   renderLetterhead('letterhead-cashflow', 'Cash Flow Statement', false);
 
   function sumCashEquivalents(totals){
-    return cashEquivalentAccountNames().reduce((s,name)=>{
-      const acct = ACCOUNTS.find(a=>a.name===name);
-      if(!acct) return s;
-      return s + acctBalance(totals[name] || {debit:0,credit:0}, acct);
-    }, 0);
+    return computeTotalCashEquivalents(totals);
   }
 
   // Beginning cash: all entries strictly before the period's "From" date (or all-time if blank)
@@ -2915,6 +3099,100 @@ function renderHolidaysTable(){
     });
   });
 }
+
+/* ---------------- Schedule ---------------- */
+function populateSchedEmployeeDropdown(){
+  const sel = $('#schedEmployee');
+  if(!sel) return;
+  const active = employees.filter(e=>e.status==='Active');
+  sel.innerHTML = active.length
+    ? active.map(e=>`<option value="${e.id}">${e.fullName}</option>`).join('')
+    : '<option value="">No active employees</option>';
+}
+
+function renderScheduleTable(){
+  const el = $('#scheduleTable');
+  if(!el) return;
+  const active = employees.filter(e=>e.status==='Active');
+  if(active.length===0){
+    el.innerHTML = '<div class="empty">Add an employee first.</div>';
+    return;
+  }
+  let html = `<table><thead><tr><th>Employee</th>${SCHEDULE_DAYS.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
+  active.forEach(emp=>{
+    html += `<tr><td>${emp.fullName}</td>`;
+    SCHEDULE_DAYS.forEach(day=>{
+      // Sorted so Morning always shows above Afternoon regardless of entry order.
+      const shifts = schedule.filter(s=>s.employeeId===emp.id && s.day===day).sort((a,b)=> a.startTime < b.startTime ? -1 : 1);
+      html += shifts.length
+        ? `<td class="sched-cell">${shifts.map(s=>
+            `<div class="sched-cell-shift">${s.shiftType ? s.shiftType+'<br>' : ''}${s.startTime}–${s.endTime}<br><button class="del-entry" data-id="${s.id}">✕</button></div>`
+          ).join('')}</td>`
+        : `<td class="sched-cell off">Off</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+  $$('#scheduleTable .del-entry').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = Number(btn.dataset.id);
+      schedule = schedule.filter(s=>s.id!==id);
+      await saveSchedule();
+      renderScheduleTable();
+    });
+  });
+}
+
+// Adds/replaces a single Morning or Afternoon shift for one employee on one day.
+// Only touches that shiftType — an existing shift of the other type on the same day is left alone,
+// which is what lets an employee carry both a Morning and an Afternoon shift on the same day.
+function upsertShift(employeeId, employeeName, day, shiftType){
+  const preset = SHIFT_TYPES[shiftType];
+  if(!preset) return;
+  schedule = schedule.filter(s=>!(s.employeeId===employeeId && s.day===day && s.shiftType===shiftType));
+  schedule.push({ id: Date.now() + Math.floor(Math.random()*1000), employeeId, employeeName, day, shiftType, startTime: preset.startTime, endTime: preset.endTime });
+}
+
+$('#addShiftBtn').addEventListener('click', async ()=>{
+  const msg = $('#schedMsg');
+  const empId = $('#schedEmployee').value;
+  const emp = employees.find(x=>String(x.id)===empId);
+  const day = $('#schedDay').value;
+  const shiftType = $('#schedShiftType').value;
+  if(!emp){ msg.textContent='Pick an employee.'; msg.className='msg show err'; return; }
+
+  if(shiftType==='Both'){
+    upsertShift(emp.id, emp.fullName, day, 'Morning');
+    upsertShift(emp.id, emp.fullName, day, 'Afternoon');
+    msg.textContent = `${emp.fullName} now has both shifts on ${day}.`;
+  }else{
+    if(!SHIFT_TYPES[shiftType]){ msg.textContent='Pick a shift.'; msg.className='msg show err'; return; }
+    upsertShift(emp.id, emp.fullName, day, shiftType);
+    const preset = SHIFT_TYPES[shiftType];
+    msg.textContent = `${emp.fullName}'s ${day} ${shiftType} shift set to ${preset.startTime}–${preset.endTime}.`;
+  }
+  await saveSchedule();
+  renderScheduleTable();
+  msg.className = 'msg show ok';
+});
+
+$('#setFullWeekBtn').addEventListener('click', async ()=>{
+  const msg = $('#schedMsg');
+  const empId = $('#schedEmployee').value;
+  const emp = employees.find(x=>String(x.id)===empId);
+  if(!emp){ msg.textContent='Pick an employee.'; msg.className='msg show err'; return; }
+
+  SCHEDULE_DAYS.forEach(day=>{
+    upsertShift(emp.id, emp.fullName, day, 'Morning');
+    upsertShift(emp.id, emp.fullName, day, 'Afternoon');
+  });
+  await saveSchedule();
+  renderScheduleTable();
+  msg.textContent = `${emp.fullName} now has both shifts every day, Saturday through Thursday.`;
+  msg.className = 'msg show ok';
+});
+
 function renderWorkplaceLocationStatus(){
   const el = $('#workplaceLocationStatus');
   if(!el) return;
@@ -3145,21 +3423,23 @@ $('#absentSaveBtn').addEventListener('click', async ()=>{
   setTimeout(()=>{ $('#markAbsentModal').classList.remove('active'); }, 900);
 });
 
-function openGiveAdvanceModal(employeeId){
+function openGiveAdvanceModal(employeeId, prefillAmount, sourceRequestId){
   const emp = employees.find(x=>x.id===employeeId);
   if(!emp) return;
   const outstanding = computeEmployeeAdvanceBalance(employeeId);
   $('#advanceEmployeeSummary').textContent = `${emp.fullName}${outstanding>0.005 ? ` — already owes ${fmt(outstanding)} Sl.sh from a previous advance` : ''}`;
-  $('#advanceAmount').value = '';
+  $('#advanceAmount').value = prefillAmount || '';
   $('#advanceDate').value = todayStr();
-  $('#advanceFromAccount').innerHTML = cashEquivalentAccountNames().map(n=>`<option value="${n}">${n}</option>`).join('');
+  $('#advanceFromAccount').innerHTML = advancePaymentMethodOptions().map(o=>`<option value="${o.name}">${o.label}</option>`).join('');
   $('#advanceMsg').className = 'msg';
   $('#giveAdvanceModal').dataset.employeeId = employeeId;
+  $('#giveAdvanceModal').dataset.sourceRequestId = sourceRequestId || '';
   $('#giveAdvanceModal').classList.add('active');
 }
 $('#advanceCancelBtn').addEventListener('click', ()=> $('#giveAdvanceModal').classList.remove('active'));
 $('#advanceSaveBtn').addEventListener('click', async ()=>{
   const employeeId = Number($('#giveAdvanceModal').dataset.employeeId);
+  const sourceRequestId = $('#giveAdvanceModal').dataset.sourceRequestId;
   const emp = employees.find(x=>x.id===employeeId);
   const msg = $('#advanceMsg');
   if(!emp) return;
@@ -3181,11 +3461,125 @@ $('#advanceSaveBtn').addEventListener('click', async ()=>{
   };
   entries.push(entry);
   await saveEntries();
+
+  if(sourceRequestId){
+    const req = advanceRequests.find(r=>r.id===Number(sourceRequestId));
+    if(req){
+      req.status = 'approved';
+      await saveAdvanceRequests();
+      renderAdvanceRequestsTable();
+    }
+  }
+
   renderAll();
   renderEmployeesTable();
   msg.textContent = `Advance of ${fmt(amount)} Sl.sh recorded for ${emp.fullName}.`;
   msg.className = 'msg show ok';
   setTimeout(()=>{ $('#giveAdvanceModal').classList.remove('active'); }, 900);
+});
+
+/* ---------------------------------------------------------------------
+   Advance Requests — staff ask for an advance from wherever they're
+   logged in (POS, Place Order, Kitchen); management reviews the queue
+   here and either approves (which opens Give Advance, prefilled) or
+   declines it. Approving doesn't pay anyone automatically — the actual
+   payout still goes through the normal Give Advance flow and ledger
+   entry, this just routes the request there with the amount filled in.
+--------------------------------------------------------------------- */
+function renderAdvanceRequestsTable(){
+  const el = $('#advanceRequestsTable');
+  if(!el) return;
+  const pending = advanceRequests.filter(r=>r.status==='pending').sort((a,b)=> a.createdAt - b.createdAt);
+  const countEl = $('#advReqPendingCount');
+  if(countEl) countEl.textContent = pending.length;
+  if(pending.length===0){
+    el.innerHTML = '<div class="empty">No pending advance requests.</div>';
+    return;
+  }
+  let html = `<table><thead><tr><th>Employee</th><th class="num">Requested</th><th>Reason</th><th>Sent</th><th>Actions</th></tr></thead><tbody>`;
+  pending.forEach(r=>{
+    html += `<tr>
+      <td>${r.employeeName}</td>
+      <td class="num">${fmt(r.amount)}</td>
+      <td>${r.reason||''}</td>
+      <td>${new Date(r.createdAt).toLocaleDateString()}</td>
+      <td>
+        <button class="primary" data-action="approve" data-id="${r.id}" style="font-size:12px;padding:5px 10px;">Approve</button>
+        <button class="del-entry" data-action="decline" data-id="${r.id}" style="font-size:12px;padding:5px 10px;">Decline</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+  $$('#advanceRequestsTable [data-action="approve"]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const req = advanceRequests.find(r=>r.id===Number(btn.dataset.id));
+      if(!req) return;
+      openGiveAdvanceModal(req.employeeId, req.amount, req.id);
+    });
+  });
+  $$('#advanceRequestsTable [data-action="decline"]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const req = advanceRequests.find(r=>r.id===Number(btn.dataset.id));
+      if(!req) return;
+      if(!confirm(`Decline ${req.employeeName}'s request for ${fmt(req.amount)} Sl.sh?`)) return;
+      req.status = 'declined';
+      await saveAdvanceRequests();
+      renderAdvanceRequestsTable();
+    });
+  });
+}
+
+async function openRequestAdvanceModal(){
+  await loadEmployees();
+  const active = employees.filter(e=>e.status==='Active');
+  const sel = $('#reqAdvanceEmployee');
+  sel.innerHTML = active.length
+    ? active.map(e=>`<option value="${e.id}">${e.fullName}</option>`).join('')
+    : '<option value="">Add an employee first (HR tab)</option>';
+  $('#reqAdvanceAmount').value = '';
+  $('#reqAdvanceReason').value = '';
+  $('#reqAdvanceMsg').className = 'msg';
+  $('#requestAdvanceModal').classList.add('active');
+}
+$('#posRequestAdvanceBtn').addEventListener('click', openRequestAdvanceModal);
+$('#waiterRequestAdvanceBtn').addEventListener('click', openRequestAdvanceModal);
+$('#kitchenRequestAdvanceBtn').addEventListener('click', openRequestAdvanceModal);
+$('#reqAdvanceCancelBtn').addEventListener('click', ()=> $('#requestAdvanceModal').classList.remove('active'));
+$('#reqAdvanceSendBtn').addEventListener('click', async ()=>{
+  const btn = $('#reqAdvanceSendBtn');
+  const msg = $('#reqAdvanceMsg');
+  const employeeId = $('#reqAdvanceEmployee').value ? Number($('#reqAdvanceEmployee').value) : null;
+  const employee = employeeId ? employees.find(e=>e.id===employeeId) : null;
+  if(!employee){ msg.textContent = 'Pick an employee first.'; msg.className = 'msg show err'; return; }
+  const amount = parseFloat($('#reqAdvanceAmount').value)||0;
+  if(amount<=0){ msg.textContent = 'Enter an amount greater than 0.'; msg.className = 'msg show err'; return; }
+
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending…';
+  try{
+    advanceRequests.push({
+      id: Date.now(),
+      employeeId: employee.id,
+      employeeName: employee.fullName,
+      amount,
+      reason: $('#reqAdvanceReason').value.trim(),
+      status: 'pending',
+      createdAt: Date.now()
+    });
+    await saveAdvanceRequests();
+    msg.textContent = `Request sent — ${employee.fullName} asked for ${fmt(amount)} Sl.sh.`;
+    msg.className = 'msg show ok';
+    setTimeout(()=>{ $('#requestAdvanceModal').classList.remove('active'); }, 900);
+  }catch(e){
+    console.error('Sending advance request failed:', e);
+    msg.textContent = 'Something went wrong: ' + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.textContent = originalLabel;
+    btn.disabled = false;
+  }
 });
 
 function computeEmployeeSalesTotal(employeeId, fromDate, toDate){
@@ -3264,7 +3658,12 @@ $('#payAdvanceDeduct').addEventListener('input', updateNetPayPreview);
 $('#payOtherDeduction').addEventListener('input', updateNetPayPreview);
 $('#payAmount').addEventListener('input', updateNetPayPreview);
 
-function postPayrollEntry(emp, grossAmount, dateStr, method, advanceDeduct, otherDeduct, deductionReason){
+function nextPayslipNumber(){
+  const n = entries.filter(e=>e.desc && e.desc.startsWith('Payroll:')).length + 1;
+  return 'PS-' + String(n).padStart(4, '0');
+}
+
+function postPayrollEntry(emp, grossAmount, dateStr, method, advanceDeduct, otherDeduct, deductionReason, periodLabel, commissionInfo){
   advanceDeduct = advanceDeduct || 0;
   otherDeduct = otherDeduct || 0;
   const netAmount = Math.max(0, grossAmount - advanceDeduct - otherDeduct);
@@ -3287,7 +3686,21 @@ function postPayrollEntry(emp, grossAmount, dateStr, method, advanceDeduct, othe
     date: dateStr,
     desc,
     lines,
-    advanceEmployeeId: advanceDeduct > 0.005 ? emp.id : undefined
+    advanceEmployeeId: advanceDeduct > 0.005 ? emp.id : undefined,
+    // Structured payroll data, kept alongside the journal lines so a payment slip can be
+    // printed or reprinted later without having to parse it back out of desc/lines.
+    payslipNo: nextPayslipNumber(),
+    payrollEmployeeId: emp.id,
+    payrollEmployeeName: emp.fullName,
+    payrollPosition: emp.position || '',
+    payrollGross: grossAmount,
+    payrollAdvanceDeduct: advanceDeduct,
+    payrollOtherDeduct: otherDeduct,
+    payrollDeductionReason: deductionReason || '',
+    payrollNet: netAmount,
+    payrollMethod: creditAccount,
+    payrollPeriodLabel: periodLabel || '',
+    payrollCommission: commissionInfo || null
   };
   entries.push(entry);
   return entry;
@@ -3316,7 +3729,24 @@ $('#runPayrollBtn').addEventListener('click', async ()=>{
     if(!confirm('The deductions add up to more than the gross pay, which would make net pay negative — it will be capped at 0. Continue?')) return;
   }
 
-  postPayrollEntry(emp, amount, dateStr, method, advanceDeduct, otherDeduct, deductionReason);
+  const payType = emp.payType || 'Monthly';
+  let periodLabel;
+  if(payType==='Daily'){
+    const days = parseFloat($('#payDaysWorked').value)||0;
+    const hasRange = $('#payPeriodFrom').value && $('#payPeriodTo').value;
+    periodLabel = `${fmt(days)} day(s) worked${hasRange ? ` (${$('#payPeriodFrom').value} to ${$('#payPeriodTo').value})` : ''}`;
+  }else{
+    periodLabel = 'Monthly salary';
+  }
+  let commissionInfo = null;
+  if(emp.hasCommission){
+    const from = $('#payCommFrom').value, to = $('#payCommTo').value;
+    const salesTotal = computeEmployeeSalesTotal(emp.id, from, to);
+    const commissionAmount = salesTotal * ((emp.commissionRate||0)/100);
+    if(commissionAmount > 0.005) commissionInfo = { from, to, salesTotal, rate: emp.commissionRate||0, commissionAmount };
+  }
+
+  const entry = postPayrollEntry(emp, amount, dateStr, method, advanceDeduct, otherDeduct, deductionReason, periodLabel, commissionInfo);
   await saveEntries();
   renderAll();
   renderEmployeesTable();
@@ -3326,6 +3756,7 @@ $('#runPayrollBtn').addEventListener('click', async ()=>{
   $('#payAdvanceDeduct').value = '';
   $('#payOtherDeduction').value = 0;
   $('#payDeductionReason').value = '';
+  openPayslipModal(entry.id);
 });
 
 $('#runPayrollAllBtn').addEventListener('click', async ()=>{
@@ -3339,7 +3770,7 @@ $('#runPayrollAllBtn').addEventListener('click', async ()=>{
   if(!confirm(`Run payroll for all ${active.length} active monthly-salary employee(s) with no commission? (Daily-rate and commission-earning employees aren't included — pay those individually above.)`)) return;
   const dateStr = $('#payDate').value || todayStr();
   const method = $('#payMethod').value;
-  active.forEach(emp => postPayrollEntry(emp, emp.monthlySalary, dateStr, method));
+  active.forEach(emp => postPayrollEntry(emp, emp.monthlySalary, dateStr, method, 0, 0, '', 'Monthly salary', null));
   await saveEntries();
   renderAll();
   msg.textContent = `Payroll posted for ${active.length} employee(s).`;
@@ -3354,14 +3785,99 @@ function renderPayrollHistory(){
     $('#payrollHistoryTable').innerHTML = '<div class="empty">No payroll has been run yet.</div>';
     return;
   }
-  let html = `<table><thead><tr><th style="width:70px;">No</th><th style="width:100px;">Date</th><th>Employee</th><th>Paid Via</th><th class="num">Amount</th></tr></thead><tbody>`;
+  let html = `<table><thead><tr><th style="width:70px;">No</th><th style="width:100px;">Date</th><th>Employee</th><th>Paid Via</th><th class="num">Amount</th><th></th></tr></thead><tbody>`;
   [...runs].sort((a,b)=>b.no-a.no).forEach(e=>{
     const expLine = e.lines.find(l=>l.account==='Salary Expense');
     const creditLine = e.lines.find(l=>l.account!=='Salary Expense' && l.credit>0);
-    html += `<tr><td>${e.no}</td><td>${e.date}</td><td>${e.desc.replace('Payroll: ','')}</td><td>${creditLine?creditLine.account:''}</td><td class="num">${fmt(expLine?expLine.debit:0)}</td></tr>`;
+    const slipBtn = e.payrollEmployeeId ? `<button class="secondary" data-action="slip" data-id="${e.id}" style="font-size:11.5px;padding:4px 10px;">🖨 Slip</button>` : '';
+    html += `<tr><td>${e.no}</td><td>${e.date}</td><td>${e.desc.replace('Payroll: ','')}</td><td>${creditLine?creditLine.account:''}</td><td class="num">${fmt(expLine?expLine.debit:0)}</td><td>${slipBtn}</td></tr>`;
   });
   html += '</tbody></table>';
   $('#payrollHistoryTable').innerHTML = html;
+  $$('#payrollHistoryTable [data-action="slip"]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openPayslipModal(Number(btn.dataset.id)));
+  });
+}
+
+/* ---------------- Payment Slip (reuses the same printable-document modal) ---------------- */
+function buildPayslipHtml(entry){
+  const c = entry.payrollCommission;
+  const baseAmount = c ? entry.payrollGross - c.commissionAmount : entry.payrollGross;
+  const earningsRows = [`<tr><td>${entry.payrollPeriodLabel || 'Base Pay'}</td><td class="idoc-num">${fmt(baseAmount)}</td></tr>`];
+  if(c){
+    const rangeLabel = (c.from && c.to) ? `, ${c.from} to ${c.to}` : '';
+    earningsRows.push(`<tr><td>Commission (${fmt(c.rate)}% of ${fmt(c.salesTotal)} in sales${rangeLabel})</td><td class="idoc-num">${fmt(c.commissionAmount)}</td></tr>`);
+  }
+
+  const deductionRows = [];
+  if(entry.payrollAdvanceDeduct > 0.005){
+    deductionRows.push(`<tr><td>Advance Repayment</td><td class="idoc-num">-${fmt(entry.payrollAdvanceDeduct)}</td></tr>`);
+  }
+  if(entry.payrollOtherDeduct > 0.005){
+    deductionRows.push(`<tr><td>Other Deduction${entry.payrollDeductionReason ? ` (${entry.payrollDeductionReason})` : ''}</td><td class="idoc-num">-${fmt(entry.payrollOtherDeduct)}</td></tr>`);
+  }
+
+  return `
+    <div class="idoc-title">Payment Slip</div>
+    <div class="idoc-toprow">
+      <div class="idoc-col">
+        <div class="idoc-label">FROM:</div>
+        <div class="idoc-line">${BUSINESS_INFO.name}</div>
+        ${BUSINESS_INFO.addressLines.map(l=>`<div class="idoc-line">${l}</div>`).join('')}
+      </div>
+      <div class="idoc-col">
+        <div class="idoc-label">PAID TO:</div>
+        <div class="idoc-line">${entry.payrollEmployeeName}</div>
+        ${entry.payrollPosition ? `<div class="idoc-line">${entry.payrollPosition}</div>` : ''}
+      </div>
+      <div class="idoc-col">
+        <div class="idoc-meta-row"><span class="idoc-meta-label">Slip #:</span><span>${entry.payslipNo||''}</span></div>
+        <div class="idoc-meta-row"><span class="idoc-meta-label">Pay Date:</span><span>${entry.date}</span></div>
+        <div class="idoc-meta-row"><span class="idoc-meta-label">Paid Via:</span><span>${entry.payrollMethod||''}</span></div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Earnings</th><th class="idoc-num">Amount</th></tr></thead>
+      <tbody>${earningsRows.join('')}</tbody>
+    </table>
+
+    ${deductionRows.length ? `
+    <table style="margin-top:12px;">
+      <thead><tr><th>Deductions</th><th class="idoc-num">Amount</th></tr></thead>
+      <tbody>${deductionRows.join('')}</tbody>
+    </table>` : ''}
+
+    <div class="idoc-totals">
+      <div class="idoc-totals-row"><span>Gross Pay</span><span>${fmt(entry.payrollGross)}</span></div>
+      ${entry.payrollAdvanceDeduct>0.005 ? `<div class="idoc-totals-row"><span>Advance Repayment</span><span>-${fmt(entry.payrollAdvanceDeduct)}</span></div>` : ''}
+      ${entry.payrollOtherDeduct>0.005 ? `<div class="idoc-totals-row"><span>Other Deduction</span><span>-${fmt(entry.payrollOtherDeduct)}</span></div>` : ''}
+      <div class="idoc-totals-row idoc-grand"><span>Net Pay</span><span>${fmt(entry.payrollNet)} Sl.sh</span></div>
+    </div>
+
+    <div class="idoc-bottom">
+      <div class="idoc-bottom-col">
+        <div class="idoc-bottom-title">Notes</div>
+        <div class="idoc-bottom-line">Thank you for your work!</div>
+      </div>
+    </div>
+  `;
+}
+
+function openPayslipModal(entryId){
+  const entry = entries.find(e=>e.id===entryId);
+  if(!entry || !entry.payrollEmployeeId) return;
+  const emp = employees.find(x=>x.id===entry.payrollEmployeeId);
+  currentDocPhone = emp ? emp.phone : null;
+  currentDocWaMessage = `Hi ${entry.payrollEmployeeName}, here's your payment slip ${entry.payslipNo} from ${BUSINESS_INFO.name} — net pay ${fmt(entry.payrollNet)} Sl.sh, paid ${entry.date}.`;
+  currentDocFilename = `Payslip-${entry.payslipNo}.png`;
+  $('#invoiceDocContent').classList.remove('receipt-mode');
+  $('#invoiceDocContent').innerHTML = buildPayslipHtml(entry);
+  statementCustomerId = null;
+  currentPosSale = null;
+  $('#posReceiptExtraActions').style.display = 'none';
+  $('#statementPaymentRow').style.display = 'none';
+  $('#invoicePrintModal').classList.add('active');
 }
 
 /* ---------------- HR sub-tabs ---------------- */
@@ -3394,6 +3910,8 @@ $$('.hr-subtab').forEach(tab=>{
     if(tab.dataset.hrview==='history') renderPayrollHistory();
     if(tab.dataset.hrview==='holidays'){ renderHolidaysTable(); renderAbsencesTable(); }
     if(tab.dataset.hrview==='attendance'){ startAttendanceLiveSync(); renderWorkplaceLocationStatus(); }
+    if(tab.dataset.hrview==='schedule'){ populateSchedEmployeeDropdown(); renderScheduleTable(); }
+    if(tab.dataset.hrview==='advances'){ loadAdvanceRequests().then(renderAdvanceRequestsTable); }
   });
 });
 
@@ -3418,6 +3936,10 @@ async function renderHR(){
   if(!$('#payDate').value) $('#payDate').value = todayStr();
   renderPayrollHistory();
   startEmployeesLiveSync();
+  await loadAdvanceRequests();
+  renderAdvanceRequestsTable();
+  await loadSchedule();
+  populateSchedEmployeeDropdown();
 }
 
 function populatePayMethodDropdown(){
@@ -4361,6 +4883,7 @@ async function sendInvoiceWhatsApp(invoiceId, triggerBtn){
 let currentDocPhone = null;
 let currentDocWaMessage = null;
 let currentDocFilename = null;
+let currentPosSale = null; // set when the print modal is showing a POS sale, so Kitchen/Counter Copy buttons know what to render
 
 /* ---------------- Customer Statement of Account ---------------- */
 function buildCustomerStatementHtml(customer, custInvoices, asOfDate){
@@ -4464,6 +4987,8 @@ function openCustomerStatementModal(customerId){
 
   $('#invoiceDocContent').classList.remove('receipt-mode');
   $('#invoiceDocContent').innerHTML = buildCustomerStatementHtml(customer, custInvoices, asOfDate);
+  currentPosSale = null;
+  $('#posReceiptExtraActions').style.display = 'none';
 
   const outstanding = custInvoices.filter(inv=>invoiceBalance(inv) > 0.005);
   if(outstanding.length > 0){
@@ -4492,6 +5017,8 @@ function openInvoicePrintModal(invoiceId){
   $('#invoiceDocContent').classList.remove('receipt-mode');
   $('#invoiceDocContent').innerHTML = buildInvoiceDocHtml(inv);
   statementCustomerId = null;
+  currentPosSale = null;
+  $('#posReceiptExtraActions').style.display = 'none';
   $('#statementPaymentRow').style.display = 'none';
   $('#invoicePrintModal').classList.add('active');
 }
@@ -4550,7 +5077,7 @@ function buildZaadPaymentBlock(sizePx){
     </div>`;
 }
 
-function buildPosReceiptHtml(sale){
+function buildPosReceiptHtml(sale, copyLabel){
   // sale = { receiptNo, date, items:[{name,qty,price}], total, paymentLabel, isCredit, customerName }
   const itemRows = sale.items.map(it => `
     <div class="rc-item">
@@ -4564,12 +5091,14 @@ function buildPosReceiptHtml(sale){
 
   const soldToLine = sale.isCredit ? `<div class="rc-meta-row"><span>Sold To</span><span>${sale.customerName||''}</span></div>` : '';
   const waiterLine = sale.waiterName ? `<div class="rc-meta-row"><span>Served By</span><span>${sale.waiterName}</span></div>` : '';
+  const copyLabelHtml = copyLabel ? `<div class="rc-copy-label">${copyLabel}</div>` : '';
 
   return `
     <div class="rc-header">
       <div class="rc-crest">UB</div>
       <div class="rc-bizname">${BUSINESS_INFO.name}</div>
       <div class="rc-addr">${BUSINESS_INFO.addressLines.join(' · ')}<br>${BUSINESS_INFO.email}</div>
+      ${copyLabelHtml}
     </div>
 
     <div class="rc-divider"></div>
@@ -4611,7 +5140,38 @@ function buildPosReceiptHtml(sale){
   `;
 }
 
+/* Kitchen ticket — what to prepare, no prices or payment info; larger type for quick reading at the pass. */
+function buildKitchenTicketHtml(sale){
+  const itemRows = sale.items.map(it => `
+    <div class="kt-item"><span class="kt-qty">${fmt(it.qty)}×</span><span>${it.name}</span></div>`).join('');
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  const waiterLine = sale.waiterName ? `<div class="rc-meta-row"><span>Served By</span><span>${sale.waiterName}</span></div>` : '';
+  const forLine = sale.isCredit && sale.customerName ? `<div class="rc-meta-row"><span>For</span><span>${sale.customerName}</span></div>` : '';
+
+  return `
+    <div class="rc-header">
+      <div class="rc-bizname">${BUSINESS_INFO.name}</div>
+      <div class="rc-copy-label kitchen">🍳 KITCHEN COPY</div>
+    </div>
+
+    <div class="rc-divider"></div>
+
+    <div class="rc-meta-row"><span>Order #</span><span>${sale.receiptNo}</span></div>
+    <div class="rc-meta-row"><span>Time</span><span>${sale.date} · ${timeStr}</span></div>
+    ${waiterLine}
+    ${forLine}
+
+    <div class="rc-divider"></div>
+
+    <div class="kt-items">${itemRows}</div>
+
+    <div class="rc-snip">✂ - - - - - - - - - - - - - - - - - -</div>
+  `;
+}
+
 function openReceiptPrintModal(sale){
+  currentPosSale = sale;
   if(sale.isCredit){
     const customer = customers.find(c=>c.name===sale.customerName);
     currentDocPhone = customer ? customer.phone : null;
@@ -4622,9 +5182,10 @@ function openReceiptPrintModal(sale){
   }
   currentDocFilename = `Receipt-${sale.receiptNo}.png`;
   $('#invoiceDocContent').classList.add('receipt-mode');
-  $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildPosReceiptHtml(sale)}</div>`;
+  $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildPosReceiptHtml(sale, 'CUSTOMER COPY')}</div>`;
   statementCustomerId = null;
   $('#statementPaymentRow').style.display = 'none';
+  $('#posReceiptExtraActions').style.display = '';
   $('#invoicePrintModal').classList.add('active');
 }
 
@@ -4646,7 +5207,7 @@ $('#sendDocWhatsAppBtn').addEventListener('click', async ()=>{
   }
 });
 
-$('#printInvoiceDocBtn').addEventListener('click', ()=>{
+function triggerDocPrint(afterPrint){
   document.body.classList.add('printing-invoice');
   requestAnimationFrame(()=>{
     requestAnimationFrame(()=>{
@@ -4656,9 +5217,37 @@ $('#printInvoiceDocBtn').addEventListener('click', ()=>{
         console.error('Print failed:', e);
         alert("Couldn't open the print dialog: " + e.message + "\n\nIf you're viewing this inside another app/frame, try opening the file directly in your browser instead.");
       }
-      setTimeout(()=> document.body.classList.remove('printing-invoice'), 300);
+      setTimeout(()=>{
+        document.body.classList.remove('printing-invoice');
+        if(afterPrint) afterPrint();
+      }, 300);
     });
   });
+}
+
+/* Swap the visible document back to the customer receipt (used after a Kitchen/Counter copy is printed). */
+function showCustomerReceiptCopy(){
+  if(!currentPosSale) return;
+  $('#invoiceDocContent').classList.add('receipt-mode');
+  $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildPosReceiptHtml(currentPosSale, 'CUSTOMER COPY')}</div>`;
+}
+
+$('#printKitchenCopyBtn').addEventListener('click', ()=>{
+  if(!currentPosSale) return;
+  $('#invoiceDocContent').classList.add('receipt-mode');
+  $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildKitchenTicketHtml(currentPosSale)}</div>`;
+  triggerDocPrint(showCustomerReceiptCopy);
+});
+
+$('#printCounterCopyBtn').addEventListener('click', ()=>{
+  if(!currentPosSale) return;
+  $('#invoiceDocContent').classList.add('receipt-mode');
+  $('#invoiceDocContent').innerHTML = `<div class="receipt-doc">${buildPosReceiptHtml(currentPosSale, 'COUNTER COPY')}</div>`;
+  triggerDocPrint(showCustomerReceiptCopy);
+});
+
+$('#printInvoiceDocBtn').addEventListener('click', ()=>{
+  triggerDocPrint();
 });
 
 $('#statementPayBtn').addEventListener('click', async ()=>{
@@ -5259,11 +5848,36 @@ function rebuildAccountsList(){
   ACCOUNTS = BASE_ACCOUNTS.concat(bankAccounts.map(b => ({ name: b.name, type: 'Asset', normal: 'debit', isBank: true, bankId: b.id })));
 }
 
+// Mobile money wallets — proper Asset accounts (separate from the "X Revenue" income
+// categories) so paying an advance out of one keeps the ledger and reports correct.
+// Deliberately not added to cashEquivalentAccountNames() — that list drives the
+// Deposit Into / Payroll / Bill-payment pickers, which weren't asked to change; these
+// only show up as extra "Paid From" options on Give Advance.
+const MOBILE_MONEY_ACCOUNTS = [
+  {name:'Zaad', label:'Zaad'},
+  {name:'Edahab', label:'eDahab'},
+  {name:'Waafi', label:'Waafi'},
+  {name:'DahabPlus', label:'DahabPlus'},
+  {name:'Premier Wallet', label:'Premier Wallet'}
+];
+
 function isCashEquivalent(accountName){
-  return accountName === 'Cash' || bankAccounts.some(b => b.name === accountName);
+  return accountName === 'Cash' || bankAccounts.some(b => b.name === accountName) || MOBILE_MONEY_ACCOUNTS.some(m => m.name === accountName);
 }
 function cashEquivalentAccountNames(){
   return ['Cash', ...bankAccounts.map(b=>b.name)];
+}
+function advancePaymentMethodOptions(){
+  return [{name:'Cash', label:'Cash'}, ...bankAccounts.map(b=>({name:b.name, label:b.name})), ...MOBILE_MONEY_ACCOUNTS];
+}
+// Actual total liquid cash on hand — every account isCashEquivalent recognizes (Cash,
+// Bank Accounts, and mobile money wallets), regardless of which pickers offer them.
+// Used by the "Cash on Hand" dashboard widgets and the Cash Flow Statement so a wallet
+// balance from a Give Advance payout is never silently missing from those totals.
+function computeTotalCashEquivalents(totals){
+  return ACCOUNTS.filter(a=>isCashEquivalent(a.name)).reduce((s,acct)=>{
+    return s + acctBalance(totals[acct.name] || {debit:0,credit:0}, acct);
+  }, 0);
 }
 
 function clearBankAcctForm(){
@@ -5408,6 +6022,7 @@ async function renderBankAccounts(){
 const POS_ITEMS_KEY = "ubcafe_pos_items";
 let posItems = [];
 let cart = []; // [{itemId, name, price, qty}]
+let pendingCheckoutMeta = null; // {kitchenStatus} carried over when a sale request (e.g. from a waiter) is loaded into the cart, so kitchen progress isn't lost when the sale is finalized
 let posActiveCategory = 'All';
 
 const HOLIDAYS_KEY = "ubcafe_holidays";
@@ -5417,6 +6032,19 @@ async function loadHolidays(){
   try{ holidays = val ? JSON.parse(val) : []; }catch(e){ holidays = []; }
 }
 async function saveHolidays(){ await storageSet(HOLIDAYS_KEY, JSON.stringify(holidays), true); }
+
+const SCHEDULE_KEY = "ubcafe_schedule";
+const SCHEDULE_DAYS = ['Sat','Sun','Mon','Tue','Wed','Thu']; // Friday is the off day, same as everywhere else in the app
+const SHIFT_TYPES = {
+  Morning: { startTime: '06:00', endTime: '12:00' },
+  Afternoon: { startTime: '16:00', endTime: '22:00' }
+};
+let schedule = []; // [{id, employeeId, employeeName, day:'Mon'..'Sun', startTime:'08:00', endTime:'16:00'}]
+async function loadSchedule(){
+  const val = await storageGet(SCHEDULE_KEY, true);
+  try{ schedule = val ? JSON.parse(val) : []; }catch(e){ schedule = []; }
+}
+async function saveSchedule(){ await storageSet(SCHEDULE_KEY, JSON.stringify(schedule), true); }
 
 function isFriday(dateStr){
   // JS Date treats a plain "YYYY-MM-DD" string as UTC midnight, so use getUTCDay to avoid
@@ -5483,8 +6111,19 @@ function isAbsent(employeeId, dateStr){
   return absences.some(a => a.employeeId===employeeId && a.date===dateStr);
 }
 
+const ADVANCE_REQUESTS_KEY = "ubcafe_advance_requests";
+let advanceRequests = []; // [{id, employeeId, employeeName, amount, reason, status:'pending'|'approved'|'declined', createdAt}]
+
+async function loadAdvanceRequests(){
+  const val = await storageGet(ADVANCE_REQUESTS_KEY, true);
+  try{ advanceRequests = val ? JSON.parse(val) : []; }catch(e){ advanceRequests = []; }
+}
+async function saveAdvanceRequests(){
+  await storageSet(ADVANCE_REQUESTS_KEY, JSON.stringify(advanceRequests), true);
+}
+
 const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
-let saleRequests = []; // [{id, source:'customer', customerId, customerName, items:[{itemId,name,price,qty}], note, status:'pending', createdAt}]
+let saleRequests = []; // [{id, source:'customer'|'waiter', customerId, customerName, waiterId, waiterName, items:[{itemId,name,price,qty}], note, status:'pending', kitchenStatus:'pending'|'ready', createdAt}]
 
 async function loadSaleRequests(){
   const val = await storageGet(SALE_REQUESTS_KEY, true);
@@ -5965,6 +6604,7 @@ function computeCartTotals(){
 
 $('#posClearCartBtn').addEventListener('click', ()=>{
   cart=[];
+  pendingCheckoutMeta = null;
   $('#posDiscountValue').value = 0;
   $('#posDiscountType').value = 'amount';
   renderCart();
@@ -6064,10 +6704,12 @@ $('#posCheckoutBtn').addEventListener('click', async ()=>{
       posSubtotal: cartTotals.subtotal,
       posDiscountAmount: cartTotals.discountAmount,
       posWaiterId: waiterId,
-      posWaiterName: waiterName
+      posWaiterName: waiterName,
+      kitchenStatus: (pendingCheckoutMeta && pendingCheckoutMeta.kitchenStatus) || 'pending'
     };
     entries.push(journalEntry);
     await saveEntries();
+    pendingCheckoutMeta = null;
 
     // Credit sales need a real Invoice record too — not just the journal entry — so the
     // customer can be tracked properly (shows in Invoice List, is payable there, and shows
@@ -6224,9 +6866,9 @@ async function renderPOS(){
 }
 
 /* ---------------------------------------------------------------------
-   Pending customer orders — submitted from the public Customer Order
-   screen. Shown here so a cashier can load one into the cart and
-   complete the checkout.
+   Pending orders — submitted either from the public Customer Order
+   screen or by a Waiter using the Place Order tab. Shown here so a
+   cashier can load one into the cart and complete the checkout.
 --------------------------------------------------------------------- */
 function renderPosPendingRequests(){
   const el = $('#posPendingRequests');
@@ -6241,10 +6883,13 @@ function renderPosPendingRequests(){
   if(label) label.style.display = '';
   el.innerHTML = pending.map(r=>{
     const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const sourceIcon = r.source==='waiter' ? '🧑‍🍳' : '🧾';
+    const waiterSuffix = r.source==='waiter' && r.waiterName ? ` (${r.waiterName})` : '';
+    const readyTag = r.kitchenStatus==='ready' ? ' · ✅ ready in kitchen' : '';
     return `
     <div class="wp-request-card">
-      <div class="wpr-top"><span>🧾 ${r.customerName}${r.note ? ' — ' + r.note : ''}</span><span>${fmt(r.items.reduce((s,it)=>s+it.price*it.qty,0))} Sl.sh</span></div>
-      <div class="wpr-items">${itemSummary}</div>
+      <div class="wpr-top"><span>${sourceIcon} ${r.customerName}${waiterSuffix}${r.note ? ' — ' + r.note : ''}</span><span>${fmt(r.items.reduce((s,it)=>s+it.price*it.qty,0))} Sl.sh</span></div>
+      <div class="wpr-items">${itemSummary}${readyTag}</div>
       <div class="wpr-actions">
         <button class="primary" data-action="load" data-id="${r.id}">Load into Sale</button>
         <button class="secondary" data-action="dismiss" data-id="${r.id}">Dismiss</button>
@@ -6286,6 +6931,14 @@ async function loadSaleRequestIntoCart(requestId){
   });
   renderCart();
 
+  // Carry the waiter and kitchen-ready status forward so finalizing the sale doesn't
+  // lose who served it or reset an order the kitchen already marked ready.
+  pendingCheckoutMeta = { kitchenStatus: req.kitchenStatus || 'pending' };
+  if(req.waiterId){
+    const sel = $('#posWaiter');
+    if(sel && Array.from(sel.options).some(o=>o.value===String(req.waiterId))) sel.value = String(req.waiterId);
+  }
+
   saleRequests = saleRequests.filter(r=>r.id!==requestId);
   await saveSaleRequests();
   renderPosPendingRequests();
@@ -6294,6 +6947,198 @@ async function loadSaleRequestIntoCart(requestId){
   msg.textContent = `Loaded ${req.customerName}'s order${req.note ? ' (' + req.note + ')' : ''} — review and complete the sale.`;
   msg.className = 'msg show ok';
 }
+
+/* ---------------------------------------------------------------------
+   Place Order (Waiter) — a waiter picks items from the menu and sends
+   the order off as a pending sale request. It doesn't touch stock or
+   the ledger — that only happens once the counter loads it into the
+   POS and completes the sale. The same request shows up live in the
+   Kitchen Dashboard so prep can start right away.
+--------------------------------------------------------------------- */
+let waiterOrderCart = []; // [{itemId, name, price, qty}]
+let waiterOrderActiveCategory = 'All';
+
+async function renderWaiterOrderView(){
+  await loadPosItems();
+  await loadEmployees();
+  await loadSaleRequests();
+  renderWoCategoryBar();
+  renderWoItemGrid();
+  renderWoCart();
+  populateWoWaiterSelect();
+  renderWoSentOrders();
+}
+
+function renderWoCategoryBar(){
+  const cats = ['All', ...new Set(posItems.map(it=>it.category||'General'))];
+  $('#woCategoryBar').innerHTML = cats.map(c=>
+    `<button class="pos-cat-btn ${c===waiterOrderActiveCategory?'active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  $$('#woCategoryBar .pos-cat-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      waiterOrderActiveCategory = btn.dataset.cat;
+      renderWoCategoryBar();
+      renderWoItemGrid();
+    });
+  });
+}
+
+function renderWoItemGrid(){
+  const items = waiterOrderActiveCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===waiterOrderActiveCategory);
+  if(items.length===0){
+    $('#woItemGrid').innerHTML = '<div class="empty">No items in this category yet.</div>';
+    return;
+  }
+  $('#woItemGrid').innerHTML = items.map(it=>{
+    const outOfStock = it.trackStock && (it.stock||0) <= 0;
+    return `
+    <div class="pos-item-btn ${outOfStock ? 'out-of-stock' : ''}" data-id="${it.id}">
+      <div class="pi-name">${it.name}</div>
+      <div class="pi-price">${fmt(it.price)} Sl.sh</div>
+    </div>`;
+  }).join('');
+  $$('#woItemGrid .pos-item-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> addToWaiterOrder(Number(btn.dataset.id)));
+  });
+}
+
+function addToWaiterOrder(itemId){
+  const item = posItems.find(it=>it.id===itemId);
+  if(!item) return;
+  if(item.trackStock && (item.stock||0)<=0){
+    alert(`${item.name} is out of stock.`);
+    return;
+  }
+  const line = waiterOrderCart.find(c=>c.itemId===itemId);
+  if(line){ line.qty += 1; } else { waiterOrderCart.push({ itemId, name: item.name, price: item.price, qty: 1 }); }
+  renderWoCart();
+}
+
+function renderWoCart(){
+  if(waiterOrderCart.length===0){
+    $('#woCartList').innerHTML = '<div class="empty" style="padding:14px 0;">Tap items to add them to this order.</div>';
+  }else{
+    $('#woCartList').innerHTML = waiterOrderCart.map((c,i)=>`
+      <div class="pos-cart-row">
+        <span class="pc-name">${c.name}</span>
+        <span class="pc-qty-controls">
+          <button class="pc-qty-btn" data-action="dec" data-i="${i}">−</button>
+          <span>${c.qty}</span>
+          <button class="pc-qty-btn" data-action="inc" data-i="${i}">+</button>
+        </span>
+        <span class="pc-total">${fmt(c.price*c.qty)}</span>
+        <button class="pc-remove" data-action="rm" data-i="${i}">✕</button>
+      </div>
+    `).join('');
+    $$('#woCartList [data-action]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.i);
+        if(btn.dataset.action==='inc') waiterOrderCart[i].qty += 1;
+        if(btn.dataset.action==='dec'){ waiterOrderCart[i].qty -= 1; if(waiterOrderCart[i].qty<=0) waiterOrderCart.splice(i,1); }
+        if(btn.dataset.action==='rm') waiterOrderCart.splice(i,1);
+        renderWoCart();
+      });
+    });
+  }
+  const total = waiterOrderCart.reduce((s,c)=>s+c.price*c.qty, 0);
+  $('#woCartTotal').textContent = fmt(total) + ' Sl.sh';
+  $('#woSendBtn').disabled = waiterOrderCart.length===0;
+}
+
+function populateWoWaiterSelect(){
+  const sel = $('#woWaiterSelect');
+  if(!sel) return;
+  const previousValue = sel.value;
+  const waiters = waiterEmployees();
+  sel.innerHTML = waiters.length
+    ? waiters.map(e=>`<option value="${e.id}">${e.fullName}</option>`).join('')
+    : '<option value="">Add a waiter first (HR tab)</option>';
+  if(waiters.some(e=>String(e.id)===previousValue)) sel.value = previousValue;
+}
+
+function renderWoSentOrders(){
+  const el = $('#woSentOrders');
+  if(!el) return;
+  const pending = saleRequests.filter(r=>r.status==='pending' && r.source==='waiter');
+  if(pending.length===0){
+    el.innerHTML = '<div class="empty" style="padding:6px 0;font-size:12px;">No orders sent yet.</div>';
+    return;
+  }
+  el.innerHTML = [...pending].reverse().map(r=>{
+    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const readyTag = r.kitchenStatus==='ready'
+      ? '<span style="color:var(--credit);font-weight:600;">✅ Ready</span>'
+      : '<span style="color:var(--ink-soft);">🍳 Preparing</span>';
+    return `
+    <div class="wp-request-card">
+      <div class="wpr-top"><span>${r.customerName}${r.waiterName ? ' · ' + r.waiterName : ''}</span>${readyTag}</div>
+      <div class="wpr-items">${itemSummary}${r.note ? ' — ' + r.note : ''}</div>
+      <div class="wpr-actions">
+        <button class="secondary" data-action="cancel" data-id="${r.id}">Cancel Order</button>
+      </div>
+    </div>`;
+  }).join('');
+  $$('#woSentOrders [data-action="cancel"]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirm('Cancel this order? This cannot be undone.')) return;
+      saleRequests = saleRequests.filter(r=>r.id!==Number(btn.dataset.id));
+      await saveSaleRequests();
+      renderWoSentOrders();
+    });
+  });
+}
+
+$('#woSendBtn').addEventListener('click', async ()=>{
+  const btn = $('#woSendBtn');
+  const msg = $('#woMsg');
+  const tableName = $('#woTableName').value.trim();
+  if(!tableName){
+    msg.textContent = 'Enter a table number or customer name first.';
+    msg.className = 'msg show err';
+    return;
+  }
+  if(waiterOrderCart.length===0) return;
+  const waiterId = $('#woWaiterSelect').value ? Number($('#woWaiterSelect').value) : null;
+  const waiterName = waiterId ? (employees.find(e=>e.id===waiterId)?.fullName || null) : null;
+
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending…';
+  try{
+    saleRequests.push({
+      id: Date.now(),
+      source: 'waiter',
+      waiterId, waiterName,
+      customerId: null,
+      customerName: tableName,
+      items: waiterOrderCart.map(c=>({ itemId: c.itemId, name: c.name, price: c.price, qty: c.qty })),
+      note: $('#woNote').value.trim(),
+      status: 'pending',
+      kitchenStatus: 'pending',
+      createdAt: Date.now()
+    });
+    await saveSaleRequests();
+    waiterOrderCart = [];
+    $('#woTableName').value = '';
+    $('#woNote').value = '';
+    renderWoCart();
+    renderWoSentOrders();
+    msg.textContent = `Order sent for ${tableName} — the kitchen and counter can see it now.`;
+    msg.className = 'msg show ok';
+  }catch(e){
+    console.error('Sending order failed:', e);
+    msg.textContent = 'Something went wrong: ' + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.textContent = originalLabel;
+    btn.disabled = waiterOrderCart.length===0;
+  }
+});
+
+$('#woClearBtn').addEventListener('click', ()=>{
+  waiterOrderCart = [];
+  renderWoCart();
+});
 
 /* ---------------------------------------------------------------------
    Waiter Dashboard — per-waiter sales totals for the selected period,
@@ -6385,6 +7230,104 @@ function renderWaiterDashboard(){
 $('#wdWaiterFilter').addEventListener('change', renderWaiterDashboard);
 
 /* ---------------------------------------------------------------------
+   Kitchen Dashboard — live queue of what to prepare, oldest first, with
+   a Mark Ready toggle. Pulls from two sources: today's finalized POS
+   sales (entries) and orders a waiter has sent but the counter hasn't
+   checked out yet (saleRequests) — the kitchen shouldn't have to wait
+   for payment to start cooking. No prices shown here — same "just what
+   to make" spirit as the printed Kitchen Copy ticket.
+--------------------------------------------------------------------- */
+function kitchenQueue(){
+  const fromEntries = entries
+    .filter(e => e.date===todayStr() && e.desc && e.desc.startsWith('POS Sale:') && e.posItems && e.posItems.length)
+    .map(e => ({
+      kind: 'entry', id: e.id, time: e.id,
+      label: e.posReceiptNo || '',
+      forTag: e.posIsCredit && e.posCustomerName ? `For ${e.posCustomerName}` : 'Walk-in',
+      waiterName: e.posWaiterName, items: e.posItems,
+      kitchenStatus: e.kitchenStatus || 'pending'
+    }));
+  const fromRequests = saleRequests
+    .filter(r => r.status==='pending' && r.items && r.items.length)
+    .map(r => ({
+      kind: 'request', id: r.id, time: r.createdAt || r.id,
+      label: '🕓 Awaiting checkout',
+      forTag: r.customerName || 'Order',
+      waiterName: r.waiterName, items: r.items,
+      kitchenStatus: r.kitchenStatus || 'pending'
+    }));
+  return [...fromEntries, ...fromRequests];
+}
+
+function kitchenOrderCardHtml(o, isReady){
+  const time = new Date(o.time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  const itemRows = o.items.map(it=>`<div class="ko-item"><span class="ko-qty">${fmt(it.qty)}×</span><span>${it.name}</span></div>`).join('');
+  const waiterTag = o.waiterName ? ` · 🧑‍🍳 ${o.waiterName}` : '';
+  return `
+    <div class="kitchen-order-card${isReady ? ' ready' : ''}">
+      <div class="ko-top"><span>${o.label}</span><span>${time}</span></div>
+      <div class="ko-meta">${o.forTag}${waiterTag}</div>
+      <div class="ko-items">${itemRows}</div>
+      <button class="secondary" data-kind="${o.kind}" data-id="${o.id}" data-action="${isReady ? 'unready' : 'ready'}" style="width:100%;">
+        ${isReady ? '↩ Back to Pending' : '✅ Mark Ready'}
+      </button>
+    </div>`;
+}
+
+async function openKitchenDashboard(){
+  await loadSaleRequests();
+  renderKitchenDashboard();
+}
+
+function renderKitchenDashboard(){
+  const orders = kitchenQueue();
+  const pending = orders.filter(o => o.kitchenStatus === 'pending').sort((a,b)=> a.time - b.time);
+  const ready = orders.filter(o => o.kitchenStatus === 'ready').sort((a,b)=> b.time - a.time);
+
+  $('#kitchenPendingCount').textContent = pending.length;
+  $('#kitchenPendingWrap').innerHTML = pending.length
+    ? pending.map(o=>kitchenOrderCardHtml(o, false)).join('')
+    : '<div class="empty">No pending orders. 🎉</div>';
+  $('#kitchenReadyWrap').innerHTML = ready.length
+    ? ready.map(o=>kitchenOrderCardHtml(o, true)).join('')
+    : '<div class="empty">No completed orders yet today.</div>';
+
+  $$('#view-kitchen [data-action="ready"]').forEach(btn=>{
+    btn.addEventListener('click', ()=> setKitchenStatus(btn.dataset.kind, Number(btn.dataset.id), 'ready'));
+  });
+  $$('#view-kitchen [data-action="unready"]').forEach(btn=>{
+    btn.addEventListener('click', ()=> setKitchenStatus(btn.dataset.kind, Number(btn.dataset.id), 'pending'));
+  });
+}
+
+async function setKitchenStatus(kind, id, status){
+  if(kind==='request'){
+    const req = saleRequests.find(r=>r.id===id);
+    if(!req) return;
+    req.kitchenStatus = status;
+    await saveSaleRequests();
+  }else{
+    const entry = entries.find(e=>e.id===id);
+    if(!entry) return;
+    entry.kitchenStatus = status;
+    await saveEntries();
+  }
+  renderKitchenDashboard();
+}
+
+$('#kitchenRefreshBtn').addEventListener('click', async ()=>{
+  const btn = $('#kitchenRefreshBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  await loadEntries();
+  await loadSaleRequests();
+  renderKitchenDashboard();
+  btn.textContent = originalLabel;
+  btn.disabled = false;
+});
+
+/* ---------------------------------------------------------------------
    Authentication (lightweight — see note below)
    NOTE: this is a soft access gate for a small shared device/team, not
    real security. Credentials live in this artifact's shared storage in
@@ -6396,7 +7339,7 @@ $('#wdWaiterFilter').addEventListener('change', renderWaiterDashboard);
        reset passwords, promote/demote roles). Full access to every tab.
      - Staff: can log in and use the app (entries, journal, reports),
        but doesn't see the Manage Users screen. Full access to every tab.
-     - Cashier / Waiter: narrower roles, restricted to just the tab(s)
+     - Cashier / Waiter / Kitchen: narrower roles, restricted to just the tab(s)
        they need (see ROLE_ALLOWED_VIEWS below). Anyone logging in with
        one of these roles skips the general Welcome dashboard and goes
        straight to their one screen.
@@ -6414,7 +7357,8 @@ let currentUserRole = null;
    unrestricted access — every sidebar tab, same as before. */
 const ROLE_ALLOWED_VIEWS = {
   'Cashier': ['pos'],
-  'Waiter': ['waiterdash']
+  'Waiter': ['waiterorder', 'waiterdash'],
+  'Kitchen': ['kitchen']
 };
 function allowedViewsForRole(role){
   return ROLE_ALLOWED_VIEWS[role] || null; // null = unrestricted
@@ -6901,6 +7845,8 @@ $('#goShowAttendanceQr').addEventListener('click', ()=>{
   currentDocFilename = 'staff-checkin-qr.png';
   $('#invoiceDocContent').classList.remove('receipt-mode');
   $('#invoiceDocContent').innerHTML = buildAttendanceQrDocHtml(link);
+  currentPosSale = null;
+  $('#posReceiptExtraActions').style.display = 'none';
   $('#statementPaymentRow').style.display = 'none';
   $('#invoicePrintModal').classList.add('active');
 });
@@ -7099,6 +8045,8 @@ const BACKUP_KEYS = {
   bills: BILLS_KEY,
   bankAccounts: BANK_ACCOUNTS_KEY,
   saleRequests: SALE_REQUESTS_KEY,
+  advanceRequests: ADVANCE_REQUESTS_KEY,
+  schedule: SCHEDULE_KEY,
   posItems: POS_ITEMS_KEY,
   users: USERS_KEY,
   holidays: HOLIDAYS_KEY,
@@ -7354,10 +8302,7 @@ async function renderWelcome(){
   await loadBankAccounts();
   rebuildAccountsList();
   const allTotals = computeLedger();
-  const cash = cashEquivalentAccountNames().reduce((s,name)=>{
-    const acct = ACCOUNTS.find(a=>a.name===name);
-    return acct ? s + acctBalance(allTotals[name] || {debit:0,credit:0}, acct) : s;
-  }, 0);
+  const cash = computeTotalCashEquivalents(allTotals);
 
   await loadEmployees();
   const activeCount = employees.filter(e=>e.status==='Active').length;
@@ -7468,10 +8413,7 @@ function updateSidebarWidgets(){
   if(!cashEl || !salesEl) return;
 
   const totals = computeLedger();
-  const cash = cashEquivalentAccountNames().reduce((s,name)=>{
-    const acct = ACCOUNTS.find(a=>a.name===name);
-    return acct ? s + acctBalance(totals[name] || {debit:0,credit:0}, acct) : s;
-  }, 0);
+  const cash = computeTotalCashEquivalents(totals);
   cashEl.textContent = fmt(cash) + ' Sl.sh';
 
   const todaySales = entries.filter(e => e.date===todayStr() && e.desc && e.desc.startsWith('POS Sale:'));
