@@ -7,8 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F7F2E4;
@@ -25,16 +26,49 @@
     --shadow: 0 1px 2px rgba(30,42,36,0.06), 0 8px 24px rgba(30,42,36,0.10);
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+  html,body{margin:0;padding:0;color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
   body{
-    background-image: radial-gradient(var(--paper-line) 1px, transparent 1px);
-    background-size: 22px 22px;
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(rgba(247,242,228,0.90), rgba(247,242,228,0.90)),
+      url('cafe-background.jpg');
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
   }
   @media (prefers-reduced-motion: reduce){ *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
 
   @keyframes dropIn{from{opacity:0;transform:translateY(-14px);}to{opacity:1;transform:translateY(0);}}
 
-  .wrap{max-width:560px;margin:0 auto;padding:36px 18px 60px;}
+  .wrap{max-width:1120px;margin:0 auto;padding:36px 18px 60px;}
+  .narrow{max-width:560px;margin-left:auto;margin-right:auto;}
+
+  /* ---------- Language switcher ---------- */
+  .lang-switch{display:flex;gap:6px;justify-content:center;margin-bottom:16px;}
+  .lang-btn{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:11px;padding:7px 16px;border-radius:999px;
+    border:1.5px solid var(--paper-line);background:#fff;color:var(--ink-soft);cursor:pointer;letter-spacing:.04em;
+    transition:all .15s ease;
+  }
+  .lang-btn:hover:not(.active){border-color:var(--brass);color:var(--ink);}
+  .lang-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  /* ---------- RTL (Arabic) ---------- */
+  html[dir="rtl"] body{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .item-card .i-name{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .cust-name .cn-name{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .confirm-wrap h2{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .item-card .i-badge{right:auto;left:8px;}
+  html[dir="rtl"] .item-card .i-soldout-ribbon{left:auto;right:-30px;transform:rotate(40deg);}
+
+  /* ---------- Order layout: menu left, cart on the right ---------- */
+  .order-layout{display:flex;gap:22px;align-items:flex-start;}
+  .menu-col{flex:1 1 60%;min-width:0;}
+  .cart-col{flex:0 0 380px;position:sticky;top:18px;align-self:flex-start;}
+  @media (max-width: 860px){
+    .order-layout{flex-direction:column;}
+    .cart-col{position:static;width:100%;flex:none;}
+  }
 
   /* ---------- Illustrated banner ---------- */
   .banner{
@@ -48,11 +82,11 @@
 
   /* ---------- Navigation bar ---------- */
   .nav-bar{
-    display:flex;gap:8px;margin-bottom:20px;position:sticky;top:12px;z-index:10;
+    display:flex;gap:14px;margin-bottom:26px;position:sticky;top:12px;z-index:10;
     animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) .05s both;
   }
   .nav-item{
-    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 6px 11px;border-radius:13px;
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 12px 17px;border-radius:13px;
     border:1.5px solid var(--paper-line);background:var(--card);color:var(--ink-soft);cursor:pointer;text-align:center;
     transition:all .18s cubic-bezier(.2,.8,.3,1);-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(30,42,36,.04);
   }
@@ -105,29 +139,50 @@
   .empty{text-align:center;padding:24px 10px;color:var(--ink-soft);font-size:13px;}
 
   /* ---------- Menu / category chips ---------- */
-  .cat-bar{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;}
+  .cat-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
   .cat-chip{
-    flex:0 0 auto;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;padding:8px 14px;
+    flex:0 0 auto;font-family:'Inter',sans-serif;font-weight:700;font-size:11.5px;padding:9px 16px;
     border-radius:999px;border:1.5px solid var(--paper-line);background:#fff;color:var(--ink-soft);cursor:pointer;
-    white-space:nowrap;transition:all .15s ease;
+    white-space:nowrap;transition:all .15s ease;text-transform:uppercase;letter-spacing:.06em;
   }
-  .cat-chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+  .cat-chip:hover:not(.active){border-color:var(--brass);color:var(--ink);}
+  .cat-chip.active{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+    box-shadow:0 3px 8px rgba(30,42,36,.25);transform:translateY(-1px);
+  }
 
-  .item-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));gap:9px;margin-bottom:6px;}
+  .item-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(136px, 1fr));gap:11px;margin-bottom:6px;}
   .item-card{
-    border:1.5px solid var(--paper-line);border-radius:11px;padding:12px 10px;background:#fff;cursor:pointer;
+    border:1.5px solid var(--paper-line);border-radius:13px;padding:16px 12px 14px;background:#fff;cursor:pointer;
     transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;-webkit-tap-highlight-color:transparent;
+    text-align:center;position:relative;overflow:hidden;
   }
   .item-card:hover{border-color:var(--brass);transform:translateY(-2px);box-shadow:0 4px 10px rgba(30,42,36,.08);}
   .item-card:active{transform:translateY(0) scale(.97);}
-  .item-card.out-of-stock{opacity:.4;cursor:not-allowed;}
-  .item-card .i-name{font-weight:600;font-size:13px;margin-bottom:4px;}
-  .item-card .i-price{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass-dark);}
+  .item-card.out-of-stock{opacity:.55;cursor:not-allowed;}
+  .item-card .i-icon{font-size:23px;line-height:1;margin-bottom:8px;}
+  .item-card .i-image{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;margin-bottom:8px;background:var(--paper);}
+  .item-card .i-name{
+    font-family:'Fraunces',serif;font-weight:700;font-size:14px;line-height:1.3;color:var(--ink);
+    min-height:36px;display:flex;align-items:center;justify-content:center;
+  }
+  .item-card .i-divider{width:26px;height:1px;background:var(--paper-line);margin:9px auto;}
+  .item-card .i-price{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink);font-weight:700;}
+  .item-card .i-badge{
+    position:absolute;top:8px;right:8px;background:var(--ink);color:var(--paper);font-family:'IBM Plex Mono',monospace;
+    font-weight:700;font-size:11px;min-width:20px;height:20px;border-radius:999px;display:flex;align-items:center;
+    justify-content:center;padding:0 5px;box-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .item-card .i-soldout-ribbon{
+    position:absolute;top:11px;left:-30px;background:var(--debit);color:#fff;font-size:9px;font-weight:700;
+    padding:3px 32px;transform:rotate(-40deg);letter-spacing:.05em;text-transform:uppercase;
+  }
 
   /* ---------- Cart ---------- */
   .cart-section{margin-top:18px;padding-top:16px;border-top:1px dashed var(--paper-line);}
-  .cart-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--paper-line);font-size:13px;}
-  .cart-row:last-child{border-bottom:none;}
+  .cart-item-wrap{padding:8px 0;border-bottom:1px dashed var(--paper-line);}
+  .cart-item-wrap:last-child{border-bottom:none;}
+  .cart-row{display:flex;align-items:center;gap:8px;font-size:13px;}
   .cart-row .cr-name{flex:1;}
   .cart-row .cr-qty{display:flex;align-items:center;gap:6px;}
   .qty-btn{
@@ -136,8 +191,13 @@
   }
   .cart-row .cr-total{font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:60px;text-align:right;}
   .cart-row .cr-remove{background:none;border:none;color:var(--debit);cursor:pointer;font-size:15px;padding:2px 4px;}
+  .cr-note-input{
+    width:100%;margin-top:6px;font-family:'Inter',sans-serif;font-size:11.5px;padding:6px 10px;
+    border:1px dashed var(--paper-line);border-radius:7px;background:var(--paper);color:var(--ink-soft);box-sizing:border-box;
+  }
+  .cr-note-input:focus{outline:none;border-color:var(--brass);border-style:solid;background:#fff;color:var(--ink);}
   .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-weight:700;font-size:15px;}
-  .cart-total-row .ct-value{font-family:'IBM Plex Mono',monospace;color:var(--brass-dark);}
+  .cart-total-row .ct-value{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
 
   /* ---------- Confirmation ---------- */
   .confirm-wrap{text-align:center;padding:20px 10px;}
@@ -152,9 +212,21 @@
     100%{transform:scale(1) rotate(-7deg);opacity:1;}
   }
   .confirm-wrap h2{font-family:'Fraunces',serif;font-weight:700;font-size:19px;margin:0 0 8px;}
+  .confirm-order-no{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--brass-dark);margin-bottom:10px;letter-spacing:.03em;}
   .confirm-status{font-weight:700;font-size:14.5px;margin-top:12px;}
 
+  /* ---------- Star rating picker ---------- */
+  .star-picker{display:flex;gap:6px;justify-content:center;padding:10px 0 4px;}
+  .star-picker .star{
+    font-size:38px;line-height:1;color:var(--paper-line);cursor:pointer;transition:transform .12s ease, color .12s ease;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .star-picker .star:hover{transform:scale(1.12);}
+  .star-picker .star.filled{color:var(--brass);}
+  .star-picker .star.filled:active{transform:scale(.92);}
+
   .track-card{background:var(--card);border:1px solid var(--paper-line);border-radius:11px;padding:14px;margin-bottom:10px;}
+  .track-card .tc-order-no{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--brass-dark);margin-bottom:5px;letter-spacing:.02em;}
   .track-card .tc-top{font-size:13px;margin-bottom:4px;}
   .track-card .tc-items{font-size:12px;color:var(--ink-soft);}
   .track-card .tc-status{font-weight:700;margin-top:8px;font-size:13px;}
@@ -162,6 +234,16 @@
   /* ---------- Payment info ---------- */
   .payment-info{font-size:12px;line-height:1.9;color:var(--ink-soft);}
   .payment-info b{color:var(--ink);}
+  .zaad-pay-block{
+    display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:14px;
+    border-top:1px dashed var(--paper-line);
+  }
+  .zaad-pay-block .zpb-title{font-weight:700;font-size:13px;color:var(--ink);}
+  .zaad-pay-block .zpb-sub{font-size:11px;margin-top:2px;}
+  .zaad-pay-block .zpb-dial{
+    display:inline-block;margin-top:4px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+    color:var(--brass-dark);text-decoration:underline;font-weight:600;
+  }
 
   /* ---------- Balance seal (Check My Balance) ---------- */
   .seal-wrap{display:flex;justify-content:center;margin-bottom:16px;}
@@ -201,10 +283,11 @@
 <div class="wrap">
 
   <div class="banner">
-    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="UB Cafe — University Cafeteria and Snack Bar">
+    <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="UB Cafe — University Cafeteria and Snack Bar">
       <defs>
-        <radialGradient id="bgGlow" cx="50%" cy="30%" r="75%">
-          <stop offset="0%" stop-color="#2A3A32"/>
+        <radialGradient id="bgGlow" cx="50%" cy="26%" r="80%">
+          <stop offset="0%" stop-color="#324438"/>
+          <stop offset="55%" stop-color="#233329"/>
           <stop offset="100%" stop-color="#1E2A24"/>
         </radialGradient>
         <pattern id="dotPattern" width="26" height="26" patternUnits="userSpaceOnUse">
@@ -212,17 +295,34 @@
         </pattern>
       </defs>
 
-      <rect width="800" height="220" fill="url(#bgGlow)"/>
-      <rect width="800" height="220" fill="url(#dotPattern)"/>
+      <rect width="1000" height="300" fill="url(#bgGlow)"/>
+      <rect width="1000" height="300" fill="url(#dotPattern)"/>
+
+      <!-- decorative outer frame -->
+      <rect x="16" y="16" width="968" height="268" fill="none" stroke="#B8892B" stroke-width="1" opacity="0.35"/>
 
       <!-- top & bottom brass double-rule, matching the ledger aesthetic -->
-      <line x1="0" y1="10" x2="800" y2="10" stroke="#B8892B" stroke-width="1.5" opacity="0.55"/>
-      <line x1="0" y1="14" x2="800" y2="14" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
-      <line x1="0" y1="206" x2="800" y2="206" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
-      <line x1="0" y1="210" x2="800" y2="210" stroke="#B8892B" stroke-width="1.5" opacity="0.55"/>
+      <line x1="0" y1="10" x2="1000" y2="10" stroke="#B8892B" stroke-width="2" opacity="0.55"/>
+      <line x1="0" y1="15" x2="1000" y2="15" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
+      <line x1="0" y1="285" x2="1000" y2="285" stroke="#B8892B" stroke-width="0.75" opacity="0.35"/>
+      <line x1="0" y1="290" x2="1000" y2="290" stroke="#B8892B" stroke-width="2" opacity="0.55"/>
+
+      <!-- corner flourishes -->
+      <g stroke="#B8892B" stroke-width="1.25" opacity="0.5" fill="none">
+        <path d="M 30 46 L 30 30 L 46 30"/>
+        <path d="M 954 30 L 970 30 L 970 46"/>
+        <path d="M 970 254 L 970 270 L 954 270"/>
+        <path d="M 46 270 L 30 270 L 30 254"/>
+      </g>
+
+      <!-- sparkle accents -->
+      <g fill="#B8892B" opacity="0.55">
+        <path d="M 250 58 L 253 66 L 261 69 L 253 72 L 250 80 L 247 72 L 239 69 L 247 66 Z"/>
+        <path d="M 748 226 L 750.5 232 L 757 234.5 L 750.5 237 L 748 243 L 745.5 237 L 739 234.5 L 745.5 232 Z"/>
+      </g>
 
       <!-- steaming cup, left -->
-      <g transform="translate(108,108)" opacity="0.92">
+      <g transform="translate(155,168) scale(1.3)" opacity="0.92">
         <path d="M -34 6 Q -34 34 -6 34 L 6 34 Q 34 34 34 6 L 34 -14 L -34 -14 Z" fill="none" stroke="#B8892B" stroke-width="2.5"/>
         <path d="M 34 -6 Q 50 -6 50 8 Q 50 22 34 20" fill="none" stroke="#B8892B" stroke-width="2.5"/>
         <line x1="-34" y1="-14" x2="34" y2="-14" stroke="#B8892B" stroke-width="2.5"/>
@@ -232,120 +332,190 @@
       </g>
 
       <!-- plate with sambusa, right -->
-      <g transform="translate(692,120)" opacity="0.92">
+      <g transform="translate(845,178) scale(1.3)" opacity="0.92">
         <ellipse cx="0" cy="18" rx="52" ry="13" fill="none" stroke="#B8892B" stroke-width="2.5"/>
         <ellipse cx="0" cy="14" rx="38" ry="9" fill="none" stroke="#B8892B" stroke-width="1.5" opacity="0.6"/>
         <path d="M -16 8 L 12 8 L -2 -20 Z" fill="none" stroke="#F7F2E4" stroke-width="2.25" stroke-linejoin="round" opacity="0.85"/>
         <circle cx="20" cy="4" r="5" fill="none" stroke="#F7F2E4" stroke-width="2" opacity="0.6"/>
       </g>
 
-      <!-- center crest + wordmark -->
-      <g transform="translate(400,78)" text-anchor="middle">
-        <circle r="30" fill="#1E2A24" stroke="#F7F2E4" stroke-width="2"/>
-        <text y="8" font-family="Fraunces, serif" font-weight="700" font-size="19" fill="#F7F2E4">UB</text>
+      <!-- small pastry, lower left -->
+      <g transform="translate(120,240) scale(0.85)" opacity="0.4">
+        <path d="M -20 4 Q -14 -12 0 -10 Q 14 -12 20 4 Q 8 -2 0 -2 Q -8 -2 -20 4 Z" fill="none" stroke="#F7F2E4" stroke-width="2" stroke-linejoin="round"/>
       </g>
-      <text x="400" y="150" text-anchor="middle" font-family="Fraunces, serif" font-weight="800" font-size="34" fill="#F7F2E4" letter-spacing="-0.5">UB Cafe</text>
-      <text x="400" y="174" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="12" fill="#E4D9BC" letter-spacing="2.5">UNIVERSITY CAFETERIA &amp; SNACK BAR</text>
+      <!-- small cup outline, lower right -->
+      <g transform="translate(880,244) scale(0.55)" opacity="0.4">
+        <path d="M -20 4 Q -20 20 -4 20 L 4 20 Q 20 20 20 4 L 20 -8 L -20 -8 Z" fill="none" stroke="#F7F2E4" stroke-width="2.5"/>
+        <path d="M 20 -4 Q 30 -4 30 5 Q 30 13 20 12" fill="none" stroke="#F7F2E4" stroke-width="2.5"/>
+      </g>
+
+      <!-- center crest + wordmark -->
+      <g transform="translate(500,102)" text-anchor="middle">
+        <circle r="46" fill="none" stroke="#B8892B" stroke-width="1.25" opacity="0.55"/>
+        <circle r="38" fill="#1E2A24" stroke="#F7F2E4" stroke-width="2.5"/>
+        <text y="10" font-family="Fraunces, serif" font-weight="700" font-size="25" fill="#F7F2E4">UB</text>
+      </g>
+      <text x="500" y="198" text-anchor="middle" font-family="Fraunces, serif" font-weight="800" font-size="46" fill="#F7F2E4" letter-spacing="-0.5">UB Cafe</text>
+      <g stroke="#B8892B" stroke-width="1" opacity="0.55">
+        <line x1="392" y1="217" x2="472" y2="217"/>
+        <line x1="528" y1="217" x2="608" y2="217"/>
+      </g>
+      <circle cx="500" cy="217" r="3" fill="#B8892B" opacity="0.8"/>
+      <text x="500" y="242" text-anchor="middle" font-family="Inter, sans-serif" font-weight="600" font-size="13.5" fill="#E4D9BC" letter-spacing="2.75">UNIVERSITY CAFETERIA &amp; SNACK BAR</text>
     </svg>
   </div>
 
-  <div class="header">
+  <div class="lang-switch narrow" id="langSwitch">
+    <button class="lang-btn" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="so">SO</button>
+    <button class="lang-btn" data-lang="ar">AR</button>
+  </div>
+
+  <div class="header narrow">
     <div class="crest">UB</div>
     <h1>UB Cafe</h1>
     <div class="sub">University Cafeteria &amp; Snack Bar</div>
   </div>
 
-  <div class="intro">Order ahead, check if it's ready, or see what you owe — pick one below.</div>
+  <div class="intro narrow" data-i18n="tagline">Order ahead, check if it's ready, or see what you owe — pick one below.</div>
 
-  <div class="nav-bar" id="navBar">
+  <div class="nav-bar narrow" id="navBar">
     <div class="nav-item active" data-section="place">
       <span class="nav-icon">🍽</span>
-      <span class="nav-label">Order</span>
-      <span class="nav-desc">Browse &amp; buy</span>
+      <span class="nav-label" data-i18n="nav_order">Order</span>
+      <span class="nav-desc" data-i18n="nav_order_desc">Browse &amp; buy</span>
     </div>
     <div class="nav-item" data-section="track">
       <span class="nav-icon">📦</span>
-      <span class="nav-label">Track</span>
-      <span class="nav-desc">Is it ready?</span>
+      <span class="nav-label" data-i18n="nav_track">Track</span>
+      <span class="nav-desc" data-i18n="nav_track_desc">Is it ready?</span>
     </div>
     <div class="nav-item" data-section="balance">
       <span class="nav-icon">💳</span>
-      <span class="nav-label">Balance</span>
-      <span class="nav-desc">What I owe</span>
+      <span class="nav-label" data-i18n="nav_balance">Balance</span>
+      <span class="nav-desc" data-i18n="nav_balance_desc">What I owe</span>
+    </div>
+    <div class="nav-item" data-section="rate">
+      <span class="nav-icon">⭐</span>
+      <span class="nav-label" data-i18n="nav_rate">Rate Us</span>
+      <span class="nav-desc" data-i18n="nav_rate_desc">Leave feedback</span>
     </div>
   </div>
 
   <!-- ===================== PLACE AN ORDER ===================== -->
   <div class="section active" id="section-place">
-    <div class="panel" id="orderForm">
-      <div class="cat-bar" id="catBar"></div>
-      <div class="item-grid" id="itemGrid"></div>
-
-      <div class="cart-section">
-        <div class="field" style="margin-bottom:10px;"><label>Your Cart</label></div>
-        <div id="cartList"></div>
-        <div class="cart-total-row"><span>Total</span><span class="ct-value" id="cartTotal">0 Sl.sh</span></div>
-      </div>
-
-      <div style="margin-top:18px;">
-        <div class="field">
-          <label for="custName">Your Name</label>
-          <input type="text" id="custName" placeholder="e.g. Ahmed">
-        </div>
-        <div class="field">
-          <label for="custPhone">Your Phone Number</label>
-          <input type="text" id="custPhone" placeholder="e.g. 0634449111" inputmode="tel">
-        </div>
-        <div class="field">
-          <label for="orderNote">Note (optional)</label>
-          <input type="text" id="orderNote" placeholder="e.g. Table 5">
+    <div class="order-layout" id="orderForm">
+      <div class="menu-col">
+        <div class="panel">
+          <input type="text" id="itemSearch" data-i18n-placeholder="search_items_placeholder" placeholder="🔍 Search items by name…" style="margin-bottom:12px;">
+          <div class="cat-bar" id="catBar"></div>
+          <div class="item-grid" id="itemGrid"></div>
         </div>
       </div>
 
-      <button class="primary" id="submitOrderBtn" disabled>Send Order to Counter</button>
-      <div class="msg" id="orderMsg"></div>
+      <div class="cart-col">
+        <div class="panel">
+          <div class="cart-section" style="margin-top:0;padding-top:0;border-top:none;">
+            <div class="field" style="margin-bottom:10px;"><label data-i18n="your_cart">Your Cart</label></div>
+            <div id="cartList"></div>
+            <div class="cart-total-row"><span data-i18n="total">Total</span><span class="ct-value" id="cartTotal">0 Sl.sh</span></div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <div class="field">
+              <label for="custName" data-i18n="your_name">Your Name</label>
+              <input type="text" id="custName" placeholder="e.g. Ahmed" data-i18n-placeholder="name_placeholder">
+            </div>
+            <div class="field">
+              <label for="custPhone" data-i18n="your_phone">Your Phone Number</label>
+              <input type="text" id="custPhone" placeholder="e.g. 0634449111" inputmode="tel" data-i18n-placeholder="phone_placeholder">
+            </div>
+            <div class="field">
+              <label for="orderNote" data-i18n="note_optional">Note (optional)</label>
+              <input type="text" id="orderNote" placeholder="e.g. Table 5" data-i18n-placeholder="note_placeholder">
+            </div>
+          </div>
+
+          <button class="primary" id="submitOrderBtn" disabled data-i18n="send_order">Send Order to Counter</button>
+          <div class="msg" id="orderMsg"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="panel" id="confirmPanel" style="display:none;">
+    <div class="panel narrow" id="confirmPanel" style="display:none;">
       <div class="confirm-wrap">
         <div class="confirm-seal">✓</div>
-        <h2>Order Sent!</h2>
+        <h2 data-i18n="order_sent_title">Order Sent!</h2>
+        <div class="confirm-order-no" id="confirmOrderNo"></div>
         <p id="confirmText" style="color:var(--ink-soft);font-size:13.5px;"></p>
         <div class="confirm-status" id="confirmStatusTracker"></div>
-        <button class="secondary" id="newOrderBtn" style="margin-top:18px;">Place Another Order</button>
+        <button class="secondary" id="newOrderBtn" style="margin-top:18px;" data-i18n="place_another_order">Place Another Order</button>
       </div>
     </div>
 
-    <div class="panel" style="margin-top:14px;">
-      <div class="field" style="margin-bottom:8px;"><label>Payment Info</label></div>
+    <div class="panel narrow" style="margin-top:14px;">
+      <div class="field" style="margin-bottom:8px;"><label data-i18n="payment_info">Payment Info</label></div>
       <div class="payment-info" id="paymentInfo"></div>
     </div>
   </div>
 
   <!-- ===================== TRACK ORDER ===================== -->
-  <div class="section" id="section-track">
+  <div class="section narrow" id="section-track">
     <div class="panel">
       <div class="field">
-        <label for="trackPhone">The phone number you ordered with</label>
-        <input type="text" id="trackPhone" placeholder="e.g. 0634449111" inputmode="tel">
+        <label for="trackPhone" data-i18n="track_phone_label">The phone number you ordered with</label>
+        <input type="text" id="trackPhone" placeholder="e.g. 0634449111" inputmode="tel" data-i18n-placeholder="phone_placeholder">
       </div>
-      <button class="primary" id="trackCheckBtn">Check Status</button>
+      <button class="primary" id="trackCheckBtn" data-i18n="check_status">Check Status</button>
       <div id="trackResult" style="margin-top:16px;"></div>
     </div>
   </div>
 
   <!-- ===================== CHECK BALANCE ===================== -->
-  <div class="section" id="section-balance">
+  <div class="section narrow" id="section-balance">
     <div class="panel" id="searchPanel">
       <div class="field">
-        <label for="phoneInput">Your Phone Number</label>
-        <input type="text" id="phoneInput" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel">
+        <label for="phoneInput" data-i18n="balance_phone_label">Your Phone Number</label>
+        <input type="text" id="phoneInput" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="phone_placeholder">
       </div>
-      <button class="primary" id="searchBtn">Check My Orders</button>
+      <button class="primary" id="searchBtn" data-i18n="check_my_orders">Check My Orders</button>
       <div class="msg" id="searchMsg"></div>
-      <div class="hint">Enter the phone number UB Cafe has on file for you to see your invoices and what you owe.</div>
+      <div class="hint" data-i18n="balance_hint">Enter the phone number UB Cafe has on file for you to see your invoices and what you owe.</div>
     </div>
     <div id="resultsArea"></div>
+  </div>
+
+  <!-- ===================== RATE US ===================== -->
+  <div class="section narrow" id="section-rate">
+    <div class="panel" id="rateForm">
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="how_was_it">How was it?</label></div>
+      <div class="star-picker" id="starPicker">
+        <span class="star" data-value="1">★</span>
+        <span class="star" data-value="2">★</span>
+        <span class="star" data-value="3">★</span>
+        <span class="star" data-value="4">★</span>
+        <span class="star" data-value="5">★</span>
+      </div>
+      <div class="field" style="margin-top:18px;">
+        <label for="reviewName" data-i18n="your_name_optional">Your Name (optional)</label>
+        <input type="text" id="reviewName" placeholder="e.g. Ahmed" data-i18n-placeholder="name_placeholder">
+      </div>
+      <div class="field">
+        <label for="reviewComment" data-i18n="tell_us_more">Tell us more (optional)</label>
+        <input type="text" id="reviewComment" placeholder="What did you like or what should we improve?" data-i18n-placeholder="review_placeholder">
+      </div>
+      <button class="primary" id="submitReviewBtn" disabled data-i18n="submit_rating">Submit Rating</button>
+      <div class="msg" id="reviewMsg"></div>
+    </div>
+
+    <div class="panel narrow" id="reviewThanksPanel" style="display:none;">
+      <div class="confirm-wrap">
+        <div class="confirm-seal">🙏</div>
+        <h2 data-i18n="thank_you">Thank You!</h2>
+        <p style="color:var(--ink-soft);font-size:13.5px;" data-i18n="feedback_helps">Your feedback helps us do better.</p>
+        <button class="secondary" id="rateAgainBtn" style="margin-top:18px;" data-i18n="rate_again">Leave Another Rating</button>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -419,14 +589,218 @@ const $ = sel => document.querySelector(sel);
 function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
 
+function buildQrSvg(text, sizePx){
+  if(typeof qrcode === 'undefined') return '';
+  try{
+    const qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    let svg = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    return svg.replace('<svg', `<svg style="width:${sizePx}px;height:${sizePx}px;display:block;"`);
+  }catch(e){
+    console.error('QR generation failed:', e);
+    return '';
+  }
+}
+
+/* ---------------------------------------------------------------------
+   i18n — English / Somali / Arabic. Static text uses data-i18n /
+   data-i18n-placeholder attributes; dynamically generated content
+   (item grid, cart, results lists) calls t() directly.
+--------------------------------------------------------------------- */
+const I18N = {
+  en: {
+    tagline: "Order ahead, check if it's ready, or see what you owe — pick one below.",
+    nav_order: "Order", nav_order_desc: "Browse & buy",
+    nav_track: "Track", nav_track_desc: "Is it ready?",
+    nav_balance: "Balance", nav_balance_desc: "What I owe",
+    nav_rate: "Rate Us", nav_rate_desc: "Leave feedback",
+    your_cart: "Your Cart", total: "Total",
+    your_name: "Your Name", your_phone: "Your Phone Number", note_optional: "Note (optional)",
+    name_placeholder: "e.g. Ahmed", phone_placeholder: "e.g. 0634449111", note_placeholder: "e.g. Table 5",
+    item_note_placeholder: "+ Special instructions (e.g. no sugar)",
+    send_order: "Send Order to Counter",
+    add_items_hint: "Tap items above to add them to your order.",
+    menu_empty: "Nothing on the menu yet — please check with the counter.",
+    order_sent_title: "Order Sent!", place_another_order: "Place Another Order",
+    payment_info: "Payment Info", pay_ahead_or_counter: "Pay Ahead or At the Counter", need_help: "Need help? Call",
+    pay_via_zaad: "Pay via Zaad", scan_to_pay: "Scan with your phone to pay", tap_to_dial: "Tap below on your phone to dial:",
+    track_phone_label: "The phone number you ordered with", check_status: "Check Status",
+    enter_phone_track: "Enter the phone number you ordered with.",
+    no_order_found: "No order found for that phone number.",
+    no_active_order: "No active order found for that phone number.",
+    balance_phone_label: "Your Phone Number", check_my_orders: "Check My Orders",
+    enter_phone_first: "Enter your phone number first.",
+    balance_hint: "Enter the phone number UB Cafe has on file for you to see your invoices and what you owe.",
+    no_orders_found: "We couldn't find any orders for that phone number. Double-check the number, or contact UB Cafe directly.",
+    you_owe: "You Owe", youre_paid_up: "You're Paid Up", no_invoices: "No invoices on file yet.",
+    paid_in_full: "Paid in full", owe: "Owe", search_different_number: "Search a different number",
+    how_was_it: "How was it?", your_name_optional: "Your Name (optional)", tell_us_more: "Tell us more (optional)",
+    review_placeholder: "What did you like or what should we improve?", submit_rating: "Submit Rating",
+    thank_you: "Thank You!", feedback_helps: "Your feedback helps us do better.", rate_again: "Leave Another Rating",
+    checking: "Checking…", sending: "Sending…",
+    name_required: "Please enter your name.",
+    order_error: "Something went wrong sending your order — please tell a staff member.",
+    review_error: "Something went wrong sending your rating — please try again.",
+    generic_error: "Something went wrong: ",
+    order_preparing: "We're preparing your order…", order_ready: "Your order is ready for pickup!",
+    order_completed: "Order completed — thanks for visiting!",
+    thanks_prefix: "Thanks", order_sent_body: "Your order has been sent to the counter",
+    pay_when_ready: "Please pay when it's ready.",
+    status_paid: "Paid", status_partial: "Partially Paid", status_unpaid: "Unpaid", status_overdue: "Overdue",
+    sold_out: "Sold Out", due: "due", all_categories: "All",
+    search_items_placeholder: "🔍 Search items by name…", no_search_results: "No items match your search."
+  },
+  so: {
+    tagline: "Dalbo intaad joogto, hubi haddii diyaar tahay, ama eeg waxaad ku leedahay — hoos ka dooro mid.",
+    nav_order: "Dalbo", nav_order_desc: "Baadh & iibso",
+    nav_track: "Raadraac", nav_track_desc: "Diyaar ma tahay?",
+    nav_balance: "Baaqiga", nav_balance_desc: "Waxa aan ku leeyahay",
+    nav_rate: "Naga Qiimee", nav_rate_desc: "Ra'yi ka dhig",
+    your_cart: "Dambiishaada", total: "Wadarta",
+    your_name: "Magacaaga", your_phone: "Lambarka Taleefankaaga", note_optional: "Fiiro gaar ah (ikhtiyaari)",
+    name_placeholder: "tusaale Ahmed", phone_placeholder: "tusaale 0634449111", note_placeholder: "tusaale Miiska 5",
+    item_note_placeholder: "+ Fadlan sheeg wax gaar ah (tusaale sokor la'aan)",
+    send_order: "U Dir Dalabka Kaawuntarka",
+    add_items_hint: "Taabo alaabta kore si aad ugu darto dalabkaaga.",
+    menu_empty: "Wali menu lama helin — fadlan la xiriir kaawuntarka.",
+    order_sent_title: "Dalabka Waa La Diray!", place_another_order: "Samee Dalab Kale",
+    payment_info: "Macluumaadka Lacag-bixinta", pay_ahead_or_counter: "Hore U Bixi Ama Kaawuntarka Ku Bixi",
+    need_help: "Caawimaad ma u baahan tahay? Wac",
+    pay_via_zaad: "Ku Bixi Zaad", scan_to_pay: "Ku sawir taleefankaaga si aad u bixiso", tap_to_dial: "Taabo hoose taleefankaaga si aad u wacdo:",
+    track_phone_label: "Lambarka aad ku dalbatay", check_status: "Hubi Xaaladda",
+    enter_phone_track: "Geli lambarka aad ku dalbatay.",
+    no_order_found: "Dalab uma helin lambarkaas taleefanka.",
+    no_active_order: "Dalab firfircoon uma helin lambarkaas taleefanka.",
+    balance_phone_label: "Lambarka Taleefankaaga", check_my_orders: "Hubi Dalabyadayda",
+    enter_phone_first: "Marka hore geli lambarkaaga taleefanka.",
+    balance_hint: "Geli lambarka taleefanka UB Cafe ay haystaan si aad u aragto qaansheegyadaada iyo waxa aad ku leedahay.",
+    no_orders_found: "Uma aanu helin wax dalab ah lambarkaas taleefanka. Hubi lambarka, ama toos ula xiriir UB Cafe.",
+    you_owe: "Waxaad Ku Leedahay", youre_paid_up: "Wax kuma saarna", no_invoices: "Weli qaansheegyo ma jiraan.",
+    paid_in_full: "Dhammaan waa la bixiyay", owe: "Waxaad ku leedahay", search_different_number: "Raadi lambar kale",
+    how_was_it: "Sideed u aragtay?", your_name_optional: "Magacaaga (ikhtiyaari)",
+    tell_us_more: "Wax dheeraad ah noo sheeg (ikhtiyaari)",
+    review_placeholder: "Maxaad jeclaatay ama maxaan hagaajino?", submit_rating: "Dir Qiimeynta",
+    thank_you: "Mahadsanid!", feedback_helps: "Ra'yigaaga wuu naga caawiyaa inaan si fiican u shaqeyno.",
+    rate_again: "Qiimeyn Kale Samee",
+    checking: "Hubinaya…", sending: "Dirsanaya…",
+    name_required: "Fadlan geli magacaaga.",
+    order_error: "Wax baa qaldamay markii dalabkaaga la dirayay — fadlan la hadal shaqaalaha.",
+    review_error: "Wax baa qaldamay markii qiimeyntaada la dirayay — fadlan isku day mar kale.",
+    generic_error: "Wax baa qaldamay: ",
+    order_preparing: "Waan diyaarinaynaa dalabkaaga…", order_ready: "Dalabkaagu wuu diyaar yahay!",
+    order_completed: "Dalabka waa la dhammeeyay — mahadsanid inaad na soo booqatay!",
+    thanks_prefix: "Mahadsanid", order_sent_body: "Dalabkaaga waxaa loo diray kaawuntarka",
+    pay_when_ready: "Fadlan bixi marka uu diyaar noqdo.",
+    status_paid: "La Bixiyay", status_partial: "Qayb Ahaan La Bixiyay", status_unpaid: "Lama Bixin", status_overdue: "Waqtigii Dhaafay",
+    sold_out: "Way Dhamaatay", due: "waqtiga", all_categories: "Dhammaan",
+    search_items_placeholder: "🔍 Ku raadi magaca alaabta…", no_search_results: "Wax alaab ah oo la mid ah lama helin."
+  },
+  ar: {
+    tagline: "اطلب مسبقًا، تحقق مما إذا كان جاهزًا، أو تحقق من رصيدك — اختر واحدًا أدناه.",
+    nav_order: "اطلب", nav_order_desc: "تصفح واشترِ",
+    nav_track: "تتبع", nav_track_desc: "هل هو جاهز؟",
+    nav_balance: "الرصيد", nav_balance_desc: "ما عليّ",
+    nav_rate: "قيّمنا", nav_rate_desc: "اترك ملاحظاتك",
+    your_cart: "سلتك", total: "الإجمالي",
+    your_name: "اسمك", your_phone: "رقم هاتفك", note_optional: "ملاحظة (اختياري)",
+    name_placeholder: "مثال: أحمد", phone_placeholder: "مثال: 0634449111", note_placeholder: "مثال: طاولة 5",
+    item_note_placeholder: "+ تعليمات خاصة (مثال: بدون سكر)",
+    send_order: "إرسال الطلب إلى الكاونتر",
+    add_items_hint: "اضغط على الأصناف أعلاه لإضافتها إلى طلبك.",
+    menu_empty: "لا توجد عناصر في القائمة بعد — يرجى مراجعة الكاونتر.",
+    order_sent_title: "تم إرسال الطلب!", place_another_order: "إجراء طلب آخر",
+    payment_info: "معلومات الدفع", pay_ahead_or_counter: "ادفع مسبقًا أو عند الكاونتر", need_help: "بحاجة للمساعدة؟ اتصل",
+    pay_via_zaad: "الدفع عبر Zaad", scan_to_pay: "امسح بهاتفك للدفع", tap_to_dial: "اضغط أدناه من هاتفك للاتصال:",
+    track_phone_label: "رقم الهاتف الذي استخدمته للطلب", check_status: "تحقق من الحالة",
+    enter_phone_track: "أدخل رقم الهاتف الذي طلبت به.",
+    no_order_found: "لم يتم العثور على طلب لهذا الرقم.",
+    no_active_order: "لا يوجد طلب نشط لهذا الرقم.",
+    balance_phone_label: "رقم هاتفك", check_my_orders: "تحقق من طلباتي",
+    enter_phone_first: "أدخل رقم هاتفك أولاً.",
+    balance_hint: "أدخل رقم الهاتف المسجل لدى UB Cafe لعرض فواتيرك وما عليك.",
+    no_orders_found: "لم نتمكن من العثور على أي طلبات لهذا الرقم. تحقق من الرقم، أو تواصل مع UB Cafe مباشرة.",
+    you_owe: "عليك", youre_paid_up: "لا يوجد عليك شيء", no_invoices: "لا توجد فواتير بعد.",
+    paid_in_full: "تم الدفع بالكامل", owe: "المستحق", search_different_number: "ابحث برقم آخر",
+    how_was_it: "كيف كانت تجربتك؟", your_name_optional: "اسمك (اختياري)", tell_us_more: "أخبرنا المزيد (اختياري)",
+    review_placeholder: "ما الذي أعجبك أو ما الذي يجب أن نحسّنه؟", submit_rating: "إرسال التقييم",
+    thank_you: "شكرًا لك!", feedback_helps: "ملاحظاتك تساعدنا على تقديم خدمة أفضل.", rate_again: "أضف تقييمًا آخر",
+    checking: "جارٍ التحقق…", sending: "جارٍ الإرسال…",
+    name_required: "يرجى إدخال اسمك.",
+    order_error: "حدث خطأ أثناء إرسال طلبك — يرجى إخبار أحد الموظفين.",
+    review_error: "حدث خطأ أثناء إرسال تقييمك — يرجى المحاولة مرة أخرى.",
+    generic_error: "حدث خطأ: ",
+    order_preparing: "نقوم بتحضير طلبك…", order_ready: "طلبك جاهز للاستلام!",
+    order_completed: "اكتمل الطلب — شكرًا لزيارتك!",
+    thanks_prefix: "شكرًا", order_sent_body: "تم إرسال طلبك إلى الكاونتر",
+    pay_when_ready: "يرجى الدفع عند جاهزية الطلب.",
+    status_paid: "مدفوع", status_partial: "مدفوع جزئيًا", status_unpaid: "غير مدفوع", status_overdue: "متأخر",
+    sold_out: "نفدت الكمية", due: "الاستحقاق", all_categories: "الكل",
+    search_items_placeholder: "🔍 ابحث عن صنف بالاسم…", no_search_results: "لا توجد أصناف مطابقة لبحثك."
+  }
+};
+
+let currentLang = (function(){
+  try{ return window.localStorage.getItem('ubcafe_lang') || 'en'; }catch(e){ return 'en'; }
+})();
+
+function t(key){
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+}
+
+function applyStaticTranslations(){
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  $$('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPlaceholder); });
+  $$('.lang-btn').forEach(btn=>{ btn.classList.toggle('active', btn.dataset.lang===currentLang); });
+}
+
+function setLang(lang){
+  currentLang = lang;
+  try{ window.localStorage.setItem('ubcafe_lang', lang); }catch(e){}
+  applyStaticTranslations();
+  // Re-render whatever's currently showing dynamic, JS-generated text.
+  renderCatBar();
+  renderItemGrid();
+  renderCart();
+  renderPaymentInfo();
+  renderStarPicker();
+  if(trackedCustomerId) renderTrackResults(trackedCustomerId);
+}
+
+$$('.lang-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> setLang(btn.dataset.lang));
+});
+
+
 const POS_ITEMS_KEY = "ubcafe_pos_items";
 const CUSTOMERS_KEY = "ubcafe_customers";
 const INVOICES_KEY = "ubcafe_invoices";
 const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
+const REVIEWS_KEY = "ubcafe_reviews";
+const ORDER_COUNTER_KEY = "ubcafe_order_counter"; // shared with index.html's Place Order (Waiter), so every order — customer or waiter — gets one unique running number
 
 let posItems = [];
 let customers = [];
 let saleRequests = [];
+let reviews = [];
+
+// Reads and increments a single shared counter so each order gets a stable, ever-increasing
+// number (ORD-0001, ORD-0002, ...) that survives the request itself later being removed from
+// saleRequests once the counter has checked it out — unlike saleRequests.length, which shrinks.
+async function nextOrderNo(){
+  let counter = 1;
+  try{
+    const val = await storageGet(ORDER_COUNTER_KEY, true);
+    const parsed = val ? JSON.parse(val) : null;
+    if(parsed && parsed.next) counter = parsed.next;
+  }catch(e){}
+  try{
+    await storageSet(ORDER_COUNTER_KEY, JSON.stringify({ next: counter + 1 }), true);
+  }catch(e){}
+  return 'ORD-' + String(counter).padStart(4, '0');
+}
 
 async function loadPosItems(){
   const val = await storageGet(POS_ITEMS_KEY, true);
@@ -442,6 +816,11 @@ async function loadSaleRequests(){
   try{ saleRequests = val ? JSON.parse(val) : []; }catch(e){ saleRequests = []; }
 }
 async function saveSaleRequests(){ await storageSet(SALE_REQUESTS_KEY, JSON.stringify(saleRequests), true); }
+async function loadReviews(){
+  const val = await storageGet(REVIEWS_KEY, true);
+  try{ reviews = val ? JSON.parse(val) : []; }catch(e){ reviews = []; }
+}
+async function saveReviews(){ await storageSet(REVIEWS_KEY, JSON.stringify(reviews), true); }
 
 /* Keep these in sync with PAYMENT_INFO in index.html */
 const PAYMENT_INFO = {
@@ -454,7 +833,8 @@ const PAYMENT_INFO = {
   premierWallet: "252634449111",
   zaadMerchant: "476934",
   edahabMerchant: "730854",
-  helpPhone: "0634449111"
+  helpPhone: "0634449111",
+  zaadUssd: "*883*476934*15#"
 };
 
 /* ---------------------------------------------------------------------
@@ -467,6 +847,7 @@ $$('.nav-item').forEach(tab=>{
     tab.classList.add('active');
     $('#section-'+tab.dataset.section).classList.add('active');
     if(tab.dataset.section==='place') renderOrderScreen();
+    if(tab.dataset.section==='rate') renderRateScreen();
   });
 });
 
@@ -475,24 +856,48 @@ $$('.nav-item').forEach(tab=>{
 --------------------------------------------------------------------- */
 let cart = [];
 let activeCategory = 'All';
+let searchQuery = '';
 
 function renderCatBar(){
   const cats = ['All', ...new Set(posItems.map(it=>it.category||'General'))];
   $('#catBar').innerHTML = cats.map(c=>
-    `<button class="cat-chip ${c===activeCategory?'active':''}" data-cat="${c}">${c}</button>`
+    `<button class="cat-chip ${c===activeCategory?'active':''}" data-cat="${c}">${c==='All' ? t('all_categories') : c}</button>`
   ).join('');
   $$('#catBar .cat-chip').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       activeCategory = btn.dataset.cat;
+      searchQuery = '';
+      $('#itemSearch').value = '';
       renderCatBar();
       renderItemGrid();
     });
   });
 }
 
+$('#itemSearch').addEventListener('input', ()=>{
+  searchQuery = $('#itemSearch').value.trim();
+  renderItemGrid();
+});
+
+const CATEGORY_ICONS = {
+  coffee:'☕', drinks:'🥤', drink:'🥤', beverages:'🥤', juice:'🧃', tea:'🍵',
+  food:'🍽', snacks:'🥐', snack:'🥐', pastry:'🥐', pastries:'🥐', bakery:'🥐',
+  breakfast:'🍳', lunch:'🍛', dinner:'🍛', dessert:'🍰', desserts:'🍰',
+  sandwich:'🥪', sandwiches:'🥪', general:'🍽'
+};
+function categoryIcon(cat){
+  return CATEGORY_ICONS[String(cat||'').toLowerCase().trim()] || '🍽';
+}
+
 function renderItemGrid(){
-  const items = activeCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===activeCategory);
+  const items = searchQuery
+    ? posItems.filter(it=>it.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : (activeCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===activeCategory));
   if(items.length===0){
+    if(searchQuery){
+      $('#itemGrid').innerHTML = `<div class="empty">${t('no_search_results')}</div>`;
+      return;
+    }
     let diag = '';
     try{
       const raw = window.localStorage.getItem(POS_ITEMS_KEY);
@@ -501,14 +906,22 @@ function renderItemGrid(){
         + `firestore connected: ${!!firestoreDb} | origin: ${location.origin} | path: ${location.pathname}`
         + `</div>`;
     }catch(e){}
-    $('#itemGrid').innerHTML = '<div class="empty">Nothing on the menu yet — please check with the counter.</div>' + diag;
+    $('#itemGrid').innerHTML = `<div class="empty">${t('menu_empty')}</div>` + diag;
     return;
   }
   $('#itemGrid').innerHTML = items.map(it=>{
     const outOfStock = it.trackStock && (it.stock||0) <= 0;
+    const inCartQty = cart.find(c=>c.itemId===it.id);
+    const iconHtml = it.image
+      ? `<img src="${it.image}" class="i-image" onerror="this.outerHTML='<div class=&quot;i-icon&quot;>${categoryIcon(it.category)}</div>';">`
+      : `<div class="i-icon">${categoryIcon(it.category)}</div>`;
     return `
     <div class="item-card ${outOfStock ? 'out-of-stock' : ''}" data-id="${it.id}">
+      ${inCartQty ? `<div class="i-badge">${inCartQty.qty}</div>` : ''}
+      ${outOfStock ? `<div class="i-soldout-ribbon">${t('sold_out')}</div>` : ''}
+      ${iconHtml}
       <div class="i-name">${it.name}</div>
+      <div class="i-divider"></div>
       <div class="i-price">${fmt(it.price)} Sl.sh</div>
     </div>`;
   }).join('');
@@ -524,24 +937,28 @@ function addToCart(itemId){
   const item = posItems.find(it=>it.id===itemId);
   if(!item) return;
   const line = cart.find(c=>c.itemId===itemId);
-  if(line){ line.qty += 1; } else { cart.push({ itemId, name: item.name, price: item.price, qty: 1 }); }
+  if(line){ line.qty += 1; } else { cart.push({ itemId, name: item.name, price: item.price, qty: 1, note: '' }); }
   renderCart();
+  renderItemGrid();
 }
 
 function renderCart(){
   if(cart.length===0){
-    $('#cartList').innerHTML = '<div class="empty" style="padding:10px 0;">Tap items above to add them to your order.</div>';
+    $('#cartList').innerHTML = `<div class="empty" style="padding:10px 0;">${t('add_items_hint')}</div>`;
   }else{
     $('#cartList').innerHTML = cart.map((c,i)=>`
-      <div class="cart-row">
-        <span class="cr-name">${c.name}</span>
-        <span class="cr-qty">
-          <button class="qty-btn" data-action="dec" data-i="${i}">−</button>
-          <span>${c.qty}</span>
-          <button class="qty-btn" data-action="inc" data-i="${i}">+</button>
-        </span>
-        <span class="cr-total">${fmt(c.price*c.qty)}</span>
-        <button class="cr-remove" data-action="rm" data-i="${i}">✕</button>
+      <div class="cart-item-wrap">
+        <div class="cart-row">
+          <span class="cr-name">${c.name}</span>
+          <span class="cr-qty">
+            <button class="qty-btn" data-action="dec" data-i="${i}">−</button>
+            <span>${c.qty}</span>
+            <button class="qty-btn" data-action="inc" data-i="${i}">+</button>
+          </span>
+          <span class="cr-total">${fmt(c.price*c.qty)}</span>
+          <button class="cr-remove" data-action="rm" data-i="${i}">✕</button>
+        </div>
+        <input type="text" class="cr-note-input" data-note-i="${i}" placeholder="${t('item_note_placeholder')}" value="${c.note||''}">
       </div>
     `).join('');
     $$('#cartList [data-action]').forEach(btn=>{
@@ -551,6 +968,13 @@ function renderCart(){
         if(btn.dataset.action==='dec'){ cart[i].qty -= 1; if(cart[i].qty<=0) cart.splice(i,1); }
         if(btn.dataset.action==='rm') cart.splice(i,1);
         renderCart();
+        renderItemGrid();
+      });
+    });
+    $$('#cartList [data-note-i]').forEach(input=>{
+      input.addEventListener('input', ()=>{
+        const i = Number(input.dataset.noteI);
+        if(cart[i]) cart[i].note = input.value;
       });
     });
   }
@@ -559,15 +983,30 @@ function renderCart(){
   $('#submitOrderBtn').disabled = cart.length===0;
 }
 
+function buildZaadPayBlockHtml(){
+  const dialHref = 'tel:' + PAYMENT_INFO.zaadUssd.replace(/#/g, '%23');
+  const qrHtml = buildQrSvg(PAYMENT_INFO.zaadUssd, 100);
+  return `
+    <div class="zaad-pay-block">
+      ${qrHtml ? `<div>${qrHtml}</div>` : ''}
+      <div>
+        <div class="zpb-title">${t('pay_via_zaad')}</div>
+        <div class="zpb-sub">${qrHtml ? t('scan_to_pay') : t('tap_to_dial')}</div>
+        <a href="${dialHref}" class="zpb-dial">${PAYMENT_INFO.zaadUssd}</a>
+      </div>
+    </div>`;
+}
+
 function renderPaymentInfo(){
   $('#paymentInfo').innerHTML = `
-    <b>Pay Ahead or At the Counter</b><br>
+    <b>${t('pay_ahead_or_counter')}</b><br>
     Zaad: ${PAYMENT_INFO.zaad} &nbsp;·&nbsp; eDahab: ${PAYMENT_INFO.edahab}<br>
     Waafi: ${PAYMENT_INFO.waafi} &nbsp;·&nbsp; DahabPlus: ${PAYMENT_INFO.dahabplus}<br>
     Premier Wallet: ${PAYMENT_INFO.premierWallet}<br>
     ${PAYMENT_INFO.bankName} — ${PAYMENT_INFO.accountNumber}<br>
     Zaad Merchant: ${PAYMENT_INFO.zaadMerchant} &nbsp;·&nbsp; eDahab Merchant: ${PAYMENT_INFO.edahabMerchant}<br>
-    <span style="opacity:.85;">Need help? Call ${PAYMENT_INFO.helpPhone}</span>
+    <span style="opacity:.85;">${t('need_help')} ${PAYMENT_INFO.helpPhone}</span>
+    ${buildZaadPayBlockHtml()}
   `;
 }
 
@@ -593,8 +1032,8 @@ async function renderOrderScreen(){
    screen updates on its own once staff act on it.
 --------------------------------------------------------------------- */
 function describeRequestStatus(req){
-  if(req.status === 'ready') return { text: '✅ Your order is ready for pickup!', color: 'var(--credit)' };
-  return { text: "⏳ We're preparing your order…", color: 'var(--brass-dark)' };
+  if(req.status === 'ready') return { text: '✅ ' + t('order_ready'), color: 'var(--credit)' };
+  return { text: "⏳ " + t('order_preparing'), color: 'var(--brass-dark)' };
 }
 
 let trackedRequestId = null;
@@ -609,7 +1048,7 @@ function handleTrackedStatusUpdate(value){
   try{ saleRequests = value ? JSON.parse(value) : []; }catch(e){ saleRequests = []; }
   const req = saleRequests.find(r=>r.id===trackedRequestId);
   if(!req){
-    el.textContent = '🎉 Order completed — thanks for visiting!';
+    el.textContent = '🎉 ' + t('order_completed');
     el.style.color = 'var(--credit)';
     stopStatusTracking();
     return;
@@ -632,7 +1071,7 @@ $('#submitOrderBtn').addEventListener('click', async ()=>{
   const msg = $('#orderMsg');
   const name = $('#custName').value.trim();
   const phone = $('#custPhone').value.trim();
-  if(!name){ msg.textContent='Please enter your name.'; msg.className='msg show err'; return; }
+  if(!name){ msg.textContent=t('name_required'); msg.className='msg show err'; return; }
   btn.disabled = true;
   try{
     await loadSaleRequests(); // refresh so we don't clobber requests submitted elsewhere in the meantime
@@ -654,26 +1093,31 @@ $('#submitOrderBtn').addEventListener('click', async ()=>{
     }
 
     const note = $('#orderNote').value.trim();
+    const orderNo = await nextOrderNo();
+    const now = Date.now();
     const request = {
-      id: Date.now(),
+      id: now,
+      orderNo,
       source: 'customer',
       customerId,
       customerName: name,
-      items: cart.map(c=>({ itemId:c.itemId, name:c.name, price:c.price, qty:c.qty })),
+      items: cart.map(c=>({ itemId:c.itemId, name:c.name, price:c.price, qty:c.qty, note:c.note||'' })),
       note,
       status: 'pending',
-      createdAt: new Date().toISOString()
+      createdAt: now
     };
     saleRequests.push(request);
     await saveSaleRequests();
 
     $('#orderForm').style.display = 'none';
     $('#confirmPanel').style.display = '';
-    $('#confirmText').textContent = `Thanks ${name}! Your order has been sent to the counter${note ? ' (' + note + ')' : ''}. Please pay when it's ready.`;
+    const placedAt = new Date(now).toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+    $('#confirmOrderNo').textContent = `${orderNo} · ${placedAt}`;
+    $('#confirmText').textContent = `${t('thanks_prefix')} ${name}! ${t('order_sent_body')}${note ? ' (' + note + ')' : ''}. ${t('pay_when_ready')}`;
     startStatusTracking(request.id);
   }catch(e){
     console.error('Customer order failed:', e);
-    msg.textContent = 'Something went wrong sending your order — please tell a staff member.';
+    msg.textContent = t('order_error');
     msg.className = 'msg show err';
   }finally{
     btn.disabled = cart.length===0;
@@ -690,13 +1134,14 @@ function renderTrackResults(customerId){
   const resultEl = $('#trackResult');
   const mine = saleRequests.filter(r=>r.customerId===customerId);
   if(mine.length===0){
-    resultEl.innerHTML = '<div class="empty">No active order found for that phone number.</div>';
+    resultEl.innerHTML = `<div class="empty">${t('no_active_order')}</div>`;
     return;
   }
   resultEl.innerHTML = mine.map(r=>{
-    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}${it.note ? ' ('+it.note+')' : ''}`).join(', ');
     const status = describeRequestStatus(r);
     return `<div class="track-card">
+      ${r.orderNo ? `<div class="tc-order-no">${r.orderNo} · ${new Date(r.createdAt).toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'})}</div>` : ''}
       <div class="tc-top">${r.note ? r.note + ' — ' : ''}${fmt(r.items.reduce((s,it)=>s+it.price*it.qty,0))} Sl.sh</div>
       <div class="tc-items">${itemSummary}</div>
       <div class="tc-status" style="color:${status.color};">${status.text}</div>
@@ -707,12 +1152,12 @@ function renderTrackResults(customerId){
 $('#trackCheckBtn').addEventListener('click', async ()=>{
   const resultEl = $('#trackResult');
   const phone = $('#trackPhone').value.trim();
-  if(!phone){ resultEl.innerHTML = '<div class="empty">Enter the phone number you ordered with.</div>'; return; }
+  if(!phone){ resultEl.innerHTML = `<div class="empty">${t('enter_phone_track')}</div>`; return; }
   await loadCustomers();
   // Only ever look up the ONE customer record matching this phone — never expose the full list.
   const match = customers.find(c => (c.phone||'').replace(/[^\d]/g,'') === phone.replace(/[^\d]/g,'') && phone.replace(/[^\d]/g,''));
   if(!match){
-    resultEl.innerHTML = '<div class="empty">No order found for that phone number.</div>';
+    resultEl.innerHTML = `<div class="empty">${t('no_order_found')}</div>`;
     return;
   }
   // Once matched, keep results live — no need to tap Check Status again to see
@@ -748,7 +1193,9 @@ function invoiceStatus(inv){
   if(balance < owed) return 'partial';
   return 'unpaid';
 }
-const STATUS_LABEL = { paid:'Paid', partial:'Partially Paid', unpaid:'Unpaid', overdue:'Overdue' };
+function statusLabel(status){
+  return { paid: t('status_paid'), partial: t('status_partial'), unpaid: t('status_unpaid'), overdue: t('status_overdue') }[status];
+}
 
 async function findOrders(phoneQuery){
   await loadCustomers();
@@ -765,7 +1212,7 @@ function renderBalanceResults(customer, custInvoices){
   const area = $('#resultsArea');
   if(!customer){
     area.innerHTML = '';
-    $('#searchMsg').textContent = "We couldn't find any orders for that phone number. Double-check the number, or contact UB Cafe directly.";
+    $('#searchMsg').textContent = t('no_orders_found');
     $('#searchMsg').className = 'msg show err';
     return;
   }
@@ -783,14 +1230,15 @@ function renderBalanceResults(customer, custInvoices){
       <div class="seal-wrap">
         <div class="seal ${owing ? 'owing' : ''}">
           <div class="seal-icon">${owing ? '⚠' : '✓'}</div>
-          <div class="seal-label">${owing ? 'You Owe' : "You're Paid Up"}</div>
+          <div class="seal-label">${owing ? t('you_owe') : t('youre_paid_up')}</div>
           <div class="seal-value">${fmt(totalOwed)}</div>
         </div>
       </div>
+      ${owing ? buildZaadPayBlockHtml() : ''}
   `;
 
   if(custInvoices.length === 0){
-    html += `<div class="empty">No invoices on file yet.</div>`;
+    html += `<div class="empty">${t('no_invoices')}</div>`;
   }else{
     [...custInvoices].sort((a,b)=> b.invoiceNo.localeCompare(a.invoiceNo)).forEach((inv, i)=>{
       const balance = invoiceBalance(inv);
@@ -802,21 +1250,21 @@ function renderBalanceResults(customer, custInvoices){
           <div class="oc-top">
             <div>
               <div class="oc-title">${inv.invoiceNo}</div>
-              <div class="oc-date">${inv.invoiceDate}${inv.dueDate ? ' · due ' + inv.dueDate : ''}</div>
+              <div class="oc-date">${inv.invoiceDate}${inv.dueDate ? ' · ' + t('due') + ' ' + inv.dueDate : ''}</div>
             </div>
-            <span class="status-pill ${status}">${STATUS_LABEL[status]}</span>
+            <span class="status-pill ${status}">${statusLabel(status)}</span>
           </div>
           <div class="oc-items">${itemsText}</div>
           <div class="oc-amounts">
-            <span>Total: ${fmt(owed)} Sl.sh</span>
-            <span class="oc-balance">${balance > 0.005 ? 'Owe: ' + fmt(balance) + ' Sl.sh' : 'Paid in full'}</span>
+            <span>${t('total')}: ${fmt(owed)} Sl.sh</span>
+            <span class="oc-balance">${balance > 0.005 ? t('owe') + ': ' + fmt(balance) + ' Sl.sh' : t('paid_in_full')}</span>
           </div>
         </div>
       `;
     });
   }
 
-  html += `<button class="back-link" id="searchAgainLink">Search a different number</button></div>`;
+  html += `<button class="back-link" id="searchAgainLink">${t('search_different_number')}</button></div>`;
   area.innerHTML = html;
 
   $('#searchAgainLink').addEventListener('click', ()=>{
@@ -831,18 +1279,18 @@ $('#searchBtn').addEventListener('click', async ()=>{
   const phone = $('#phoneInput').value.trim();
   const msg = $('#searchMsg');
   if(!phone){
-    msg.textContent = 'Enter your phone number first.';
+    msg.textContent = t('enter_phone_first');
     msg.className = 'msg show err';
     return;
   }
   btn.disabled = true;
   const original = btn.textContent;
-  btn.textContent = 'Checking…';
+  btn.textContent = t('checking');
   try{
     const { customer, invoices: custInvoices } = await findOrders(phone);
     renderBalanceResults(customer, custInvoices);
   }catch(e){
-    msg.textContent = 'Something went wrong: ' + e.message;
+    msg.textContent = t('generic_error') + e.message;
     msg.className = 'msg show err';
   }finally{
     btn.disabled = false;
@@ -850,6 +1298,65 @@ $('#searchBtn').addEventListener('click', async ()=>{
   }
 });
 $('#phoneInput').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#searchBtn').click(); });
+
+/* ---------------------------------------------------------------------
+   RATE US
+--------------------------------------------------------------------- */
+let selectedRating = 0;
+
+function renderStarPicker(){
+  $$('#starPicker .star').forEach(star=>{
+    star.classList.toggle('filled', Number(star.dataset.value) <= selectedRating);
+  });
+  $('#submitReviewBtn').disabled = selectedRating === 0;
+}
+
+$$('#starPicker .star').forEach(star=>{
+  star.addEventListener('click', ()=>{
+    selectedRating = Number(star.dataset.value);
+    renderStarPicker();
+  });
+});
+
+function renderRateScreen(){
+  selectedRating = 0;
+  $('#rateForm').style.display = '';
+  $('#reviewThanksPanel').style.display = 'none';
+  $('#reviewName').value = '';
+  $('#reviewComment').value = '';
+  $('#reviewMsg').className = 'msg';
+  renderStarPicker();
+}
+
+$('#submitReviewBtn').addEventListener('click', async ()=>{
+  if(selectedRating === 0) return;
+  const btn = $('#submitReviewBtn');
+  const msg = $('#reviewMsg');
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = t('sending');
+  try{
+    await loadReviews(); // refresh so we don't clobber reviews submitted elsewhere in the meantime
+    reviews.push({
+      id: Date.now(),
+      customerName: $('#reviewName').value.trim(),
+      rating: selectedRating,
+      comment: $('#reviewComment').value.trim(),
+      createdAt: new Date().toISOString()
+    });
+    await saveReviews();
+    $('#rateForm').style.display = 'none';
+    $('#reviewThanksPanel').style.display = '';
+  }catch(e){
+    console.error('Submitting review failed:', e);
+    msg.textContent = t('review_error');
+    msg.className = 'msg show err';
+  }finally{
+    btn.textContent = originalLabel;
+    btn.disabled = selectedRating === 0;
+  }
+});
+$('#rateAgainBtn').addEventListener('click', renderRateScreen);
 
 /* ---------------------------------------------------------------------
    Init
@@ -864,6 +1371,7 @@ function startPosItemsLiveSync(){
   });
 }
 startPosItemsLiveSync();
+applyStaticTranslations();
 renderOrderScreen();
 </script>
 </body>

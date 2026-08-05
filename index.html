@@ -9,7 +9,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F7F2E4;
@@ -39,6 +39,21 @@
   .masthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:22px;border-bottom:3px double var(--ink);padding-bottom:14px;}
   .masthead h1{font-family:'Fraunces',serif;font-weight:700;font-size:30px;margin:0;letter-spacing:-0.01em;}
   .masthead .sub{font-size:12.5px;color:var(--ink-soft);letter-spacing:.04em;text-transform:uppercase;}
+
+  /* ---------- Language switcher ---------- */
+  .lang-switch-mini{display:flex;gap:5px;}
+  .lang-switch-mini .lang-btn{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:10.5px;padding:5px 10px;border-radius:999px;
+    border:1.5px solid var(--paper-line);background:var(--card);color:var(--ink-soft);cursor:pointer;letter-spacing:.03em;
+    transition:all .15s ease;
+  }
+  .lang-switch-mini .lang-btn:hover:not(.active){border-color:var(--brass);color:var(--ink);}
+  .lang-switch-mini .lang-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  /* ---------- RTL (Arabic) ---------- */
+  html[dir="rtl"] body{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .masthead h1, html[dir="rtl"] .sidebar-title, html[dir="rtl"] .mobile-topbar-title{font-family:'Cairo',sans-serif;}
+  html[dir="rtl"] .sidebar-close-btn{right:auto;left:10px;}
 
   /* ---------- Tabs ---------- */
   .tabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;}
@@ -80,9 +95,13 @@
   }
   .pos-item-btn:hover{border-color:var(--brass);background:#FBF6EA;}
   .pos-item-btn:active{transform:scale(0.96);}
+  .pos-item-btn .pi-image{width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:8px;background:var(--paper);}
   .pos-item-btn .pi-name{font-weight:600;font-size:13px;margin-bottom:4px;}
   .pos-item-btn .pi-price{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass-dark);}
   .pos-item-btn .pi-stock{font-size:10.5px;margin-top:3px;color:var(--ink-soft);}
+  .item-thumb{width:34px;height:34px;object-fit:cover;border-radius:6px;display:block;}
+  .item-thumb-empty{width:34px;height:34px;border-radius:6px;background:var(--paper);color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;font-size:11px;}
   .pos-item-btn .pi-stock.low{color:var(--debit);font-weight:600;}
   .pos-item-btn.out-of-stock{opacity:.45;cursor:not-allowed;}
   .pos-item-btn.out-of-stock:hover{border-color:var(--paper-line);background:var(--card);}
@@ -102,6 +121,13 @@
   .wp-request-card .wpr-actions{display:flex;gap:8px;}
   .wp-request-card .wpr-actions button{font-size:12px;padding:5px 10px;}
 
+  .review-card{background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+  .review-card .rv-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .review-card .rv-stars{color:var(--brass);font-size:15px;letter-spacing:1px;}
+  .review-card .rv-date{font-size:11px;color:var(--ink-soft);}
+  .review-card .rv-name{font-weight:700;font-size:13px;margin-bottom:4px;}
+  .review-card .rv-comment{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+
   .kitchen-order-card{
     background:var(--card);border:1px solid var(--paper-line);border-radius:10px;padding:14px 16px;
     margin-bottom:10px;
@@ -110,9 +136,10 @@
   .kitchen-order-card .ko-top{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14px;margin-bottom:4px;}
   .kitchen-order-card .ko-meta{font-size:11.5px;color:var(--ink-soft);margin-bottom:10px;}
   .kitchen-order-card .ko-items{margin-bottom:12px;}
-  .kitchen-order-card .ko-item{display:flex;gap:8px;font-size:14px;font-weight:600;padding:4px 0;border-bottom:1px dotted var(--paper-line);}
+  .kitchen-order-card .ko-item{display:flex;flex-wrap:wrap;gap:8px;font-size:14px;font-weight:600;padding:4px 0;border-bottom:1px dotted var(--paper-line);}
   .kitchen-order-card .ko-item:last-child{border-bottom:none;}
   .kitchen-order-card .ko-item .ko-qty{font-family:'IBM Plex Mono',monospace;min-width:28px;color:var(--brass-dark);}
+  .kitchen-order-card .ko-item .ko-item-note{flex-basis:100%;font-size:12px;font-weight:700;color:var(--debit);padding-left:38px;}
 
   #scheduleTable table td.sched-cell{text-align:center;font-size:12px;white-space:nowrap;}
   #scheduleTable table td.sched-cell.off{color:var(--ink-soft);font-style:italic;}
@@ -126,7 +153,8 @@
   }
   .pos-cart-title{font-family:'Fraunces',serif;font-weight:600;font-size:15px;margin-bottom:10px;}
   .pos-cart-list{min-height:40px;max-height:220px;overflow-y:auto;margin-bottom:8px;}
-  .pos-cart-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--paper-line);font-size:12.5px;}
+  .pos-cart-item{padding:6px 0;border-bottom:1px dashed var(--paper-line);}
+  .pos-cart-row{display:flex;align-items:center;gap:8px;font-size:12.5px;}
   .pos-cart-row .pc-name{flex:1;}
   .pos-cart-row .pc-qty-controls{display:flex;align-items:center;gap:4px;}
   .pos-cart-row .pc-qty-btn{
@@ -135,6 +163,11 @@
   }
   .pos-cart-row .pc-total{font-family:'IBM Plex Mono',monospace;width:70px;text-align:right;}
   .pos-cart-row .pc-remove{background:none;border:none;color:var(--debit);cursor:pointer;font-size:14px;}
+  .pc-note-input{
+    width:100%;margin-top:4px;font-family:'Inter',sans-serif;font-size:11px;padding:4px 8px;
+    border:1px dashed var(--paper-line);border-radius:6px;background:#FBF6EA;color:var(--ink-soft);box-sizing:border-box;
+  }
+  .pc-note-input:focus{outline:none;border-color:var(--brass);border-style:solid;background:#fff;color:var(--ink);}
   .pos-cart-total{display:flex;justify-content:space-between;font-weight:700;font-size:16px;padding-top:8px;border-top:2px double var(--ink);}
   .pos-recent-title{font-family:'Fraunces',serif;font-weight:600;font-size:13px;margin:18px 0 8px;border-top:1px solid var(--paper-line);padding-top:14px;}
   .pos-recent-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;color:var(--ink-soft);}
@@ -205,6 +238,7 @@
   .receipt-doc .rc-item:last-child{border-bottom:none;}
   .receipt-doc .rc-item-top{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;}
   .receipt-doc .rc-item-sub{font-size:10.5px;color:#666;margin-top:1px;}
+  .receipt-doc .rc-item-note{font-size:11px;font-weight:700;color:#A63D2F;margin-top:2px;}
   .receipt-doc .rc-total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:700;padding:6px 0 2px;}
   .receipt-doc .rc-total-label{font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:#555;}
   .receipt-doc .rc-payment-row{display:flex;justify-content:space-between;font-size:11.5px;margin-top:4px;color:#444;}
@@ -219,9 +253,10 @@
   .receipt-doc .rc-copy-label{text-align:center;font-weight:700;font-size:11px;letter-spacing:.18em;color:#8C6A20;margin-top:4px;}
   .receipt-doc .rc-copy-label.kitchen{background:#1E2A24;color:#fff;padding:5px 0;border-radius:4px;margin:8px 0 0;font-size:12px;}
   .receipt-doc .kt-items{margin:4px 0;}
-  .receipt-doc .kt-item{display:flex;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px dotted #ddd;font-size:16px;font-weight:700;}
+  .receipt-doc .kt-item{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;padding:9px 0;border-bottom:1px dotted #ddd;font-size:16px;font-weight:700;}
   .receipt-doc .kt-item:last-child{border-bottom:none;}
   .receipt-doc .kt-item .kt-qty{font-family:'IBM Plex Mono',monospace;min-width:32px;}
+  .receipt-doc .kt-item .kt-item-note{flex-basis:100%;font-size:13px;font-weight:700;color:#A63D2F;padding-left:42px;}
   .invoice-doc .idoc-paid-badge{
     display:inline-block;border:3px solid #2C6E63;color:#2C6E63;font-weight:700;font-size:15px;
     letter-spacing:.15em;padding:4px 14px;border-radius:6px;transform:rotate(-6deg);
@@ -389,7 +424,14 @@
   .screen.active{display:block;}
 
   /* ---------- Login ---------- */
-  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-wrap{
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+    background-image:
+      linear-gradient(rgba(30,42,36,0.60), rgba(30,42,36,0.60)),
+      url('cafe-background.jpg');
+    background-size:cover;
+    background-position:center;
+  }
   .login-card{
     width:100%;max-width:360px;background:var(--card);border:1px solid var(--ink);
     border-radius:12px;box-shadow:var(--shadow);padding:32px 30px 26px;text-align:center;
@@ -577,6 +619,12 @@
       <div class="login-sub">University Cafeteria &amp; Snack Bar</div>
       <div class="login-sub2">Ledger &amp; Financial Reports</div>
 
+      <div class="lang-switch-mini" id="langSwitchLogin" style="justify-content:center;margin-top:16px;">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="so">SO</button>
+        <button class="lang-btn" data-lang="ar">AR</button>
+      </div>
+
       <div class="field" style="margin-top:22px;">
         <label for="loginUser">Username</label>
         <input type="text" id="loginUser" autocomplete="username">
@@ -603,8 +651,13 @@
         <div class="sub">University Cafeteria &amp; Snack Bar</div>
       </div>
       <div class="topbar-right">
+        <div class="lang-switch-mini" id="langSwitchWelcome">
+          <button class="lang-btn" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="so">SO</button>
+          <button class="lang-btn" data-lang="ar">AR</button>
+        </div>
         <span class="sub" id="welcomeUser"></span>
-        <button class="secondary" id="logoutBtnWelcome">Logout</button>
+        <button class="secondary" id="logoutBtnWelcome" data-i18n="logout">Logout</button>
       </div>
     </div>
 
@@ -645,6 +698,7 @@
         <button class="secondary" id="goNewEntry">+ New Journal Entry</button>
         <button class="secondary" id="goReports">View Financial Reports</button>
         <button class="secondary" id="goCopyCustomerLink">🔗 Copy Customer Order Link</button>
+        <button class="secondary" id="goShowOrderQr">📱 Show Customer Order QR Code</button>
         <button class="secondary" id="goCopyAttendanceLink">🔗 Copy Staff Check-In Link</button>
         <button class="secondary" id="syncTestBtn">🔄 Sync Test (tap on each device)</button>
         <div class="msg" id="syncTestResult" style="text-align:left;"></div>
@@ -675,6 +729,12 @@
       <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
     </div>
 
+    <div class="lang-switch-mini" id="langSwitchSidebar" style="margin:0 14px 14px;">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="so">SO</button>
+      <button class="lang-btn" data-lang="ar">AR</button>
+    </div>
+
     <div class="sidebar-widgets" id="sidebarWidgets">
       <div class="sidebar-widget">
         <div class="sw-label">Cash &amp; Bank</div>
@@ -687,29 +747,31 @@
     </div>
 
     <div class="tabs main-tabs sidebar-nav">
-      <button class="tab active" data-view="entry">📝 <span>New Entry</span></button>
-      <button class="tab" data-view="pos">🛒 <span>POS</span></button>
-      <button class="tab" data-view="waiterorder">📋 <span>Place Order</span></button>
-      <button class="tab" data-view="waiterdash">🧑‍🍳 <span>Waiter Dashboard</span></button>
-      <button class="tab" data-view="kitchen">🍳 <span>Kitchen</span></button>
-      <button class="tab" data-view="journal">📖 <span>Journal</span></button>
-      <button class="tab" data-view="hr">👥 <span>HR</span></button>
-      <button class="tab" data-view="invoices">🧾 <span>Invoices</span></button>
-      <button class="tab" data-view="vendors">🚚 <span>Vendors</span></button>
-      <button class="tab" data-view="bankaccts">🏦 <span>Bank Accounts</span></button>
-      <button class="tab" data-view="ledger">📗 <span>General Ledger</span></button>
-      <button class="tab" data-view="trial">⚖️ <span>Trial Balance</span></button>
-      <button class="tab" data-view="income">📈 <span>Income Statement</span></button>
-      <button class="tab" data-view="equity">🧮 <span>Equity Statement</span></button>
-      <button class="tab" data-view="balance">📋 <span>Balance Sheet</span></button>
-      <button class="tab" data-view="cashflow">💧 <span>Cash Flow</span></button>
+      <button class="tab active" data-view="entry">📝 <span data-i18n="nav_entry">New Entry</span></button>
+      <button class="tab" data-view="pos">🛒 <span data-i18n="nav_pos">POS</span></button>
+      <button class="tab" data-view="waiterorder">📋 <span data-i18n="nav_waiterorder">Place Order</span></button>
+      <button class="tab" data-view="waiterdash">🧑‍🍳 <span data-i18n="nav_waiterdash">Waiter Dashboard</span></button>
+      <button class="tab" data-view="kitchen">🍳 <span data-i18n="nav_kitchen">Kitchen</span></button>
+      <button class="tab" data-view="reviews">⭐ <span data-i18n="nav_reviews">Reviews</span></button>
+      <button class="tab" data-view="analytics">📊 <span data-i18n="nav_analytics">Analytics</span></button>
+      <button class="tab" data-view="journal">📖 <span data-i18n="nav_journal">Journal</span></button>
+      <button class="tab" data-view="hr">👥 <span data-i18n="nav_hr">HR</span></button>
+      <button class="tab" data-view="invoices">🧾 <span data-i18n="nav_invoices">Invoices</span></button>
+      <button class="tab" data-view="vendors">🚚 <span data-i18n="nav_vendors">Vendors</span></button>
+      <button class="tab" data-view="bankaccts">🏦 <span data-i18n="nav_bankaccts">Bank Accounts</span></button>
+      <button class="tab" data-view="ledger">📗 <span data-i18n="nav_ledger">General Ledger</span></button>
+      <button class="tab" data-view="trial">⚖️ <span data-i18n="nav_trial">Trial Balance</span></button>
+      <button class="tab" data-view="income">📈 <span data-i18n="nav_income">Income Statement</span></button>
+      <button class="tab" data-view="equity">🧮 <span data-i18n="nav_equity">Equity Statement</span></button>
+      <button class="tab" data-view="balance">📋 <span data-i18n="nav_balance">Balance Sheet</span></button>
+      <button class="tab" data-view="cashflow">💧 <span data-i18n="nav_cashflow">Cash Flow</span></button>
     </div>
 
     <div class="sidebar-footer">
       <span class="sub" id="entryCount">0 entries on file</span>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <button class="secondary" id="homeBtn" style="flex:1;">Home</button>
-        <button class="secondary" id="logoutBtnApp" style="flex:1;">Logout</button>
+        <button class="secondary" id="logoutBtnApp" style="flex:1;" data-i18n="logout">Logout</button>
       </div>
     </div>
   </nav>
@@ -773,8 +835,8 @@
       </div>
 
       <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab pos-subtab active" data-posview="sell">Sell</button>
-        <button class="tab pos-subtab" data-posview="items">Manage Items</button>
+        <button class="tab pos-subtab active" data-posview="sell" data-i18n="pos_sub_sell">Sell</button>
+        <button class="tab pos-subtab" data-posview="items" data-i18n="pos_sub_items">Manage Items</button>
       </div>
 
       <!-- Sell -->
@@ -794,6 +856,7 @@
               </div>
               <div id="posPendingRequests"></div>
             </div>
+            <input type="text" id="posItemSearch" placeholder="🔍 Search items by name…" style="margin-bottom:10px;">
             <div class="pos-category-bar" id="posCategoryBar"></div>
             <div class="pos-item-grid" id="posItemGrid"></div>
           </div>
@@ -891,6 +954,12 @@
             </div>
           </div>
           <div class="voucher-row">
+            <div class="field">
+              <label for="posItemImage">Image URL (optional)</label>
+              <input type="text" id="posItemImage" placeholder="https://... — shown on the menu instead of the category icon">
+            </div>
+          </div>
+          <div class="voucher-row">
             <div class="field" style="flex:0 0 auto;">
               <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
                 <input type="checkbox" id="posItemTrackStock" style="width:auto;">
@@ -947,6 +1016,7 @@
 
       <div class="pos-layout">
         <div class="pos-items-panel">
+          <input type="text" id="woItemSearch" placeholder="🔍 Search items by name…" style="margin-bottom:10px;">
           <div class="pos-category-bar" id="woCategoryBar"></div>
           <div class="pos-item-grid" id="woItemGrid"></div>
         </div>
@@ -1030,6 +1100,49 @@
       <div id="kitchenReadyWrap"></div>
     </div>
 
+    <!-- ============ REVIEWS ============ -->
+    <div class="view" id="view-reviews">
+      <div class="toolbar">
+        <h2>Reviews</h2>
+        <div class="actions"><button class="secondary" id="reviewsRefreshBtn">🔄 Refresh</button></div>
+      </div>
+      <div class="hint" style="margin-bottom:16px;">Ratings and feedback customers leave from the ⭐ Rate Us tab on the ordering page.</div>
+
+      <div class="stat-grid" id="reviewsStatGrid"></div>
+
+      <div id="reviewsList"></div>
+    </div>
+
+    <!-- ============ ANALYTICS ============ -->
+    <div class="view" id="view-analytics">
+      <div class="toolbar"><h2>Sales Analytics</h2></div>
+      <div class="period-bar" id="periodBar-analytics"></div>
+
+      <div class="stat-grid" id="analyticsStatGrid" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Revenue by Payment Method</h3>
+      <div id="analyticsPaymentMethod" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Best-Selling Products</h3>
+      <div id="analyticsBestSellers" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Monthly Sales</h3>
+      <div id="analyticsMonthlySales" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Daily Orders</h3>
+      <div id="analyticsDailyOrders" style="margin-bottom:24px;"></div>
+
+      <h3 style="font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;">Customer Purchase History</h3>
+      <div class="voucher">
+        <div class="field">
+          <label for="analyticsCustomerSelect">Customer</label>
+          <select id="analyticsCustomerSelect"></select>
+        </div>
+        <div class="hint" style="margin-top:0;">Only customers with credit sales or invoices on file have a purchase history — regular cash/mobile-money sales aren't tied to a specific customer.</div>
+      </div>
+      <div id="analyticsCustomerHistory" style="margin-top:14px;"></div>
+    </div>
+
     <!-- ============ JOURNAL ============ -->
     <div class="view" id="view-journal">
       <div class="toolbar">
@@ -1047,13 +1160,13 @@
       <div class="toolbar"><h2>HR</h2></div>
 
       <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab hr-subtab active" data-hrview="employees">Employees</button>
-        <button class="tab hr-subtab" data-hrview="payroll">Run Payroll</button>
-        <button class="tab hr-subtab" data-hrview="history">Payroll History</button>
-        <button class="tab hr-subtab" data-hrview="holidays">Holidays</button>
-        <button class="tab hr-subtab" data-hrview="attendance">Attendance</button>
-        <button class="tab hr-subtab" data-hrview="schedule">Schedule</button>
-        <button class="tab hr-subtab" data-hrview="advances">Advance Requests</button>
+        <button class="tab hr-subtab active" data-hrview="employees" data-i18n="hr_sub_employees">Employees</button>
+        <button class="tab hr-subtab" data-hrview="payroll" data-i18n="hr_sub_payroll">Run Payroll</button>
+        <button class="tab hr-subtab" data-hrview="history" data-i18n="hr_sub_history">Payroll History</button>
+        <button class="tab hr-subtab" data-hrview="holidays" data-i18n="hr_sub_holidays">Holidays</button>
+        <button class="tab hr-subtab" data-hrview="attendance" data-i18n="hr_sub_attendance">Attendance</button>
+        <button class="tab hr-subtab" data-hrview="schedule" data-i18n="hr_sub_schedule">Schedule</button>
+        <button class="tab hr-subtab" data-hrview="advances" data-i18n="hr_sub_advances">Advance Requests</button>
       </div>
 
       <!-- Employees -->
@@ -1357,10 +1470,10 @@
       <div class="toolbar"><h2>Invoices &amp; Billing</h2></div>
 
       <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab inv-subtab active" data-invview="customers">Customers</button>
-        <button class="tab inv-subtab" data-invview="create">Create Invoice</button>
-        <button class="tab inv-subtab" data-invview="list">Invoice List</button>
-        <button class="tab inv-subtab" data-invview="debt">Customer Debt</button>
+        <button class="tab inv-subtab active" data-invview="customers" data-i18n="inv_sub_customers">Customers</button>
+        <button class="tab inv-subtab" data-invview="create" data-i18n="inv_sub_create">Create Invoice</button>
+        <button class="tab inv-subtab" data-invview="list" data-i18n="inv_sub_list">Invoice List</button>
+        <button class="tab inv-subtab" data-invview="debt" data-i18n="inv_sub_debt">Customer Debt</button>
       </div>
 
       <!-- Customers -->
@@ -1508,9 +1621,9 @@
       <div class="toolbar"><h2>Vendors &amp; Bills</h2></div>
 
       <div class="tabs" style="margin-bottom:16px;">
-        <button class="tab vnd-subtab active" data-vndview="vendors">Vendors</button>
-        <button class="tab vnd-subtab" data-vndview="create">Create Bill</button>
-        <button class="tab vnd-subtab" data-vndview="list">Bill List</button>
+        <button class="tab vnd-subtab active" data-vndview="vendors" data-i18n="vnd_sub_vendors">Vendors</button>
+        <button class="tab vnd-subtab" data-vndview="create" data-i18n="vnd_sub_create">Create Bill</button>
+        <button class="tab vnd-subtab" data-vndview="list" data-i18n="vnd_sub_list">Bill List</button>
       </div>
 
       <!-- Vendors -->
@@ -2207,6 +2320,83 @@ const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
 const todayStr = () => new Date().toISOString().slice(0,10);
 
 /* ---------------------------------------------------------------------
+   i18n — English / Somali / Arabic. Static text uses data-i18n; dynamic,
+   JS-generated content calls t() directly.
+   Scope note: this covers the app's navigation (sidebar tabs, POS/HR/
+   Invoices/Vendors sub-tabs) and shared chrome — the highest-traffic
+   surface every user touches regardless of role. It does not (yet)
+   cover every label inside every report/form in this large admin tool;
+   those still read in English.
+--------------------------------------------------------------------- */
+const I18N = {
+  en: {
+    nav_entry: "New Entry", nav_pos: "POS", nav_waiterorder: "Place Order", nav_waiterdash: "Waiter Dashboard",
+    nav_kitchen: "Kitchen", nav_reviews: "Reviews", nav_analytics: "Analytics", nav_journal: "Journal", nav_hr: "HR", nav_invoices: "Invoices",
+    nav_vendors: "Vendors", nav_bankaccts: "Bank Accounts", nav_ledger: "General Ledger", nav_trial: "Trial Balance",
+    nav_income: "Income Statement", nav_equity: "Equity Statement", nav_balance: "Balance Sheet", nav_cashflow: "Cash Flow",
+    pos_sub_sell: "Sell", pos_sub_items: "Manage Items",
+    hr_sub_employees: "Employees", hr_sub_payroll: "Run Payroll", hr_sub_history: "Payroll History",
+    hr_sub_holidays: "Holidays", hr_sub_attendance: "Attendance", hr_sub_schedule: "Schedule", hr_sub_advances: "Advance Requests",
+    inv_sub_customers: "Customers", inv_sub_create: "Create Invoice", inv_sub_list: "Invoice List", inv_sub_debt: "Customer Debt",
+    vnd_sub_vendors: "Vendors", vnd_sub_create: "Create Bill", vnd_sub_list: "Bill List",
+    logout: "Logout"
+  },
+  so: {
+    nav_entry: "Diiwaan Cusub", nav_pos: "POS", nav_waiterorder: "Dalabka Dir", nav_waiterdash: "Dashboardka Adeegayaasha",
+    nav_kitchen: "Jikada", nav_reviews: "Ra'yiyada", nav_analytics: "Falanqaynta", nav_journal: "Joornaalka", nav_hr: "Shaqaalaha", nav_invoices: "Qaansheegyada",
+    nav_vendors: "Iibiyeyaasha", nav_bankaccts: "Xisaabaadka Bangiga", nav_ledger: "Buugga Guud", nav_trial: "Balansada Tijaabada",
+    nav_income: "Bayaanka Dakhliga", nav_equity: "Bayaanka Ra'sumaalka", nav_balance: "Bayaanka Hantida", nav_cashflow: "Socodka Lacagta",
+    pos_sub_sell: "Iib", pos_sub_items: "Maamul Alaabta",
+    hr_sub_employees: "Shaqaalaha", hr_sub_payroll: "Bixi Mushaharka", hr_sub_history: "Taariikhda Mushaharka",
+    hr_sub_holidays: "Ciidaha", hr_sub_attendance: "Imaanshaha", hr_sub_schedule: "Jadwalka", hr_sub_advances: "Codsiyada Horumarka",
+    inv_sub_customers: "Macaamiisha", inv_sub_create: "Samee Qaansheeg", inv_sub_list: "Liiska Qaansheegyada", inv_sub_debt: "Deynta Macaamiisha",
+    vnd_sub_vendors: "Iibiyeyaasha", vnd_sub_create: "Samee Biil", vnd_sub_list: "Liiska Biilasha",
+    logout: "Ka Bax"
+  },
+  ar: {
+    nav_entry: "قيد جديد", nav_pos: "نقطة البيع", nav_waiterorder: "إرسال طلب", nav_waiterdash: "لوحة النادل",
+    nav_kitchen: "المطبخ", nav_reviews: "التقييمات", nav_analytics: "التحليلات", nav_journal: "دفتر اليومية", nav_hr: "الموظفون", nav_invoices: "الفواتير",
+    nav_vendors: "الموردون", nav_bankaccts: "الحسابات البنكية", nav_ledger: "دفتر الأستاذ العام", nav_trial: "ميزان المراجعة",
+    nav_income: "قائمة الدخل", nav_equity: "قائمة حقوق الملكية", nav_balance: "الميزانية العمومية", nav_cashflow: "التدفق النقدي",
+    pos_sub_sell: "بيع", pos_sub_items: "إدارة الأصناف",
+    hr_sub_employees: "الموظفون", hr_sub_payroll: "تشغيل الرواتب", hr_sub_history: "سجل الرواتب",
+    hr_sub_holidays: "العطلات", hr_sub_attendance: "الحضور", hr_sub_schedule: "الجدول", hr_sub_advances: "طلبات السلف",
+    inv_sub_customers: "العملاء", inv_sub_create: "إنشاء فاتورة", inv_sub_list: "قائمة الفواتير", inv_sub_debt: "ديون العملاء",
+    vnd_sub_vendors: "الموردون", vnd_sub_create: "إنشاء فاتورة مورد", vnd_sub_list: "قائمة الفواتير",
+    logout: "تسجيل الخروج"
+  }
+};
+
+let currentLang = (function(){
+  try{ return window.localStorage.getItem('ubcafe_lang') || 'en'; }catch(e){ return 'en'; }
+})();
+
+function t(key){
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+}
+
+function applyStaticTranslations(){
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  $$('[data-i18n]').forEach(el=>{
+    // Preserve a leading emoji/icon — this only ever targets the text-bearing
+    // element itself (nav buttons already keep the emoji outside the translated span).
+    el.textContent = t(el.dataset.i18n);
+  });
+  $$('.lang-btn').forEach(btn=>{ btn.classList.toggle('active', btn.dataset.lang===currentLang); });
+}
+
+function setLang(lang){
+  currentLang = lang;
+  try{ window.localStorage.setItem('ubcafe_lang', lang); }catch(e){}
+  applyStaticTranslations();
+}
+
+$$('.lang-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> setLang(btn.dataset.lang));
+});
+
+/* ---------------------------------------------------------------------
    Persistence
 --------------------------------------------------------------------- */
 async function loadEntries(){
@@ -2240,6 +2430,8 @@ $$('.main-tabs .tab').forEach(tab=>{
     if(tab.dataset.view==='waiterorder') renderWaiterOrderView();
     if(tab.dataset.view==='waiterdash') renderWaiterDashboard();
     if(tab.dataset.view==='kitchen') openKitchenDashboard();
+    if(tab.dataset.view==='reviews') openReviewsView();
+    if(tab.dataset.view==='analytics') openAnalyticsView();
     if(tab.dataset.view==='hr') renderHR();
     if(tab.dataset.view==='invoices') renderInvoices();
     if(tab.dataset.view==='vendors') renderVendors();
@@ -5060,6 +5252,22 @@ function buildAttendanceQrDocHtml(link){
   `;
 }
 
+function buildOrderQrDocHtml(link){
+  const qrHtml = buildQrSvg(link, 240);
+  return `
+    <div style="text-align:center;padding:20px;">
+      <div class="idoc-title" style="justify-content:center;">Order Here</div>
+      <div style="font-size:13px;color:#555;margin-bottom:18px;">${BUSINESS_INFO.name}</div>
+      ${qrHtml
+        ? `<div style="display:flex;justify-content:center;margin-bottom:16px;">${qrHtml}</div>`
+        : `<div style="padding:20px;color:#a00;">Couldn't generate the QR code — check your internet connection and try again.</div>`
+      }
+      <div style="font-size:13px;font-weight:600;margin-bottom:4px;">Scan to browse the menu &amp; order</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#555;word-break:break-all;">${link}</div>
+    </div>
+  `;
+}
+
 function buildZaadPaymentBlock(sizePx){
   sizePx = sizePx || 90;
   // tel: links need the # percent-encoded as %23 — browsers won't dial a raw # in a tel: URI.
@@ -5083,6 +5291,7 @@ function buildPosReceiptHtml(sale, copyLabel){
     <div class="rc-item">
       <div class="rc-item-top"><span>${it.name}</span><span>${fmt(it.qty*it.price)}</span></div>
       <div class="rc-item-sub">${fmt(it.qty)} × ${fmt(it.price)} Sl.sh</div>
+      ${it.note ? `<div class="rc-item-note">📝 ${it.note}</div>` : ''}
     </div>`).join('');
 
   const badge = sale.isCredit
@@ -5092,6 +5301,10 @@ function buildPosReceiptHtml(sale, copyLabel){
   const soldToLine = sale.isCredit ? `<div class="rc-meta-row"><span>Sold To</span><span>${sale.customerName||''}</span></div>` : '';
   const waiterLine = sale.waiterName ? `<div class="rc-meta-row"><span>Served By</span><span>${sale.waiterName}</span></div>` : '';
   const copyLabelHtml = copyLabel ? `<div class="rc-copy-label">${copyLabel}</div>` : '';
+  const orderNoLine = sale.orderNo ? `<div class="rc-meta-row"><span>Order #</span><span>${sale.orderNo}</span></div>` : '';
+  const dateTimeStr = sale.time
+    ? `${sale.date} · ${new Date(sale.time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})}`
+    : sale.date;
 
   return `
     <div class="rc-header">
@@ -5104,7 +5317,8 @@ function buildPosReceiptHtml(sale, copyLabel){
     <div class="rc-divider"></div>
 
     <div class="rc-meta-row"><span>Receipt #</span><span>${sale.receiptNo}</span></div>
-    <div class="rc-meta-row"><span>Date</span><span>${sale.date}</span></div>
+    ${orderNoLine}
+    <div class="rc-meta-row"><span>Date</span><span>${dateTimeStr}</span></div>
     ${soldToLine}
     ${waiterLine}
 
@@ -5143,9 +5357,13 @@ function buildPosReceiptHtml(sale, copyLabel){
 /* Kitchen ticket — what to prepare, no prices or payment info; larger type for quick reading at the pass. */
 function buildKitchenTicketHtml(sale){
   const itemRows = sale.items.map(it => `
-    <div class="kt-item"><span class="kt-qty">${fmt(it.qty)}×</span><span>${it.name}</span></div>`).join('');
-  const now = new Date();
-  const timeStr = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+    <div class="kt-item">
+      <span class="kt-qty">${fmt(it.qty)}×</span><span>${it.name}</span>
+      ${it.note ? `<div class="kt-item-note">📝 ${it.note}</div>` : ''}
+    </div>`).join('');
+  const timeStr = sale.time
+    ? new Date(sale.time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'})
+    : new Date().toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
   const waiterLine = sale.waiterName ? `<div class="rc-meta-row"><span>Served By</span><span>${sale.waiterName}</span></div>` : '';
   const forLine = sale.isCredit && sale.customerName ? `<div class="rc-meta-row"><span>For</span><span>${sale.customerName}</span></div>` : '';
 
@@ -5157,7 +5375,7 @@ function buildKitchenTicketHtml(sale){
 
     <div class="rc-divider"></div>
 
-    <div class="rc-meta-row"><span>Order #</span><span>${sale.receiptNo}</span></div>
+    <div class="rc-meta-row"><span>Order #</span><span>${sale.orderNo || sale.receiptNo}</span></div>
     <div class="rc-meta-row"><span>Time</span><span>${sale.date} · ${timeStr}</span></div>
     ${waiterLine}
     ${forLine}
@@ -6022,7 +6240,7 @@ async function renderBankAccounts(){
 const POS_ITEMS_KEY = "ubcafe_pos_items";
 let posItems = [];
 let cart = []; // [{itemId, name, price, qty}]
-let pendingCheckoutMeta = null; // {kitchenStatus} carried over when a sale request (e.g. from a waiter) is loaded into the cart, so kitchen progress isn't lost when the sale is finalized
+let pendingCheckoutMeta = null; // {kitchenStatus, orderNo} carried over when a sale request (e.g. from a waiter) is loaded into the cart, so kitchen progress and the original order number aren't lost when the sale is finalized
 let posActiveCategory = 'All';
 
 const HOLIDAYS_KEY = "ubcafe_holidays";
@@ -6122,8 +6340,243 @@ async function saveAdvanceRequests(){
   await storageSet(ADVANCE_REQUESTS_KEY, JSON.stringify(advanceRequests), true);
 }
 
+const REVIEWS_KEY = "ubcafe_reviews";
+let reviews = []; // [{id, customerName, rating:1-5, comment, createdAt}]
+async function loadReviews(){
+  const val = await storageGet(REVIEWS_KEY, true);
+  try{ reviews = val ? JSON.parse(val) : []; }catch(e){ reviews = []; }
+}
+
+async function openReviewsView(){
+  await loadReviews();
+  renderReviewsView();
+}
+
+function renderReviewsView(){
+  const total = reviews.length;
+  const avg = total ? reviews.reduce((s,r)=>s+r.rating, 0) / total : 0;
+  const thisMonth = reviews.filter(r=>{
+    const d = new Date(r.createdAt);
+    const now = new Date();
+    return d.getFullYear()===now.getFullYear() && d.getMonth()===now.getMonth();
+  }).length;
+
+  $('#reviewsStatGrid').innerHTML = `
+    <div class="stat-card stat-credit">
+      <div class="label">Average Rating</div>
+      <div class="value credit">${total ? avg.toFixed(1) + ' ★' : '—'}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Reviews</div>
+      <div class="value">${total}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">This Month</div>
+      <div class="value">${thisMonth}</div>
+    </div>
+  `;
+
+  const el = $('#reviewsList');
+  if(total===0){
+    el.innerHTML = '<div class="empty">No reviews yet.</div>';
+    return;
+  }
+  const sorted = [...reviews].sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
+  el.innerHTML = sorted.map(r=>{
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    const date = new Date(r.createdAt).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    return `
+    <div class="review-card">
+      <div class="rv-top"><span class="rv-stars">${stars}</span><span class="rv-date">${date}</span></div>
+      <div class="rv-name">${r.customerName || 'Anonymous'}</div>
+      ${r.comment ? `<div class="rv-comment">${r.comment}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+$('#reviewsRefreshBtn').addEventListener('click', async ()=>{
+  const btn = $('#reviewsRefreshBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+  await loadReviews();
+  renderReviewsView();
+  btn.textContent = originalLabel;
+  btn.disabled = false;
+});
+
+/* ---------------------------------------------------------------------
+   Analytics — daily orders, monthly sales, best sellers, revenue by
+   payment method, average order value, and customer purchase history.
+   All computed from POS Sale journal entries within the shared
+   reporting period (the same From/To used by the accounting reports).
+--------------------------------------------------------------------- */
+function analyticsSalesInPeriod(){
+  return entries.filter(e => e.desc && e.desc.startsWith('POS Sale:') && e.posItems && inPeriod(e.date));
+}
+function analyticsSaleRevenue(e){
+  const line = e.lines.find(l=>l.debit>0);
+  return line ? line.debit : 0;
+}
+
+async function openAnalyticsView(){
+  await loadCustomers();
+  await loadInvoices();
+  renderPeriodBar('periodBar-analytics', renderAnalyticsView);
+  populateAnalyticsCustomerSelect();
+  renderAnalyticsView();
+}
+
+function renderAnalyticsView(){
+  const sales = analyticsSalesInPeriod();
+  const totalOrders = sales.length;
+  const totalRevenue = sales.reduce((s,e)=>s+analyticsSaleRevenue(e), 0);
+  const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
+
+  $('#analyticsStatGrid').innerHTML = `
+    <div class="stat-card stat-credit">
+      <div class="label">Total Revenue</div>
+      <div class="value credit">${fmt(totalRevenue)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Orders</div>
+      <div class="value">${totalOrders}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Average Order Value</div>
+      <div class="value">${fmt(avgOrderValue)}</div>
+    </div>
+  `;
+
+  renderAnalyticsPaymentMethod(sales, totalRevenue);
+  renderAnalyticsBestSellers(sales);
+  renderAnalyticsMonthlySales(sales);
+  renderAnalyticsDailyOrders(sales);
+}
+
+const ANALYTICS_PAYMENT_LABELS = {
+  'Cash Revenue':'Cash', 'Zaad Revenue':'Zaad', 'Edahab Revenue':'eDahab', 'Waafi Revenue':'Waafi',
+  'DahabPlus Revenue':'DahabPlus', 'Premier Wallet Revenue':'Premier Wallet', 'Credit Sales Revenue':'On Credit'
+};
+function renderAnalyticsPaymentMethod(sales, totalRevenue){
+  const byMethod = {};
+  sales.forEach(e=>{
+    const revLine = e.lines.find(l=>l.credit>0);
+    const account = revLine ? revLine.account : 'Other';
+    const label = ANALYTICS_PAYMENT_LABELS[account] || account;
+    byMethod[label] = (byMethod[label]||0) + (revLine ? revLine.credit : 0);
+  });
+  const rows = Object.entries(byMethod).sort((a,b)=> b[1]-a[1]);
+  const el = $('#analyticsPaymentMethod');
+  if(rows.length===0){ el.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
+  let html = `<table><thead><tr><th>Method</th><th class="num">Revenue</th><th class="num">% of Total</th></tr></thead><tbody>`;
+  rows.forEach(([label, amount])=>{
+    const pct = totalRevenue > 0 ? (amount/totalRevenue*100).toFixed(1) : '0.0';
+    html += `<tr><td>${label}</td><td class="num">${fmt(amount)}</td><td class="num">${pct}%</td></tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderAnalyticsBestSellers(sales){
+  const byItem = {};
+  sales.forEach(e=>{
+    (e.posItems||[]).forEach(it=>{
+      if(!byItem[it.name]) byItem[it.name] = { qty: 0, revenue: 0 };
+      byItem[it.name].qty += it.qty;
+      byItem[it.name].revenue += it.qty * it.price;
+    });
+  });
+  const rows = Object.entries(byItem).sort((a,b)=> b[1].qty - a[1].qty).slice(0, 15);
+  const el = $('#analyticsBestSellers');
+  if(rows.length===0){ el.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
+  let html = `<table><thead><tr><th>Item</th><th class="num">Qty Sold</th><th class="num">Revenue</th></tr></thead><tbody>`;
+  rows.forEach(([name, d])=>{
+    html += `<tr><td>${name}</td><td class="num">${fmt(d.qty)}</td><td class="num">${fmt(d.revenue)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderAnalyticsMonthlySales(sales){
+  const byMonth = {};
+  sales.forEach(e=>{
+    const month = e.date.slice(0,7); // YYYY-MM
+    if(!byMonth[month]) byMonth[month] = { orders: 0, revenue: 0 };
+    byMonth[month].orders += 1;
+    byMonth[month].revenue += analyticsSaleRevenue(e);
+  });
+  const rows = Object.entries(byMonth).sort((a,b)=> b[0].localeCompare(a[0]));
+  const el = $('#analyticsMonthlySales');
+  if(rows.length===0){ el.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
+  let html = `<table><thead><tr><th>Month</th><th class="num">Orders</th><th class="num">Revenue</th><th class="num">Avg Order</th></tr></thead><tbody>`;
+  rows.forEach(([month, d])=>{
+    const label = new Date(month+'-02').toLocaleDateString('en-US', {month:'long', year:'numeric'});
+    html += `<tr><td>${label}</td><td class="num">${d.orders}</td><td class="num">${fmt(d.revenue)}</td><td class="num">${fmt(d.revenue/d.orders)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function renderAnalyticsDailyOrders(sales){
+  const byDay = {};
+  sales.forEach(e=>{
+    if(!byDay[e.date]) byDay[e.date] = { orders: 0, revenue: 0 };
+    byDay[e.date].orders += 1;
+    byDay[e.date].revenue += analyticsSaleRevenue(e);
+  });
+  const rows = Object.entries(byDay).sort((a,b)=> b[0].localeCompare(a[0])).slice(0, 31);
+  const el = $('#analyticsDailyOrders');
+  if(rows.length===0){ el.innerHTML = '<div class="empty">No sales in this period.</div>'; return; }
+  let html = `<table><thead><tr><th>Date</th><th class="num">Orders</th><th class="num">Revenue</th></tr></thead><tbody>`;
+  rows.forEach(([date, d])=>{
+    html += `<tr><td>${date}</td><td class="num">${d.orders}</td><td class="num">${fmt(d.revenue)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  if(Object.keys(byDay).length > 31) html += '<div class="hint">Showing the most recent 31 days in this period.</div>';
+  el.innerHTML = html;
+}
+
+function populateAnalyticsCustomerSelect(){
+  const sel = $('#analyticsCustomerSelect');
+  sel.innerHTML = customers.length
+    ? `<option value="">Choose a customer…</option>` + customers.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')
+    : '<option value="">No customers on file</option>';
+}
+$('#analyticsCustomerSelect').addEventListener('change', renderAnalyticsCustomerHistory);
+
+function renderAnalyticsCustomerHistory(){
+  const el = $('#analyticsCustomerHistory');
+  const customerId = $('#analyticsCustomerSelect').value ? Number($('#analyticsCustomerSelect').value) : null;
+  if(!customerId){ el.innerHTML = ''; return; }
+  const customer = customers.find(c=>c.id===customerId);
+  if(!customer){ el.innerHTML = ''; return; }
+
+  const posHistory = entries
+    .filter(e => e.desc && e.desc.startsWith('POS Sale:') && (e.posCustomerId===customerId || (e.posCustomerName && e.posCustomerName===customer.name)))
+    .map(e => ({ date: e.date, desc: e.posReceiptNo ? `POS Sale — ${e.posReceiptNo}` : 'POS Sale', amount: analyticsSaleRevenue(e) }));
+  const invHistory = invoices
+    .filter(inv => inv.customerId === customerId)
+    .map(inv => ({ date: inv.invoiceDate, desc: `Invoice ${inv.invoiceNo}`, amount: (inv.grandTotal !== undefined ? inv.grandTotal : inv.total) }));
+
+  const combined = [...posHistory, ...invHistory].sort((a,b)=> b.date.localeCompare(a.date));
+  if(combined.length===0){
+    el.innerHTML = `<div class="empty">No purchase history on file for ${customer.name}.</div>`;
+    return;
+  }
+  const total = combined.reduce((s,r)=>s+r.amount, 0);
+  let html = `<div class="hint" style="margin-top:0;">${customer.name} — ${combined.length} record(s), ${fmt(total)} Sl.sh total</div>`;
+  html += `<table><thead><tr><th>Date</th><th>Description</th><th class="num">Amount</th></tr></thead><tbody>`;
+  combined.forEach(r=>{
+    html += `<tr><td>${r.date}</td><td>${r.desc}</td><td class="num">${fmt(r.amount)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
 const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
-let saleRequests = []; // [{id, source:'customer'|'waiter', customerId, customerName, waiterId, waiterName, items:[{itemId,name,price,qty}], note, status:'pending', kitchenStatus:'pending'|'ready', createdAt}]
+let saleRequests = []; // [{id, orderNo, source:'customer'|'waiter', customerId, customerName, waiterId, waiterName, items:[{itemId,name,price,qty}], note, status:'pending', kitchenStatus:'pending'|'ready', createdAt}]
+const ORDER_COUNTER_KEY = "ubcafe_order_counter"; // shared with order.html, so every order — customer or waiter — gets one unique running number
 
 async function loadSaleRequests(){
   const val = await storageGet(SALE_REQUESTS_KEY, true);
@@ -6131,6 +6584,21 @@ async function loadSaleRequests(){
 }
 async function saveSaleRequests(){
   await storageSet(SALE_REQUESTS_KEY, JSON.stringify(saleRequests), true);
+}
+// Reads and increments a single shared counter so each order gets a stable, ever-increasing
+// number (ORD-0001, ORD-0002, ...) that survives the request itself later being removed from
+// saleRequests once the counter has been checked out — unlike saleRequests.length, which shrinks.
+async function nextOrderNo(){
+  let counter = 1;
+  try{
+    const val = await storageGet(ORDER_COUNTER_KEY, true);
+    const parsed = val ? JSON.parse(val) : null;
+    if(parsed && parsed.next) counter = parsed.next;
+  }catch(e){}
+  try{
+    await storageSet(ORDER_COUNTER_KEY, JSON.stringify({ next: counter + 1 }), true);
+  }catch(e){}
+  return 'ORD-' + String(counter).padStart(4, '0');
 }
 
 async function loadPosItems(){
@@ -6148,6 +6616,7 @@ function clearPosItemForm(){
   $('#posItemCategory').value = '';
   $('#posItemPrice').value = '';
   $('#posItemBarcode').value = '';
+  $('#posItemImage').value = '';
   $('#posItemTrackStock').checked = false;
   $('#posItemStock').value = 0;
   $('#posItemReorder').value = 0;
@@ -6164,11 +6633,14 @@ function renderPosItemsTable(){
     $('#posItemsTable').innerHTML = '<div class="empty">No menu items yet. Add one above.</div>';
     return;
   }
-  let html = `<div class="table-scroll"><table><thead><tr><th>Item</th><th>Category</th><th>Barcode</th><th class="num">Price</th><th class="num">Stock</th><th>Actions</th></tr></thead><tbody>`;
+  let html = `<div class="table-scroll"><table><thead><tr><th></th><th>Item</th><th>Category</th><th>Barcode</th><th class="num">Price</th><th class="num">Stock</th><th>Actions</th></tr></thead><tbody>`;
   posItems.forEach(it=>{
     const isLow = it.trackStock && (it.stock||0) <= (it.reorderLevel||0);
     const stockDisplay = it.trackStock ? fmt(it.stock||0) + (isLow ? ' ⚠' : '') : '—';
-    html += `<tr class="${isLow ? 'stock-row-low' : ''}"><td>${it.name}</td><td>${it.category||''}</td><td>${it.barcode||''}</td><td class="num">${fmt(it.price)}</td>
+    const thumb = it.image
+      ? `<img src="${it.image}" class="item-thumb" onerror="this.style.display='none'">`
+      : `<div class="item-thumb item-thumb-empty">—</div>`;
+    html += `<tr class="${isLow ? 'stock-row-low' : ''}"><td>${thumb}</td><td>${it.name}</td><td>${it.category||''}</td><td>${it.barcode||''}</td><td class="num">${fmt(it.price)}</td>
       <td class="num">${stockDisplay}</td>
       <td><div class="actions-cell">
         <button class="del-entry" data-action="edit" data-id="${it.id}">Edit</button>
@@ -6204,6 +6676,7 @@ function loadPosItemForEdit(itemId){
   $('#posItemCategory').value = item.category || '';
   $('#posItemPrice').value = item.price;
   $('#posItemBarcode').value = item.barcode || '';
+  $('#posItemImage').value = item.image || '';
   $('#posItemTrackStock').checked = !!item.trackStock;
   $('#posItemStockFields').style.display = item.trackStock ? '' : 'none';
   $('#posItemStock').value = item.trackStock ? (item.stock||0) : 0;
@@ -6244,6 +6717,7 @@ $('#savePosItemBtn').addEventListener('click', async ()=>{
   const name = $('#posItemName').value.trim();
   const price = parseFloat($('#posItemPrice').value)||0;
   const barcode = $('#posItemBarcode').value.trim();
+  const image = $('#posItemImage').value.trim();
   const msg = $('#posItemMsg');
   if(!name){ msg.textContent='Item name is required.'; msg.className='msg show err'; return; }
   if(price<=0){ msg.textContent='Price must be greater than 0.'; msg.className='msg show err'; return; }
@@ -6262,11 +6736,11 @@ $('#savePosItemBtn').addEventListener('click', async ()=>{
     // Keep the item's current stock level when editing — the Opening Stock field only sets
     // the starting point for brand-new items; restocking is done through the Restock button.
     const stock = trackStock ? (existing.trackStock ? (existing.stock||0) : (parseFloat($('#posItemStock').value)||0)) : undefined;
-    posItems[idx] = { ...existing, name, category: $('#posItemCategory').value.trim() || 'General', price, barcode, trackStock, stock, reorderLevel };
+    posItems[idx] = { ...existing, name, category: $('#posItemCategory').value.trim() || 'General', price, barcode, image, trackStock, stock, reorderLevel };
     msg.textContent = 'Item updated.';
   }else{
     const stock = trackStock ? (parseFloat($('#posItemStock').value)||0) : undefined;
-    posItems.push({ id: Date.now(), name, category: $('#posItemCategory').value.trim() || 'General', price, barcode, trackStock, stock, reorderLevel });
+    posItems.push({ id: Date.now(), name, category: $('#posItemCategory').value.trim() || 'General', price, barcode, image, trackStock, stock, reorderLevel });
     msg.textContent = 'Item saved.';
   }
   await savePosItems();
@@ -6434,11 +6908,21 @@ function renderPosCategoryBar(){
   });
 }
 
+let posSearchQuery = '';
+
 function renderPosItemGrid(){
   renderLowStockBanner();
-  const items = posActiveCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===posActiveCategory);
+  let items;
+  if(posSearchQuery){
+    const q = posSearchQuery.toLowerCase();
+    items = posItems.filter(it=>it.name.toLowerCase().includes(q));
+  }else{
+    items = posActiveCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===posActiveCategory);
+  }
   if(items.length===0){
-    $('#posItemGrid').innerHTML = '<div class="empty">No items in this category yet — add some from Manage Items.</div>';
+    $('#posItemGrid').innerHTML = posSearchQuery
+      ? `<div class="empty">No items match "${posSearchQuery}".</div>`
+      : '<div class="empty">No items in this category yet — add some from Manage Items.</div>';
     return;
   }
   $('#posItemGrid').innerHTML = items.map(it=>{
@@ -6447,8 +6931,10 @@ function renderPosItemGrid(){
     const stockLine = it.trackStock
       ? `<div class="pi-stock ${isLow||outOfStock ? 'low' : ''}">${outOfStock ? 'Out of stock' : fmt(it.stock) + ' left'}</div>`
       : '';
+    const imageHtml = it.image ? `<img src="${it.image}" class="pi-image" onerror="this.style.display='none'">` : '';
     return `
     <div class="pos-item-btn ${outOfStock ? 'out-of-stock' : ''}" data-id="${it.id}">
+      ${imageHtml}
       <div class="pi-name">${it.name}</div>
       <div class="pi-price">${fmt(it.price)} Sl.sh</div>
       ${stockLine}
@@ -6458,6 +6944,10 @@ function renderPosItemGrid(){
     btn.addEventListener('click', ()=> addToCart(Number(btn.dataset.id)));
   });
 }
+$('#posItemSearch').addEventListener('input', ()=>{
+  posSearchQuery = $('#posItemSearch').value.trim();
+  renderPosItemGrid();
+});
 
 /* ---------------- Cart ---------------- */
 function addToCart(itemId){
@@ -6469,7 +6959,7 @@ function addToCart(itemId){
     alert(`Only ${fmt(item.stock||0)} ${item.name} left in stock.`);
     return;
   }
-  if(line){ line.qty += 1; } else { cart.push({ itemId, name: item.name, price: item.price, qty: 1 }); }
+  if(line){ line.qty += 1; } else { cart.push({ itemId, name: item.name, price: item.price, qty: 1, note: '' }); }
   renderCart();
 }
 
@@ -6556,15 +7046,18 @@ function renderCart(){
     $('#posCartList').innerHTML = '<div class="empty" style="padding:14px 0;">Tap items to add them to the sale.</div>';
   }else{
     $('#posCartList').innerHTML = cart.map((c,i)=>`
-      <div class="pos-cart-row">
-        <span class="pc-name">${c.name}</span>
-        <span class="pc-qty-controls">
-          <button class="pc-qty-btn" data-action="dec" data-i="${i}">−</button>
-          <span>${c.qty}</span>
-          <button class="pc-qty-btn" data-action="inc" data-i="${i}">+</button>
-        </span>
-        <span class="pc-total">${fmt(c.price*c.qty)}</span>
-        <button class="pc-remove" data-action="rm" data-i="${i}">✕</button>
+      <div class="pos-cart-item">
+        <div class="pos-cart-row">
+          <span class="pc-name">${c.name}</span>
+          <span class="pc-qty-controls">
+            <button class="pc-qty-btn" data-action="dec" data-i="${i}">−</button>
+            <span>${c.qty}</span>
+            <button class="pc-qty-btn" data-action="inc" data-i="${i}">+</button>
+          </span>
+          <span class="pc-total">${fmt(c.price*c.qty)}</span>
+          <button class="pc-remove" data-action="rm" data-i="${i}">✕</button>
+        </div>
+        <input type="text" class="pc-note-input" data-note-i="${i}" placeholder="+ Special instructions (e.g. no sugar)" value="${c.note||''}">
       </div>
     `).join('');
     $$('#posCartList [data-action]').forEach(btn=>{
@@ -6581,6 +7074,12 @@ function renderCart(){
         if(btn.dataset.action==='dec'){ cart[i].qty -= 1; if(cart[i].qty<=0) cart.splice(i,1); }
         if(btn.dataset.action==='rm') cart.splice(i,1);
         renderCart();
+      });
+    });
+    $$('#posCartList [data-note-i]').forEach(input=>{
+      input.addEventListener('input', ()=>{
+        const i = Number(input.dataset.noteI);
+        if(cart[i]) cart[i].note = input.value;
       });
     });
   }
@@ -6682,6 +7181,7 @@ $('#posCheckoutBtn').addEventListener('click', async ()=>{
     const receiptNo = nextPosReceiptNumber();
     const paymentLabels = { 'Cash Revenue':'Cash', 'Zaad Revenue':'Zaad', 'Edahab Revenue':'eDahab', 'Waafi Revenue':'Waafi', 'DahabPlus Revenue':'DahabPlus', 'Premier Wallet Revenue':'Premier Wallet', 'Credit Sales Revenue':'On Credit' };
     const customerName = isCredit ? customers.find(c=>String(c.id)===$('#posCustomer').value)?.name : null;
+    const customerId = isCredit && $('#posCustomer').value ? Number($('#posCustomer').value) : null;
     const paymentLabel = isCredit ? 'On Credit' : `${paymentLabels[revenueType]||revenueType} → ${debitAccount}`;
     const waiterId = $('#posWaiter').value ? Number($('#posWaiter').value) : null;
     const waiterName = waiterId ? (employees.find(e=>e.id===waiterId)?.fullName || null) : null;
@@ -6696,9 +7196,11 @@ $('#posCheckoutBtn').addEventListener('click', async ()=>{
         { account: revenueType, debit: 0, credit: total }
       ],
       // Structured sale data, kept alongside the journal lines so the receipt can be reprinted later.
+      orderNo: (pendingCheckoutMeta && pendingCheckoutMeta.orderNo) || await nextOrderNo(),
       posReceiptNo: receiptNo,
-      posItems: cart.map(c=>({ itemId: c.itemId, name: c.name, qty: c.qty, price: c.price })),
+      posItems: cart.map(c=>({ itemId: c.itemId, name: c.name, qty: c.qty, price: c.price, note: c.note||'' })),
       posIsCredit: isCredit,
+      posCustomerId: customerId,
       posCustomerName: customerName,
       posPaymentLabel: paymentLabel,
       posSubtotal: cartTotals.subtotal,
@@ -6754,6 +7256,7 @@ $('#posCheckoutBtn').addEventListener('click', async ()=>{
 
     const sale = {
       receiptNo, date: saleDate,
+      orderNo: journalEntry.orderNo, time: journalEntry.id,
       items: journalEntry.posItems,
       subtotal: cartTotals.subtotal, discountAmount: cartTotals.discountAmount,
       total, isCredit,
@@ -6804,7 +7307,7 @@ function renderPosRecentSales(){
       const entry = entries.find(e=>e.id===Number(btn.dataset.entryId));
       if(!entry || !entry.posItems) return;
       openReceiptPrintModal({
-        receiptNo: entry.posReceiptNo, date: entry.date, items: entry.posItems,
+        receiptNo: entry.posReceiptNo, date: entry.date, orderNo: entry.orderNo, time: entry.id, items: entry.posItems,
         total: entry.lines.find(l=>l.debit>0)?.debit || 0,
         subtotal: entry.posSubtotal, discountAmount: entry.posDiscountAmount,
         isCredit: entry.posIsCredit, customerName: entry.posCustomerName, paymentLabel: entry.posPaymentLabel,
@@ -6859,6 +7362,7 @@ async function renderPOS(){
   renderCart();
   populatePosDropdowns();
   renderPosPendingRequests();
+  startSaleRequestsLiveSync();
   $('#posRevenueType').dispatchEvent(new Event('change'));
   renderPosItemsTable();
   renderPosRecentSales();
@@ -6870,6 +7374,27 @@ async function renderPOS(){
    screen or by a Waiter using the Place Order tab. Shown here so a
    cashier can load one into the cart and complete the checkout.
 --------------------------------------------------------------------- */
+let unsubSaleRequestsLive = null;
+function startSaleRequestsLiveSync(){
+  if(unsubSaleRequestsLive) unsubSaleRequestsLive();
+  unsubSaleRequestsLive = subscribeToKey(SALE_REQUESTS_KEY, (value)=>{
+    try{ saleRequests = value ? JSON.parse(value) : []; }catch(e){ saleRequests = []; }
+    // All three cheap to call and all guard on their DOM not being present, so it's safe
+    // to refresh whichever of these screens isn't the one currently on view.
+    renderPosPendingRequests();
+    renderKitchenDashboard();
+    renderWoSentOrders();
+  });
+}
+let unsubEntriesLiveKitchen = null;
+function startEntriesLiveSyncForKitchen(){
+  if(unsubEntriesLiveKitchen) unsubEntriesLiveKitchen();
+  unsubEntriesLiveKitchen = subscribeToKey(STORAGE_KEY, (value)=>{
+    try{ entries = value ? JSON.parse(value) : []; }catch(e){ entries = []; }
+    renderKitchenDashboard();
+  });
+}
+
 function renderPosPendingRequests(){
   const el = $('#posPendingRequests');
   if(!el) return;
@@ -6882,12 +7407,14 @@ function renderPosPendingRequests(){
   }
   if(label) label.style.display = '';
   el.innerHTML = pending.map(r=>{
-    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}${it.note ? ' ('+it.note+')' : ''}`).join(', ');
     const sourceIcon = r.source==='waiter' ? '🧑‍🍳' : '🧾';
     const waiterSuffix = r.source==='waiter' && r.waiterName ? ` (${r.waiterName})` : '';
     const readyTag = r.kitchenStatus==='ready' ? ' · ✅ ready in kitchen' : '';
+    const timeStr = r.createdAt ? new Date(r.createdAt).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
     return `
     <div class="wp-request-card">
+      ${r.orderNo ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:var(--brass-dark);margin-bottom:3px;">${r.orderNo} · ${timeStr}</div>` : ''}
       <div class="wpr-top"><span>${sourceIcon} ${r.customerName}${waiterSuffix}${r.note ? ' — ' + r.note : ''}</span><span>${fmt(r.items.reduce((s,it)=>s+it.price*it.qty,0))} Sl.sh</span></div>
       <div class="wpr-items">${itemSummary}${readyTag}</div>
       <div class="wpr-actions">
@@ -6927,13 +7454,13 @@ async function loadSaleRequestIntoCart(requestId){
 
   cart = req.items.map(it=>{
     const live = posItems.find(p=>p.id===it.itemId);
-    return { itemId: it.itemId, name: live ? live.name : it.name, price: live ? live.price : it.price, qty: it.qty };
+    return { itemId: it.itemId, name: live ? live.name : it.name, price: live ? live.price : it.price, qty: it.qty, note: it.note||'' };
   });
   renderCart();
 
   // Carry the waiter and kitchen-ready status forward so finalizing the sale doesn't
   // lose who served it or reset an order the kitchen already marked ready.
-  pendingCheckoutMeta = { kitchenStatus: req.kitchenStatus || 'pending' };
+  pendingCheckoutMeta = { kitchenStatus: req.kitchenStatus || 'pending', orderNo: req.orderNo || null };
   if(req.waiterId){
     const sel = $('#posWaiter');
     if(sel && Array.from(sel.options).some(o=>o.value===String(req.waiterId))) sel.value = String(req.waiterId);
@@ -6967,6 +7494,7 @@ async function renderWaiterOrderView(){
   renderWoCart();
   populateWoWaiterSelect();
   renderWoSentOrders();
+  startSaleRequestsLiveSync();
 }
 
 function renderWoCategoryBar(){
@@ -6983,16 +7511,28 @@ function renderWoCategoryBar(){
   });
 }
 
+let woSearchQuery = '';
+
 function renderWoItemGrid(){
-  const items = waiterOrderActiveCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===waiterOrderActiveCategory);
+  let items;
+  if(woSearchQuery){
+    const q = woSearchQuery.toLowerCase();
+    items = posItems.filter(it=>it.name.toLowerCase().includes(q));
+  }else{
+    items = waiterOrderActiveCategory==='All' ? posItems : posItems.filter(it=>(it.category||'General')===waiterOrderActiveCategory);
+  }
   if(items.length===0){
-    $('#woItemGrid').innerHTML = '<div class="empty">No items in this category yet.</div>';
+    $('#woItemGrid').innerHTML = woSearchQuery
+      ? `<div class="empty">No items match "${woSearchQuery}".</div>`
+      : '<div class="empty">No items in this category yet.</div>';
     return;
   }
   $('#woItemGrid').innerHTML = items.map(it=>{
     const outOfStock = it.trackStock && (it.stock||0) <= 0;
+    const imageHtml = it.image ? `<img src="${it.image}" class="pi-image" onerror="this.style.display='none'">` : '';
     return `
     <div class="pos-item-btn ${outOfStock ? 'out-of-stock' : ''}" data-id="${it.id}">
+      ${imageHtml}
       <div class="pi-name">${it.name}</div>
       <div class="pi-price">${fmt(it.price)} Sl.sh</div>
     </div>`;
@@ -7001,6 +7541,10 @@ function renderWoItemGrid(){
     btn.addEventListener('click', ()=> addToWaiterOrder(Number(btn.dataset.id)));
   });
 }
+$('#woItemSearch').addEventListener('input', ()=>{
+  woSearchQuery = $('#woItemSearch').value.trim();
+  renderWoItemGrid();
+});
 
 function addToWaiterOrder(itemId){
   const item = posItems.find(it=>it.id===itemId);
@@ -7010,7 +7554,7 @@ function addToWaiterOrder(itemId){
     return;
   }
   const line = waiterOrderCart.find(c=>c.itemId===itemId);
-  if(line){ line.qty += 1; } else { waiterOrderCart.push({ itemId, name: item.name, price: item.price, qty: 1 }); }
+  if(line){ line.qty += 1; } else { waiterOrderCart.push({ itemId, name: item.name, price: item.price, qty: 1, note: '' }); }
   renderWoCart();
 }
 
@@ -7019,15 +7563,18 @@ function renderWoCart(){
     $('#woCartList').innerHTML = '<div class="empty" style="padding:14px 0;">Tap items to add them to this order.</div>';
   }else{
     $('#woCartList').innerHTML = waiterOrderCart.map((c,i)=>`
-      <div class="pos-cart-row">
-        <span class="pc-name">${c.name}</span>
-        <span class="pc-qty-controls">
-          <button class="pc-qty-btn" data-action="dec" data-i="${i}">−</button>
-          <span>${c.qty}</span>
-          <button class="pc-qty-btn" data-action="inc" data-i="${i}">+</button>
-        </span>
-        <span class="pc-total">${fmt(c.price*c.qty)}</span>
-        <button class="pc-remove" data-action="rm" data-i="${i}">✕</button>
+      <div class="pos-cart-item">
+        <div class="pos-cart-row">
+          <span class="pc-name">${c.name}</span>
+          <span class="pc-qty-controls">
+            <button class="pc-qty-btn" data-action="dec" data-i="${i}">−</button>
+            <span>${c.qty}</span>
+            <button class="pc-qty-btn" data-action="inc" data-i="${i}">+</button>
+          </span>
+          <span class="pc-total">${fmt(c.price*c.qty)}</span>
+          <button class="pc-remove" data-action="rm" data-i="${i}">✕</button>
+        </div>
+        <input type="text" class="pc-note-input" data-note-i="${i}" placeholder="+ Special instructions (e.g. no sugar)" value="${c.note||''}">
       </div>
     `).join('');
     $$('#woCartList [data-action]').forEach(btn=>{
@@ -7037,6 +7584,12 @@ function renderWoCart(){
         if(btn.dataset.action==='dec'){ waiterOrderCart[i].qty -= 1; if(waiterOrderCart[i].qty<=0) waiterOrderCart.splice(i,1); }
         if(btn.dataset.action==='rm') waiterOrderCart.splice(i,1);
         renderWoCart();
+      });
+    });
+    $$('#woCartList [data-note-i]').forEach(input=>{
+      input.addEventListener('input', ()=>{
+        const i = Number(input.dataset.noteI);
+        if(waiterOrderCart[i]) waiterOrderCart[i].note = input.value;
       });
     });
   }
@@ -7065,12 +7618,14 @@ function renderWoSentOrders(){
     return;
   }
   el.innerHTML = [...pending].reverse().map(r=>{
-    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}`).join(', ');
+    const itemSummary = r.items.map(it=>`${it.name} x${it.qty}${it.note ? ' ('+it.note+')' : ''}`).join(', ');
     const readyTag = r.kitchenStatus==='ready'
       ? '<span style="color:var(--credit);font-weight:600;">✅ Ready</span>'
       : '<span style="color:var(--ink-soft);">🍳 Preparing</span>';
+    const timeStr = r.createdAt ? new Date(r.createdAt).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}) : '';
     return `
     <div class="wp-request-card">
+      ${r.orderNo ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:700;color:var(--brass-dark);margin-bottom:3px;">${r.orderNo} · ${timeStr}</div>` : ''}
       <div class="wpr-top"><span>${r.customerName}${r.waiterName ? ' · ' + r.waiterName : ''}</span>${readyTag}</div>
       <div class="wpr-items">${itemSummary}${r.note ? ' — ' + r.note : ''}</div>
       <div class="wpr-actions">
@@ -7105,13 +7660,15 @@ $('#woSendBtn').addEventListener('click', async ()=>{
   const originalLabel = btn.textContent;
   btn.textContent = 'Sending…';
   try{
+    const orderNo = await nextOrderNo();
     saleRequests.push({
       id: Date.now(),
+      orderNo,
       source: 'waiter',
       waiterId, waiterName,
       customerId: null,
       customerName: tableName,
-      items: waiterOrderCart.map(c=>({ itemId: c.itemId, name: c.name, price: c.price, qty: c.qty })),
+      items: waiterOrderCart.map(c=>({ itemId: c.itemId, name: c.name, price: c.price, qty: c.qty, note: c.note||'' })),
       note: $('#woNote').value.trim(),
       status: 'pending',
       kitchenStatus: 'pending',
@@ -7123,7 +7680,7 @@ $('#woSendBtn').addEventListener('click', async ()=>{
     $('#woNote').value = '';
     renderWoCart();
     renderWoSentOrders();
-    msg.textContent = `Order sent for ${tableName} — the kitchen and counter can see it now.`;
+    msg.textContent = `${orderNo} sent for ${tableName} — the kitchen and counter can see it now.`;
     msg.className = 'msg show ok';
   }catch(e){
     console.error('Sending order failed:', e);
@@ -7242,7 +7799,7 @@ function kitchenQueue(){
     .filter(e => e.date===todayStr() && e.desc && e.desc.startsWith('POS Sale:') && e.posItems && e.posItems.length)
     .map(e => ({
       kind: 'entry', id: e.id, time: e.id,
-      label: e.posReceiptNo || '',
+      label: e.orderNo ? `${e.orderNo} · ${e.posReceiptNo||''}` : (e.posReceiptNo || ''),
       forTag: e.posIsCredit && e.posCustomerName ? `For ${e.posCustomerName}` : 'Walk-in',
       waiterName: e.posWaiterName, items: e.posItems,
       kitchenStatus: e.kitchenStatus || 'pending'
@@ -7251,7 +7808,7 @@ function kitchenQueue(){
     .filter(r => r.status==='pending' && r.items && r.items.length)
     .map(r => ({
       kind: 'request', id: r.id, time: r.createdAt || r.id,
-      label: '🕓 Awaiting checkout',
+      label: r.orderNo ? `${r.orderNo} · Awaiting checkout` : '🕓 Awaiting checkout',
       forTag: r.customerName || 'Order',
       waiterName: r.waiterName, items: r.items,
       kitchenStatus: r.kitchenStatus || 'pending'
@@ -7261,7 +7818,11 @@ function kitchenQueue(){
 
 function kitchenOrderCardHtml(o, isReady){
   const time = new Date(o.time).toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
-  const itemRows = o.items.map(it=>`<div class="ko-item"><span class="ko-qty">${fmt(it.qty)}×</span><span>${it.name}</span></div>`).join('');
+  const itemRows = o.items.map(it=>`
+    <div class="ko-item">
+      <span class="ko-qty">${fmt(it.qty)}×</span><span>${it.name}</span>
+      ${it.note ? `<div class="ko-item-note">📝 ${it.note}</div>` : ''}
+    </div>`).join('');
   const waiterTag = o.waiterName ? ` · 🧑‍🍳 ${o.waiterName}` : '';
   return `
     <div class="kitchen-order-card${isReady ? ' ready' : ''}">
@@ -7277,6 +7838,8 @@ function kitchenOrderCardHtml(o, isReady){
 async function openKitchenDashboard(){
   await loadSaleRequests();
   renderKitchenDashboard();
+  startSaleRequestsLiveSync();
+  startEntriesLiveSyncForKitchen();
 }
 
 function renderKitchenDashboard(){
@@ -7851,6 +8414,28 @@ $('#goShowAttendanceQr').addEventListener('click', ()=>{
   $('#invoicePrintModal').classList.add('active');
 });
 
+$('#goShowOrderQr').addEventListener('click', ()=>{
+  const msg = $('#linkCopyMsg');
+  let link;
+  try{
+    // order.html is expected to sit next to this file, same as attendance.html
+    link = new URL('order.html', location.href).href;
+  }catch(e){
+    msg.textContent = "Can't build a real link yet — this only works once the files are deployed to an actual website (GitHub Pages, Netlify, etc.), not while just previewing the file.";
+    msg.className = 'msg show err';
+    return;
+  }
+  currentDocPhone = null;
+  currentDocWaMessage = `Order ahead at ${BUSINESS_INFO.name}: ${link}`;
+  currentDocFilename = 'customer-order-qr.png';
+  $('#invoiceDocContent').classList.remove('receipt-mode');
+  $('#invoiceDocContent').innerHTML = buildOrderQrDocHtml(link);
+  currentPosSale = null;
+  $('#posReceiptExtraActions').style.display = 'none';
+  $('#statementPaymentRow').style.display = 'none';
+  $('#invoicePrintModal').classList.add('active');
+});
+
 /* ---------------------------------------------------------------------
    Manage Users modal (Admin only)
 --------------------------------------------------------------------- */
@@ -8046,6 +8631,7 @@ const BACKUP_KEYS = {
   bankAccounts: BANK_ACCOUNTS_KEY,
   saleRequests: SALE_REQUESTS_KEY,
   advanceRequests: ADVANCE_REQUESTS_KEY,
+  reviews: REVIEWS_KEY,
   schedule: SCHEDULE_KEY,
   posItems: POS_ITEMS_KEY,
   users: USERS_KEY,
@@ -8449,6 +9035,7 @@ $('#employeeSearch').addEventListener('input', renderEmployeesTable);
 $('#journalSearch').addEventListener('input', renderJournal);
 
 resetForm();
+applyStaticTranslations();
 showScreen('screen-login');
 refreshBiometricLoginButtonVisibility();
 
