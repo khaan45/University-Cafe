@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#15201B;
@@ -48,21 +48,6 @@
   .screen{display:none;animation:fadeSlide .35s cubic-bezier(.2,.8,.3,1) both;}
   .screen.active{display:block;}
   @keyframes fadeSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
-  /* ---------- Language switcher ---------- */
-  .lang-switch{display:flex;gap:6px;justify-content:center;margin-bottom:16px;}
-  .lang-btn{
-    font-family:'Inter',sans-serif;font-weight:700;font-size:11px;padding:7px 16px;border-radius:999px;
-    border:1.5px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;letter-spacing:.04em;
-    transition:all .15s ease;
-  }
-  .lang-btn:hover:not(.active){border-color:var(--brass);color:var(--ink);}
-  .lang-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
-
-  /* ---------- RTL (Arabic) ---------- */
-  html[dir="rtl"] body{font-family:'Cairo',sans-serif;}
-  html[dir="rtl"] .emp-avatar, html[dir="rtl"] .pin-emp-avatar{font-family:'Cairo',sans-serif;}
-  html[dir="rtl"] .badge-bar h1, html[dir="rtl"] .pin-header h2, html[dir="rtl"] .status-title, html[dir="rtl"] .desktop-block h2{font-family:'Cairo',sans-serif;}
 
   .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:12px;}
 
@@ -151,34 +136,6 @@
   .hist-row .hr-hours{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:14px;color:var(--credit);}
   .hist-row .hr-hours.open{color:var(--amber);}
 
-  /* ---------- Request Advance ---------- */
-  .field-label{font-size:12px;font-weight:600;color:var(--ink-soft);margin:14px 0 6px;display:block;}
-  .text-input{
-    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);
-    font-family:'Inter',sans-serif;font-size:15px;color:var(--ink);box-sizing:border-box;
-  }
-  .text-input:focus{outline:none;border-color:var(--brass);}
-  .adv-row{
-    display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--card);
-    border:1px solid var(--line);border-radius:11px;margin-bottom:8px;
-  }
-  .adv-row .adv-amt{font-weight:700;font-size:14px;font-family:'IBM Plex Mono',monospace;}
-  .adv-row .adv-reason{font-size:11.5px;color:var(--ink-soft);margin-top:2px;}
-  .adv-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;flex:0 0 auto;margin-left:10px;}
-  .adv-tag.pending{background:var(--amber-bg);color:var(--amber);}
-  .adv-tag.approved{background:var(--credit-bg);color:var(--credit);}
-  .adv-tag.declined{background:var(--debit-bg);color:var(--debit);}
-
-  /* ---------- My Schedule ---------- */
-  .sched-row{
-    display:flex;justify-content:space-between;align-items:flex-start;padding:12px 14px;background:var(--card);
-    border:1px solid var(--line);border-radius:11px;margin-bottom:8px;gap:14px;
-  }
-  .sched-row .sr-day{font-weight:700;font-size:13px;padding-top:1px;}
-  .sched-row .sr-time{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--credit);text-align:right;line-height:1.7;}
-  .sched-row.off .sr-time{color:var(--ink-soft);font-style:italic;}
-  .sched-row.today{border-color:var(--brass);}
-
   .stamp-overlay{
     position:fixed;inset:0;background:rgba(21,32,27,.6);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;
   }
@@ -190,7 +147,6 @@
     animation:stampDown .5s cubic-bezier(.17,.85,.35,1.25) forwards;
   }
   .stamp.out{border-color:var(--amber);color:var(--amber);background:rgba(251,240,222,.97);}
-  .stamp.warn{border-color:var(--debit);color:var(--debit);background:rgba(246,227,223,.97);}
   @keyframes stampDown{
     0%{transform:scale(.3) rotate(-20deg);opacity:0;}
     60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
@@ -199,7 +155,6 @@
   .stamp .stamp-check{font-size:38px;}
   .stamp .stamp-title{font-family:'Fraunces',serif;font-weight:800;font-size:15px;margin-top:4px;}
   .stamp .stamp-time{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:5px;color:var(--ink-soft);}
-  .stamp .stamp-warn-text{font-size:10.5px;font-weight:700;margin-top:8px;padding:0 14px;line-height:1.4;}
   .stamp-dismiss{
     margin-top:18px;background:var(--card);color:var(--ink);border:1.5px solid var(--ink);border-radius:9px;
     padding:9px 22px;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;cursor:pointer;
@@ -221,8 +176,8 @@
 <div class="desktop-block" id="desktopBlock">
   <div class="db-inner">
     <div class="db-icon">📱</div>
-    <h2 data-i18n="please_use_phone">Please use your phone</h2>
-    <p data-i18n="mobile_only_desc">Staff check-in only works from a mobile phone. Open this same link on your phone's browser to check in for your shift.</p>
+    <h2>Please use your phone</h2>
+    <p>Staff check-in only works from a mobile phone. Open this same link on your phone's browser to check in for your shift.</p>
     <p id="blockDiagnostics" style="margin-top:16px;font-size:10.5px;color:#7A8781;word-break:break-all;font-family:'IBM Plex Mono',monospace;"></p>
   </div>
 </div>
@@ -237,12 +192,6 @@
 
   <div class="content">
 
-    <div class="lang-switch" id="langSwitch">
-      <button class="lang-btn" data-lang="en">EN</button>
-      <button class="lang-btn" data-lang="so">SO</button>
-      <button class="lang-btn" data-lang="ar">AR</button>
-    </div>
-
     <div style="text-align:center;margin-bottom:14px;">
       <button class="secondary" id="syncTestBtn" style="font-size:11px;padding:8px 12px;width:auto;margin:0;">🔄 Sync Test</button>
       <div id="syncTestResult" style="font-size:10.5px;color:var(--ink-soft);margin-top:8px;font-family:'IBM Plex Mono',monospace;word-break:break-all;"></div>
@@ -250,8 +199,8 @@
 
     <!-- ===== Screen 1: pick employee ===== -->
     <div class="screen active" id="screen-pick">
-      <div class="section-label" data-i18n="who_are_you">Who are you?</div>
-      <div class="emp-list" id="empList"><div class="empty" data-i18n="loading">Loading…</div></div>
+      <div class="section-label">Who are you?</div>
+      <div class="emp-list" id="empList"><div class="empty">Loading…</div></div>
     </div>
 
     <!-- ===== Screen 2: PIN entry ===== -->
@@ -259,50 +208,26 @@
       <div class="pin-header">
         <div class="pin-emp-avatar" id="pinAvatar"></div>
         <h2 id="pinEmpName"></h2>
-        <div class="pin-hint" id="pinHint" data-i18n="enter_pin">Enter your 4-digit PIN</div>
+        <div class="pin-hint" id="pinHint">Enter your 4-digit PIN</div>
       </div>
       <div class="pin-dots" id="pinDots"></div>
       <div class="keypad" id="keypad"></div>
       <div class="pin-msg" id="pinMsg"></div>
-      <button class="pin-back" id="pinBackBtn" data-i18n="not_you_go_back">← Not you? Go back</button>
+      <button class="pin-back" id="pinBackBtn">← Not you? Go back</button>
     </div>
 
     <!-- ===== Screen 3: shift status ===== -->
     <div class="screen" id="screen-status">
       <div class="status-card" id="statusCard"></div>
-      <button class="secondary" id="viewHistoryBtn">📋 <span data-i18n="view_history">View My History</span></button>
-      <button class="secondary" id="viewScheduleBtn">📅 <span data-i18n="my_schedule">My Schedule</span></button>
-      <button class="secondary" id="requestAdvanceBtn">💵 <span data-i18n="request_advance">Request an Advance</span></button>
-      <button class="secondary" id="statusBackBtn" data-i18n="switch_user">← Switch User</button>
+      <button class="secondary" id="viewHistoryBtn">📋 View My History</button>
+      <button class="secondary" id="statusBackBtn">← Switch User</button>
     </div>
 
     <!-- ===== Screen 4: history ===== -->
     <div class="screen" id="screen-history">
       <div class="section-label" id="historyTitle">My Attendance History</div>
       <div id="historyList"></div>
-      <button class="secondary" id="historyBackBtn" data-i18n="back">← Back</button>
-    </div>
-
-    <!-- ===== Screen 6: my schedule ===== -->
-    <div class="screen" id="screen-schedule">
-      <div class="section-label" data-i18n="my_weekly_schedule">My Weekly Schedule</div>
-      <div id="myScheduleList"></div>
-      <button class="secondary" id="scheduleBackBtn" data-i18n="back">← Back</button>
-    </div>
-
-    <!-- ===== Screen 5: request advance ===== -->
-    <div class="screen" id="screen-advance">
-      <div class="section-label" data-i18n="request_an_advance_title">Request an Advance</div>
-      <label class="field-label" for="advAmount" data-i18n="amount_label">Amount (Sl.sh)</label>
-      <input type="number" id="advAmount" class="text-input" min="0" step="1" inputmode="numeric" placeholder="0">
-      <label class="field-label" for="advReason" data-i18n="reason_optional">Reason (optional)</label>
-      <input type="text" id="advReason" class="text-input" placeholder="e.g. school fees" data-i18n-placeholder="reason_placeholder">
-      <div class="msg" id="advMsg" style="display:none;"></div>
-      <button class="primary" id="advSendBtn" data-i18n="send_request">Send Request</button>
-
-      <div class="section-label" style="margin-top:26px;" data-i18n="your_requests">Your Requests</div>
-      <div id="advHistoryList"></div>
-      <button class="secondary" id="advBackBtn" data-i18n="back">← Back</button>
+      <button class="secondary" id="historyBackBtn">← Back</button>
     </div>
 
   </div>
@@ -314,9 +239,8 @@
       <div class="stamp-check" id="stampIcon">✓</div>
       <div class="stamp-title" id="stampTitle">CHECKED IN</div>
       <div class="stamp-time" id="stampTime"></div>
-      <div class="stamp-warn-text" id="stampWarnText" style="display:none;"></div>
     </div>
-    <button class="stamp-dismiss" id="stampDismissBtn" data-i18n="done_button">Done</button>
+    <button class="stamp-dismiss" id="stampDismissBtn">Done</button>
   </div>
 </div>
 
@@ -389,13 +313,9 @@ const $ = sel => document.querySelector(sel);
 function $$(sel){ return Array.from(document.querySelectorAll(sel)); }
 const EMPLOYEES_KEY = "ubcafe_employees";
 const ATTENDANCE_KEY = "ubcafe_attendance";
-const ADVANCE_REQUESTS_KEY = "ubcafe_advance_requests";
-const SCHEDULE_KEY = "ubcafe_schedule";
-const SCHEDULE_DAYS = ['Sat','Sun','Mon','Tue','Wed','Thu']; // Friday is the off day, same as everywhere else in the app
 
 function todayStr(){ return new Date().toISOString().slice(0,10); }
 function nowTimeStr(){ return new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}); }
-const fmt = n => (Math.round(n*100)/100).toLocaleString('en-US');
 function initials(name){
   const parts = String(name||'').trim().split(/\s+/);
   return ((parts[0]?.[0]||'') + (parts[1]?.[0]||'')).toUpperCase() || '?';
@@ -406,149 +326,23 @@ function formatHours(ms){
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-/* ---------------------------------------------------------------------
-   i18n — English / Somali / Arabic. Static text uses data-i18n /
-   data-i18n-placeholder attributes; dynamically generated content
-   calls t() directly.
---------------------------------------------------------------------- */
-const I18N = {
-  en: {
-    who_are_you: "Who are you?", loading: "Loading…",
-    enter_pin: "Enter your 4-digit PIN",
-    create_pin_hint: "First time — create a 4-digit PIN you'll use to check in from now on",
-    confirm_pin_hint: "Enter it once more to confirm",
-    incorrect_pin: "Incorrect PIN — try again.",
-    pins_didnt_match: "Those didn't match — let's start over.",
-    not_you_go_back: "← Not you? Go back",
-    ready_to_start: "Ready to start your shift?", havent_checked_in: "You haven't checked in today.",
-    check_in: "Check In", on_shift: "You're on shift", checked_in_at: "Checked in at",
-    check_out: "Check Out", shift_complete: "Shift complete", great_work: "Great work today!",
-    in_label: "In", out_label: "Out", hours_label: "Hours",
-    view_history: "View My History", my_schedule: "My Schedule", request_advance: "Request an Advance",
-    switch_user: "← Switch User",
-    my_attendance_history: "My Attendance History", back: "← Back",
-    no_history: "No history yet.", in_progress: "In progress", still_on_shift: " – still on shift",
-    request_an_advance_title: "Request an Advance", amount_label: "Amount (Sl.sh)",
-    reason_optional: "Reason (optional)", reason_placeholder: "e.g. school fees", send_request: "Send Request",
-    your_requests: "Your Requests", no_requests_yet: "No requests yet.",
-    amount_required: "Enter an amount greater than 0.", advance_sent: "Sent — management will review it.",
-    status_pending: "Pending", status_approved: "Approved", status_declined: "Declined",
-    my_weekly_schedule: "My Weekly Schedule", off_label: "Off", today_label: " · Today",
-    checked_in_label: "CHECKED IN", checked_out_label: "CHECKED OUT", done_button: "Done",
-    getting_location: "Getting your location…", generic_error: "Something went wrong: ", sending: "Sending…",
-    far_from_workplace: "You're {dist}m from the workplace — this check-in will be flagged for review.",
-    device_registered_alert: "{name} is registered to a different phone. Ask a manager to reset it if this is a new phone.",
-    please_use_phone: "Please use your phone",
-    mobile_only_desc: "Staff check-in only works from a mobile phone. Open this same link on your phone's browser to check in for your shift.",
-    tag_done: "Done", tag_on_shift: "On Shift", no_active_employees: "No active employees on file.",
-    day_Sat: "Sat", day_Sun: "Sun", day_Mon: "Mon", day_Tue: "Tue", day_Wed: "Wed", day_Thu: "Thu", day_Fri: "Fri",
-    shift_Morning: "Morning", shift_Afternoon: "Afternoon"
-  },
-  so: {
-    who_are_you: "Yaad tahay?", loading: "Waa la soo raraya…",
-    enter_pin: "Geli lambarkaaga 4-tirsan (PIN)",
-    create_pin_hint: "Markaan hore — samee PIN 4-tiro ah oo aad ku isticmaali doonto hadda ka dib",
-    confirm_pin_hint: "Mar kale geli si aad u xaqiijiso",
-    incorrect_pin: "PIN khalad ah — isku day mar kale.",
-    pins_didnt_match: "Isku mid ma noqon — aan ka bilowno bilowga.",
-    not_you_go_back: "← Adiga ma aha? Dib u noqo",
-    ready_to_start: "Diyaar u tahay inaad bilowdo shiftigaaga?", havent_checked_in: "Maanta wali soo geli ma samayn.",
-    check_in: "Soo Gal", on_shift: "Shift baad ku jirtaa", checked_in_at: "Waxaad soo gashay",
-    check_out: "Bax", shift_complete: "Shiftigu waa dhammaaday", great_work: "Shaqo fiican maanta!",
-    in_label: "Soo Gal", out_label: "Bax", hours_label: "Saacadaha",
-    view_history: "Eeg Taariikhdayda", my_schedule: "Jadwalkayga", request_advance: "Codso Horumar",
-    switch_user: "← Isticmaale Kale",
-    my_attendance_history: "Taariikhda Imaanshahayga", back: "← Dib",
-    no_history: "Wali taariikh ma jirto.", in_progress: "Socda", still_on_shift: " – wali shift ku jira",
-    request_an_advance_title: "Codso Horumar", amount_label: "Qadarka (Sl.sh)",
-    reason_optional: "Sababta (ikhtiyaari)", reason_placeholder: "tusaale kharashka dugsiga", send_request: "Dir Codsiga",
-    your_requests: "Codsiyadaada", no_requests_yet: "Wali codsi ma jiro.",
-    amount_required: "Geli qadar ka weyn 0.", advance_sent: "Waa la diray — maamulku wuu eegi doonaa.",
-    status_pending: "Sugaya", status_approved: "La Ansixiyay", status_declined: "La Diiday",
-    my_weekly_schedule: "Jadwalkayga Toddobaadlaha ah", off_label: "Fasax", today_label: " · Maanta",
-    checked_in_label: "WAA LA GALAY", checked_out_label: "WAA LA BAXAY", done_button: "Dhammaystiran",
-    getting_location: "Waxaan helayaa goobtaada…", generic_error: "Wax baa qaldamay: ", sending: "Dirsanaya…",
-    far_from_workplace: "Waxaad ka joogtaa {dist}m goobta shaqada — soo gelidan waa la calaamadin doonaa dib u eegis.",
-    device_registered_alert: "{name} waxaa loo diiwaan geliyay taleefan kale. Waydii maamule inuu dib u deyo haddii uu tani tahay taleefan cusub.",
-    please_use_phone: "Fadlan isticmaal taleefankaaga",
-    mobile_only_desc: "Soo gelida shaqaalaha waxay kaliya ka shaqeysaa taleefan gacanta. Isla linkigan ka fur biraawsarka taleefankaaga si aad u soo gasho shiftigaaga.",
-    tag_done: "Dhammaystiran", tag_on_shift: "Shift Ku Jira", no_active_employees: "Shaqaale firfircoon lama helin.",
-    day_Sat: "Sabti", day_Sun: "Axad", day_Mon: "Isniin", day_Tue: "Talaado", day_Wed: "Arbaco", day_Thu: "Khamiis", day_Fri: "Jimce",
-    shift_Morning: "Aroor", shift_Afternoon: "Galab"
-  },
-  ar: {
-    who_are_you: "من أنت؟", loading: "جارٍ التحميل…",
-    enter_pin: "أدخل رمزك السري المكوّن من 4 أرقام",
-    create_pin_hint: "أول مرة — أنشئ رمزًا سريًا من 4 أرقام ستستخدمه لتسجيل الدخول من الآن فصاعدًا",
-    confirm_pin_hint: "أدخله مرة أخرى للتأكيد",
-    incorrect_pin: "رمز سري غير صحيح — حاول مرة أخرى.",
-    pins_didnt_match: "الرمزان غير متطابقين — لنبدأ من جديد.",
-    not_you_go_back: "← لست أنت؟ ارجع",
-    ready_to_start: "هل أنت مستعد لبدء دوامك؟", havent_checked_in: "لم تسجل حضورك اليوم.",
-    check_in: "تسجيل حضور", on_shift: "أنت في الدوام", checked_in_at: "سجّلت حضورك في",
-    check_out: "تسجيل انصراف", shift_complete: "اكتمل الدوام", great_work: "عمل رائع اليوم!",
-    in_label: "حضور", out_label: "انصراف", hours_label: "الساعات",
-    view_history: "عرض سجلّي", my_schedule: "جدولي", request_advance: "طلب سلفة",
-    switch_user: "← تبديل المستخدم",
-    my_attendance_history: "سجل حضوري", back: "← رجوع",
-    no_history: "لا يوجد سجل بعد.", in_progress: "جارٍ الآن", still_on_shift: " – لا يزال في الدوام",
-    request_an_advance_title: "طلب سلفة", amount_label: "المبلغ (ش.ص)",
-    reason_optional: "السبب (اختياري)", reason_placeholder: "مثال: مصاريف مدرسية", send_request: "إرسال الطلب",
-    your_requests: "طلباتك", no_requests_yet: "لا توجد طلبات بعد.",
-    amount_required: "أدخل مبلغًا أكبر من 0.", advance_sent: "تم الإرسال — ستقوم الإدارة بمراجعته.",
-    status_pending: "قيد الانتظار", status_approved: "تمت الموافقة", status_declined: "مرفوض",
-    my_weekly_schedule: "جدولي الأسبوعي", off_label: "إجازة", today_label: " · اليوم",
-    checked_in_label: "تم تسجيل الحضور", checked_out_label: "تم تسجيل الانصراف", done_button: "تم",
-    getting_location: "جارٍ تحديد موقعك…", generic_error: "حدث خطأ: ", sending: "جارٍ الإرسال…",
-    far_from_workplace: "أنت على بعد {dist} مترًا من مكان العمل — سيتم وضع علامة على هذا التسجيل للمراجعة.",
-    device_registered_alert: "{name} مسجّل على هاتف آخر. اطلب من المدير إعادة الضبط إذا كان هذا هاتفًا جديدًا.",
-    please_use_phone: "يرجى استخدام هاتفك",
-    mobile_only_desc: "يعمل تسجيل حضور الموظفين فقط من الهاتف المحمول. افتح هذا الرابط نفسه من متصفح هاتفك لتسجيل حضور دوامك.",
-    tag_done: "تم", tag_on_shift: "في الدوام", no_active_employees: "لا يوجد موظفون نشطون مسجّلون.",
-    day_Sat: "السبت", day_Sun: "الأحد", day_Mon: "الإثنين", day_Tue: "الثلاثاء", day_Wed: "الأربعاء", day_Thu: "الخميس", day_Fri: "الجمعة",
-    shift_Morning: "صباحًا", shift_Afternoon: "مساءً"
-  }
-};
-
-let currentLang = (function(){
-  try{ return window.localStorage.getItem('ubcafe_lang') || 'en'; }catch(e){ return 'en'; }
-})();
-
-function t(key, vars){
-  let str = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
-  if(vars){ Object.keys(vars).forEach(k=>{ str = str.replace('{'+k+'}', vars[k]); }); }
-  return str;
-}
-
-function applyStaticTranslations(){
-  document.documentElement.lang = currentLang;
-  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-  $$('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
-  $$('[data-i18n-placeholder]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPlaceholder); });
-  $$('.lang-btn').forEach(btn=>{ btn.classList.toggle('active', btn.dataset.lang===currentLang); });
-}
-
-function setLang(lang){
-  currentLang = lang;
-  try{ window.localStorage.setItem('ubcafe_lang', lang); }catch(e){}
-  applyStaticTranslations();
-  // Re-render whichever dynamic, JS-generated screens might currently be showing.
-  renderEmpList();
-  if(selectedEmployee){
-    if($('#screen-status').classList.contains('active')) renderStatusCard();
-    if($('#screen-schedule').classList.contains('active')) renderMySchedule();
-    if($('#screen-advance').classList.contains('active')) renderAdvanceHistory();
-  }
-}
-
-$$('.lang-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=> setLang(btn.dataset.lang));
-});
-
 let employees = [];
 let attendance = []; // [{id, employeeId, employeeName, date, checkInTime, checkInTs, checkOutTime, checkOutTs, lat?, lng?}]
-let advanceRequests = []; // [{id, employeeId, employeeName, amount, reason, status:'pending'|'approved'|'declined', createdAt}]
-let schedule = []; // [{id, employeeId, employeeName, day:'Mon'..'Sun', startTime, endTime}] — read-only here, set from the main app
+
+const WORKPLACE_LOCATION_KEY = "ubcafe_workplace_location";
+let workplaceLocation = null; // {lat, lng, radiusMeters}
+async function loadWorkplaceLocation(){
+  const val = await storageGet(WORKPLACE_LOCATION_KEY, true);
+  try{ workplaceLocation = val ? JSON.parse(val) : null; }catch(e){ workplaceLocation = null; }
+}
+function distanceMeters(lat1, lng1, lat2, lng2){
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
 let selectedEmployee = null;
 let pinBuffer = '';
 let pinMode = null; // 'verify' | 'create' | 'confirm'
@@ -562,32 +356,6 @@ async function loadData(){
 }
 async function saveAttendance(){ await storageSet(ATTENDANCE_KEY, JSON.stringify(attendance), true); }
 async function saveEmployees(){ await storageSet(EMPLOYEES_KEY, JSON.stringify(employees), true); }
-
-const WORKPLACE_LOCATION_KEY = "ubcafe_workplace_location";
-let workplaceLocation = null; // {lat, lng, radiusMeters} — set by an Admin in the main app
-async function loadWorkplaceLocation(){
-  const val = await storageGet(WORKPLACE_LOCATION_KEY, true);
-  try{ workplaceLocation = val ? JSON.parse(val) : null; }catch(e){ workplaceLocation = null; }
-}
-function distanceMeters(lat1, lng1, lat2, lng2){
-  // Haversine formula — great-circle distance between two lat/lng points, in meters.
-  // Identical to the copy in the main app so a check-in is judged the same way here as it is there.
-  const R = 6371000;
-  const toRad = d => d * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-async function loadAdvanceRequests(){
-  const val = await storageGet(ADVANCE_REQUESTS_KEY, true);
-  try{ advanceRequests = val ? JSON.parse(val) : []; }catch(e){ advanceRequests = []; }
-}
-async function saveAdvanceRequests(){ await storageSet(ADVANCE_REQUESTS_KEY, JSON.stringify(advanceRequests), true); }
-async function loadSchedule(){
-  const val = await storageGet(SCHEDULE_KEY, true);
-  try{ schedule = val ? JSON.parse(val) : []; }catch(e){ schedule = []; }
-}
 
 function todaysRecord(employeeId){
   return attendance.find(a => a.employeeId===employeeId && a.date===todayStr());
@@ -637,14 +405,14 @@ function renderEmpList(){
     }catch(e){
       diag = `<div style="margin-top:14px;font-size:10px;color:#9AA69D;">Diagnostics unavailable: ${e.message}</div>`;
     }
-    list.innerHTML = `<div class="empty">${t('no_active_employees')}</div>` + diag;
+    list.innerHTML = '<div class="empty">No active employees on file.</div>' + diag;
     return;
   }
   list.innerHTML = active.map(e=>{
     const rec = todaysRecord(e.id);
     let tag = '';
-    if(rec && rec.checkOutTime) tag = `<span class="emp-tag done">${t('tag_done')}</span>`;
-    else if(rec) tag = `<span class="emp-tag in">${t('tag_on_shift')}</span>`;
+    if(rec && rec.checkOutTime) tag = '<span class="emp-tag done">Done</span>';
+    else if(rec) tag = '<span class="emp-tag in">On Shift</span>';
     return `<div class="emp-row" data-id="${e.id}">
       <div class="emp-avatar">${initials(e.fullName)}</div>
       <div class="emp-name">${e.fullName}</div>
@@ -657,7 +425,7 @@ function renderEmpList(){
       if(!selectedEmployee) return;
       const deviceId = getDeviceId();
       if(selectedEmployee.registeredDeviceId && deviceId && selectedEmployee.registeredDeviceId !== deviceId){
-        alert(t('device_registered_alert', {name: selectedEmployee.fullName}));
+        alert(`${selectedEmployee.fullName} is registered to a different phone. Ask a manager to reset it if this is a new phone.`);
         return;
       }
       openPinScreen();
@@ -707,10 +475,10 @@ function openPinScreen(){
   $('#pinMsg').textContent = '';
   if(selectedEmployee.pin){
     pinMode = 'verify';
-    $('#pinHint').textContent = t('enter_pin');
+    $('#pinHint').textContent = 'Enter your 4-digit PIN';
   }else{
     pinMode = 'create';
-    $('#pinHint').textContent = t('create_pin_hint');
+    $('#pinHint').textContent = "First time — create a 4-digit PIN you'll use to check in from now on";
   }
   renderPinDots();
   showScreen('screen-pin');
@@ -723,7 +491,7 @@ async function handlePinComplete(){
       msg.textContent = '';
       openStatusScreen();
     }else{
-      msg.textContent = t('incorrect_pin');
+      msg.textContent = 'Incorrect PIN — try again.';
       shakeDots();
       pinBuffer = '';
       setTimeout(renderPinDots, 300);
@@ -732,7 +500,7 @@ async function handlePinComplete(){
     pinFirstEntry = pinBuffer;
     pinBuffer = '';
     pinMode = 'confirm';
-    $('#pinHint').textContent = t('confirm_pin_hint');
+    $('#pinHint').textContent = 'Enter it once more to confirm';
     renderPinDots();
   }else if(pinMode === 'confirm'){
     if(pinBuffer === pinFirstEntry){
@@ -741,13 +509,13 @@ async function handlePinComplete(){
       msg.textContent = '';
       openStatusScreen();
     }else{
-      msg.textContent = t('pins_didnt_match');
+      msg.textContent = "Those didn't match — let's start over.";
       shakeDots();
       pinBuffer = '';
       pinFirstEntry = '';
       pinMode = 'create';
       setTimeout(()=>{
-        $('#pinHint').textContent = t('create_pin_hint');
+        $('#pinHint').textContent = "First time — create a 4-digit PIN you'll use to check in from now on";
         renderPinDots();
       }, 400);
     }
@@ -772,6 +540,45 @@ function getLocationPromise(){
 function openStatusScreen(){
   renderStatusCard();
   showScreen('screen-status');
+  attemptAutoCheckIn();
+}
+
+/* ---------------------------------------------------------------------
+   Auto check-in — if a workplace location has been configured (Admin
+   sets this in the main app), and this employee is already within range
+   of it, complete their check-in automatically instead of making them
+   tap the button. Silently does nothing (leaving the manual button in
+   place) if there's no workplace location set, location can't be read,
+   or they're not actually close enough — so it never blocks anyone.
+--------------------------------------------------------------------- */
+async function attemptAutoCheckIn(){
+  if(!workplaceLocation || !selectedEmployee) return;
+  if(todaysRecord(selectedEmployee.id)) return; // already checked in or done today
+  const location = await getLocationPromise();
+  if(!location) return;
+  const dist = distanceMeters(location.lat, location.lng, workplaceLocation.lat, workplaceLocation.lng);
+  if(dist > workplaceLocation.radiusMeters) return;
+
+  const time = nowTimeStr();
+  const ts = Date.now();
+  attendance.push({
+    id: Date.now(),
+    employeeId: selectedEmployee.id,
+    employeeName: selectedEmployee.fullName,
+    date: todayStr(),
+    checkInTime: time,
+    checkInTs: ts,
+    lat: location.lat,
+    lng: location.lng,
+    autoCheckedIn: true
+  });
+  await saveAttendance();
+  if(!selectedEmployee.registeredDeviceId){
+    const deviceId = getDeviceId();
+    if(deviceId){ selectedEmployee.registeredDeviceId = deviceId; await saveEmployees(); }
+  }
+  showStamp('in', time);
+  renderStatusCard();
 }
 
 function renderStatusCard(){
@@ -781,20 +588,25 @@ function renderStatusCard(){
   if(!rec){
     card.innerHTML = `
       <div class="status-icon">👋</div>
-      <div class="status-title">${t('ready_to_start')}</div>
-      <div class="status-sub">${t('havent_checked_in')}</div>
-      <button class="primary" id="actionBtn">${t('check_in')}</button>
+      <div class="status-title">Ready to start your shift?</div>
+      <div class="status-sub">You haven't checked in today.</div>
+      <button class="primary" id="actionBtn">Check In</button>
       <div class="msg" id="statusMsg" style="display:none;"></div>
     `;
     $('#actionBtn').addEventListener('click', doCheckIn);
   }else if(!rec.checkOutTime){
+    const hoursSince = rec.checkInTs ? (Date.now() - rec.checkInTs) / (1000*60*60) : 0;
+    const longShiftReminder = hoursSince >= 10
+      ? `<div class="msg show err" style="margin-top:14px;">👋 You've been checked in a while — don't forget to check out when your shift is over.</div>`
+      : '';
     card.innerHTML = `
       <div class="status-icon">⏱</div>
-      <div class="status-title">${t('on_shift')}</div>
-      <div class="status-sub">${t('checked_in_at')} ${rec.checkInTime}</div>
+      <div class="status-title">You're on shift</div>
+      <div class="status-sub">Checked in at ${rec.checkInTime}${rec.autoCheckedIn ? ' — automatically, since you were at the workplace' : ''}</div>
       <div class="elapsed" id="elapsedTime">—</div>
-      <button class="primary checkout" id="actionBtn">${t('check_out')}</button>
+      <button class="primary checkout" id="actionBtn">Check Out</button>
       <div class="msg" id="statusMsg" style="display:none;"></div>
+      ${longShiftReminder}
     `;
     updateElapsed(rec.checkInTs);
     if(window._elapsedTimer) clearInterval(window._elapsedTimer);
@@ -805,12 +617,12 @@ function renderStatusCard(){
     const hoursWorked = formatHours(rec.checkOutTs - rec.checkInTs);
     card.innerHTML = `
       <div class="status-icon">✅</div>
-      <div class="status-title">${t('shift_complete')}</div>
-      <div class="status-sub">${t('great_work')}</div>
+      <div class="status-title">Shift complete</div>
+      <div class="status-sub">Great work today!</div>
       <div class="status-times">
-        <div class="st-item"><div class="st-label">${t('in_label')}</div><div class="st-value">${rec.checkInTime}</div></div>
-        <div class="st-item"><div class="st-label">${t('out_label')}</div><div class="st-value">${rec.checkOutTime}</div></div>
-        <div class="st-item"><div class="st-label">${t('hours_label')}</div><div class="st-value">${hoursWorked}</div></div>
+        <div class="st-item"><div class="st-label">In</div><div class="st-value">${rec.checkInTime}</div></div>
+        <div class="st-item"><div class="st-label">Out</div><div class="st-value">${rec.checkOutTime}</div></div>
+        <div class="st-item"><div class="st-label">Hours</div><div class="st-value">${hoursWorked}</div></div>
       </div>
     `;
   }
@@ -826,15 +638,11 @@ function updateElapsed(sinceTs){
   el.textContent = `${h}:${m}:${s}`;
 }
 
-function showStamp(kind, time, warnText){
+function showStamp(kind, time){
   $('#stampIcon').textContent = kind==='out' ? '👋' : '✓';
-  $('#stampTitle').textContent = kind==='out' ? t('checked_out_label') : t('checked_in_label');
+  $('#stampTitle').textContent = kind==='out' ? 'CHECKED OUT' : 'CHECKED IN';
   $('#stampTime').textContent = time;
-  $('#stampEl').classList.toggle('out', kind==='out' && !warnText);
-  $('#stampEl').classList.toggle('warn', !!warnText);
-  const warnEl = $('#stampWarnText');
-  warnEl.textContent = warnText || '';
-  warnEl.style.display = warnText ? 'block' : 'none';
+  $('#stampEl').classList.toggle('out', kind==='out');
   const stamp = $('#stampEl');
   stamp.style.animation = 'none';
   void stamp.offsetWidth;
@@ -844,22 +652,11 @@ function showStamp(kind, time, warnText){
 $('#stampDismissBtn').addEventListener('click', ()=> $('#stampOverlay').classList.remove('show'));
 $('#stampOverlay').addEventListener('click', (e)=>{ if(e.target.id==='stampOverlay') $('#stampOverlay').classList.remove('show'); });
 
-// Distance check against the workplace location an Admin set in the main app — never blocks
-// a check-in (GPS drifts, especially indoors, and wrongly locking out a real employee is worse
-// than rarely letting a genuinely-far one through), just surfaces a warning on their screen so
-// they know it's flagged, matching what a manager would already see in the Attendance table.
-function farFromWorkplaceWarning(location){
-  if(!location || !workplaceLocation) return null;
-  const dist = distanceMeters(location.lat, location.lng, workplaceLocation.lat, workplaceLocation.lng);
-  if(dist <= workplaceLocation.radiusMeters) return null;
-  return '⚠ ' + t('far_from_workplace', {dist: Math.round(dist)});
-}
-
 async function doCheckIn(){
   const btn = $('#actionBtn');
   const msg = $('#statusMsg');
   btn.disabled = true;
-  btn.textContent = t('getting_location');
+  btn.textContent = 'Getting your location…';
   try{
     const location = await getLocationPromise();
     const time = nowTimeStr();
@@ -878,14 +675,14 @@ async function doCheckIn(){
       const deviceId = getDeviceId();
       if(deviceId){ selectedEmployee.registeredDeviceId = deviceId; await saveEmployees(); }
     }
-    showStamp('in', time, farFromWorkplaceWarning(location));
+    showStamp('in', time);
     renderStatusCard();
   }catch(e){
     msg.style.display = 'block';
-    msg.textContent = t('generic_error') + e.message;
+    msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg err';
     btn.disabled = false;
-    btn.textContent = t('check_in');
+    btn.textContent = 'Check In';
   }
 }
 
@@ -895,7 +692,7 @@ async function doCheckOut(){
   const rec = todaysRecord(selectedEmployee.id);
   if(!rec) return;
   btn.disabled = true;
-  btn.textContent = t('getting_location');
+  btn.textContent = 'Getting your location…';
   try{
     const location = await getLocationPromise();
     const time = nowTimeStr();
@@ -907,10 +704,10 @@ async function doCheckOut(){
     renderStatusCard();
   }catch(e){
     msg.style.display = 'block';
-    msg.textContent = t('generic_error') + e.message;
+    msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg err';
     btn.disabled = false;
-    btn.textContent = t('check_out');
+    btn.textContent = 'Check Out';
   }
 }
 
@@ -925,23 +722,23 @@ $('#statusBackBtn').addEventListener('click', ()=>{
    Screen 4 — my history
 --------------------------------------------------------------------- */
 $('#viewHistoryBtn').addEventListener('click', ()=>{
-  $('#historyTitle').textContent = t('my_attendance_history');
+  $('#historyTitle').textContent = `${selectedEmployee.fullName}'s Attendance History`;
   const mine = attendance
     .filter(a=>a.employeeId===selectedEmployee.id)
     .sort((a,b)=> b.date < a.date ? -1 : (b.date > a.date ? 1 : 0))
     .slice(0, 30);
   const list = $('#historyList');
   if(mine.length===0){
-    list.innerHTML = `<div class="empty">${t('no_history')}</div>`;
+    list.innerHTML = '<div class="empty">No history yet.</div>';
   }else{
     list.innerHTML = mine.map(rec=>{
       const hoursText = rec.checkOutTs
         ? formatHours(rec.checkOutTs - rec.checkInTs)
-        : t('in_progress');
+        : 'In progress';
       return `<div class="hist-row">
         <div>
           <div class="hr-date">${rec.date}</div>
-          <div class="hr-times">${rec.checkInTime}${rec.checkOutTime ? ' – ' + rec.checkOutTime : t('still_on_shift')}</div>
+          <div class="hr-times">${rec.checkInTime}${rec.checkOutTime ? ' – ' + rec.checkOutTime : ' – still on shift'}</div>
         </div>
         <div class="hr-hours ${!rec.checkOutTs ? 'open' : ''}">${hoursText}</div>
       </div>`;
@@ -950,121 +747,6 @@ $('#viewHistoryBtn').addEventListener('click', ()=>{
   showScreen('screen-history');
 });
 $('#historyBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
-
-/* ---------------------------------------------------------------------
-   Screen 5 — request an advance
---------------------------------------------------------------------- */
-$('#requestAdvanceBtn').addEventListener('click', async ()=>{
-  const btn = $('#requestAdvanceBtn');
-  const originalLabel = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = t('loading');
-  await loadAdvanceRequests();
-  btn.disabled = false;
-  btn.textContent = originalLabel;
-  $('#advAmount').value = '';
-  $('#advReason').value = '';
-  $('#advMsg').style.display = 'none';
-  renderAdvanceHistory();
-  showScreen('screen-advance');
-});
-$('#advBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
-
-function renderAdvanceHistory(){
-  const el = $('#advHistoryList');
-  const mine = advanceRequests
-    .filter(r=>r.employeeId===selectedEmployee.id)
-    .sort((a,b)=> b.createdAt - a.createdAt)
-    .slice(0, 10);
-  if(mine.length===0){
-    el.innerHTML = `<div class="empty">${t('no_requests_yet')}</div>`;
-    return;
-  }
-  el.innerHTML = mine.map(r=>{
-    const status = r.status || 'pending';
-    const tagLabel = status==='approved' ? t('status_approved') : (status==='declined' ? t('status_declined') : t('status_pending'));
-    return `<div class="adv-row">
-      <div>
-        <div class="adv-amt">${fmt(r.amount)} Sl.sh</div>
-        ${r.reason ? `<div class="adv-reason">${r.reason}</div>` : ''}
-      </div>
-      <span class="adv-tag ${status}">${tagLabel}</span>
-    </div>`;
-  }).join('');
-}
-
-$('#advSendBtn').addEventListener('click', async ()=>{
-  const btn = $('#advSendBtn');
-  const msg = $('#advMsg');
-  const amount = parseFloat($('#advAmount').value)||0;
-  if(amount<=0){
-    msg.textContent = t('amount_required');
-    msg.className = 'msg err';
-    msg.style.display = 'block';
-    return;
-  }
-  btn.disabled = true;
-  const originalLabel = btn.textContent;
-  btn.textContent = t('sending');
-  try{
-    advanceRequests.push({
-      id: Date.now(),
-      employeeId: selectedEmployee.id,
-      employeeName: selectedEmployee.fullName,
-      amount,
-      reason: $('#advReason').value.trim(),
-      status: 'pending',
-      createdAt: Date.now()
-    });
-    await saveAdvanceRequests();
-    $('#advAmount').value = '';
-    $('#advReason').value = '';
-    msg.textContent = t('advance_sent');
-    msg.className = 'msg ok';
-    msg.style.display = 'block';
-    renderAdvanceHistory();
-  }catch(e){
-    msg.textContent = t('generic_error') + e.message;
-    msg.className = 'msg err';
-    msg.style.display = 'block';
-  }finally{
-    btn.textContent = originalLabel;
-    btn.disabled = false;
-  }
-});
-
-/* ---------------------------------------------------------------------
-   Screen 6 — my schedule (read-only; set by management in the main app)
---------------------------------------------------------------------- */
-$('#viewScheduleBtn').addEventListener('click', async ()=>{
-  const btn = $('#viewScheduleBtn');
-  const originalLabel = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = t('loading');
-  await loadSchedule();
-  btn.disabled = false;
-  btn.textContent = originalLabel;
-  renderMySchedule();
-  showScreen('screen-schedule');
-});
-$('#scheduleBackBtn').addEventListener('click', ()=> showScreen('screen-status'));
-
-function renderMySchedule(){
-  const el = $('#myScheduleList');
-  const todayIdx = (new Date().getDay() + 1) % 7; // JS getDay(): Sun=0..Sat=6 → shift so Sat=0..Thu=5 (Fri lands on 6, off the list — no day highlights on a Friday)
-  el.innerHTML = SCHEDULE_DAYS.map((day, i)=>{
-    const shifts = schedule.filter(s=>s.employeeId===selectedEmployee.id && s.day===day).sort((a,b)=> a.startTime < b.startTime ? -1 : 1);
-    const isToday = i === todayIdx;
-    const rowClass = `sched-row${shifts.length ? '' : ' off'}${isToday ? ' today' : ''}`;
-    const timeText = shifts.length
-      ? shifts.map(s=>`${s.shiftType ? t('shift_'+s.shiftType)+' ' : ''}${s.startTime}–${s.endTime}`).join('<br>')
-      : t('off_label');
-    return `<div class="${rowClass}">
-      <div class="sr-day">${t('day_'+day)}${isToday ? t('today_label') : ''}</div>
-      <div class="sr-time">${timeText}</div>
-    </div>`;
-  }).join('');
-}
 
 /* ---------------------------------------------------------------------
    Live clock line
@@ -1119,7 +801,6 @@ $('#syncTestBtn').addEventListener('click', async ()=>{
 });
 
 (async function init(){
-  applyStaticTranslations();
   if(!isMobileDevice()){
     const hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     $('#blockDiagnostics').textContent =
