@@ -586,10 +586,14 @@ function renderStatusCard(){
   const rec = todaysRecord(selectedEmployee.id);
 
   if(!rec){
+    const geofenceHint = workplaceLocation
+      ? `<div class="status-sub" style="margin-top:4px;">📍 You'll need to be at the workplace to check in.</div>`
+      : '';
     card.innerHTML = `
       <div class="status-icon">👋</div>
       <div class="status-title">Ready to start your shift?</div>
       <div class="status-sub">You haven't checked in today.</div>
+      ${geofenceHint}
       <button class="primary" id="actionBtn">Check In</button>
       <div class="msg" id="statusMsg" style="display:none;"></div>
     `;
@@ -659,6 +663,29 @@ async function doCheckIn(){
   btn.textContent = 'Getting your location…';
   try{
     const location = await getLocationPromise();
+
+    // Geofence — if a workplace location has been configured, checking in
+    // actually requires being within range of it, not just a warning.
+    if(workplaceLocation){
+      if(!location){
+        msg.style.display = 'block';
+        msg.textContent = "Couldn't get your location. Turn on location services for this site and try again — checking in requires being at the workplace.";
+        msg.className = 'msg err';
+        btn.disabled = false;
+        btn.textContent = 'Check In';
+        return;
+      }
+      const dist = distanceMeters(location.lat, location.lng, workplaceLocation.lat, workplaceLocation.lng);
+      if(dist > workplaceLocation.radiusMeters){
+        msg.style.display = 'block';
+        msg.textContent = `You're about ${Math.round(dist)}m from the workplace — check-in only works within ${workplaceLocation.radiusMeters}m. Move closer and try again.`;
+        msg.className = 'msg err';
+        btn.disabled = false;
+        btn.textContent = 'Check In';
+        return;
+      }
+    }
+
     const time = nowTimeStr();
     const ts = Date.now();
     attendance.push({
