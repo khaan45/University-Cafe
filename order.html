@@ -395,6 +395,16 @@
       <span class="nav-label" data-i18n="nav_balance">Balance</span>
       <span class="nav-desc" data-i18n="nav_balance_desc">What I owe</span>
     </div>
+    <div class="nav-item" data-section="vote">
+      <span class="nav-icon">🏆</span>
+      <span class="nav-label" data-i18n="nav_vote">Vote</span>
+      <span class="nav-desc" data-i18n="nav_vote_desc">Top 5 of the semester</span>
+    </div>
+    <div class="nav-item" data-section="results">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label" data-i18n="nav_results">Results</span>
+      <span class="nav-desc" data-i18n="nav_results_desc">Staff only</span>
+    </div>
     <div class="nav-item" data-section="rate">
       <span class="nav-icon">⭐</span>
       <span class="nav-label" data-i18n="nav_rate">Rate Us</span>
@@ -483,6 +493,59 @@
       <div class="hint" data-i18n="balance_hint">Enter the phone number UB Cafe has on file for you to see your invoices and what you owe.</div>
     </div>
     <div id="resultsArea"></div>
+  </div>
+
+  <!-- ===================== VOTE: TOP 5 OF THE SEMESTER ===================== -->
+  <div class="section narrow" id="section-vote">
+    <div class="panel" id="votePhonePanel">
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_title">Top 5 Customers of the Semester</label></div>
+      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_intro">Registered customers can rank their top 5 favorite customers of the semester. One vote per phone number.</p>
+      <div class="field">
+        <label for="votePhone" data-i18n="vote_phone_label">Your Phone Number</label>
+        <input type="text" id="votePhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="phone_placeholder">
+      </div>
+      <button class="primary" id="voteVerifyBtn" data-i18n="vote_verify_btn">Verify &amp; Continue</button>
+      <div class="msg" id="votePhoneMsg"></div>
+    </div>
+
+    <div class="panel" id="voteBallotPanel" style="display:none;">
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_pick_intro">Rank your top 5</label></div>
+      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_pick_hint">Choose a different customer for each place.</p>
+      <div id="voteRankFields"></div>
+      <button class="primary" id="voteSubmitBtn" data-i18n="vote_submit_btn">Submit My Vote</button>
+      <button class="secondary" id="voteCancelBtn" style="margin-top:10px;" data-i18n="vote_change_number">Use a different phone number</button>
+      <div class="msg" id="voteBallotMsg"></div>
+    </div>
+
+    <div class="panel narrow" id="voteThanksPanel" style="display:none;">
+      <div class="confirm-wrap">
+        <div class="confirm-seal">🏆</div>
+        <h2 data-i18n="vote_thanks_title">Vote Submitted!</h2>
+        <p style="color:var(--ink-soft);font-size:13.5px;" data-i18n="vote_thanks_body">Thanks for voting — your top 5 has been recorded for this semester.</p>
+        <button class="secondary" id="voteChangeBtn" style="margin-top:18px;" data-i18n="vote_edit_vote">Change My Vote</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== RESULTS (STAFF) ===================== -->
+  <div class="section narrow" id="section-results">
+    <div class="panel" id="resultsPinPanel">
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="results_title">Vote Results</label></div>
+      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="results_staff_only">Staff only — enter the results PIN to view the current standings.</p>
+      <div class="field">
+        <label for="resultsPin" data-i18n="results_pin_label">Staff PIN</label>
+        <input type="text" id="resultsPin" inputmode="numeric" placeholder="••••">
+      </div>
+      <button class="primary" id="resultsUnlockBtn" data-i18n="results_unlock_btn">View Results</button>
+      <div class="msg" id="resultsPinMsg"></div>
+    </div>
+
+    <div class="panel" id="resultsBoardPanel" style="display:none;">
+      <div class="field" style="margin-bottom:6px;"><label data-i18n="results_title">Vote Results</label></div>
+      <div id="resultsBoardMeta" class="hint" style="margin-top:0;text-align:left;"></div>
+      <div id="resultsBoardList"></div>
+      <button class="secondary" id="resultsLockBtn" style="margin-top:14px;" data-i18n="results_lock_btn">Lock</button>
+    </div>
   </div>
 
   <!-- ===================== RATE US ===================== -->
@@ -635,6 +698,31 @@ const I18N = {
     no_orders_found: "We couldn't find any orders for that phone number. Double-check the number, or contact UB Cafe directly.",
     you_owe: "You Owe", youre_paid_up: "You're Paid Up", no_invoices: "No invoices on file yet.",
     paid_in_full: "Paid in full", owe: "Owe", search_different_number: "Search a different number",
+    nav_vote: "Vote", nav_vote_desc: "Top 5 of the semester",
+    vote_title: "Top 5 Customers of the Semester",
+    vote_intro: "Registered customers can rank their top 5 favorite customers of the semester. One vote per phone number.",
+    vote_phone_label: "Your Phone Number", vote_verify_btn: "Verify & Continue",
+    vote_checking: "Checking…",
+    vote_not_eligible: "We couldn't find that phone number on file. Double-check it, or contact UB Cafe.",
+    vote_no_candidates: "There aren't enough customers on file yet to vote on.",
+    vote_pick_intro: "Rank your top 5", vote_pick_hint: "Choose a different customer for each place.",
+    vote_place_1: "1st Place", vote_place_2: "2nd Place", vote_place_3: "3rd Place", vote_place_4: "4th Place", vote_place_5: "5th Place",
+    vote_select_placeholder: "Select a customer…",
+    vote_submit_btn: "Submit My Vote", vote_change_number: "Use a different phone number",
+    vote_duplicate_error: "Please select a different customer for each place.",
+    vote_incomplete_error: "Please fill all 5 places before submitting.",
+    vote_error: "Something went wrong submitting your vote — please try again.",
+    vote_thanks_title: "Vote Submitted!",
+    vote_thanks_body: "Thanks for voting — your top 5 has been recorded for this semester.",
+    vote_edit_vote: "Change My Vote",
+    nav_results: "Results", nav_results_desc: "Staff only",
+    results_title: "Vote Results",
+    results_staff_only: "Staff only — enter the results PIN to view the current standings.",
+    results_pin_label: "Staff PIN", results_unlock_btn: "View Results",
+    results_wrong_pin: "Incorrect PIN.",
+    results_no_votes: "No votes have been submitted yet.",
+    results_votes_count: "{n} ballots submitted so far.",
+    results_points_label: "pts", results_lock_btn: "Lock",
     how_was_it: "How was it?", your_name_optional: "Your Name (optional)", tell_us_more: "Tell us more (optional)",
     review_placeholder: "What did you like or what should we improve?", submit_rating: "Submit Rating",
     thank_you: "Thank You!", feedback_helps: "Your feedback helps us do better.", rate_again: "Leave Another Rating",
@@ -678,6 +766,31 @@ const I18N = {
     no_orders_found: "Uma aanu helin wax dalab ah lambarkaas taleefanka. Hubi lambarka, ama toos ula xiriir UB Cafe.",
     you_owe: "Waxaad Ku Leedahay", youre_paid_up: "Wax kuma saarna", no_invoices: "Weli qaansheegyo ma jiraan.",
     paid_in_full: "Dhammaan waa la bixiyay", owe: "Waxaad ku leedahay", search_different_number: "Raadi lambar kale",
+    nav_vote: "Codee", nav_vote_desc: "Top 5-ta Simistarka",
+    vote_title: "5-ta Ugu Fiican ee Macaamiisha Simistarka",
+    vote_intro: "Macaamiisha diiwaangashan ayaa kala saari kara 5-ta macaamiil ee ay ugu jecel yihiin simistarkan. Cod hal mar oo lambar taleefan ah.",
+    vote_phone_label: "Lambarka Taleefankaaga", vote_verify_btn: "Xaqiiji & Sii Wad",
+    vote_checking: "Xaqiijinaya…",
+    vote_not_eligible: "Uma helin lambarkaas taleefanka diiwaanka. Hubi lambarka, ama la xiriir UB Cafe.",
+    vote_no_candidates: "Wali ma jiraan macaamiil ku filan oo diiwaan gashan si loo codeeyo.",
+    vote_pick_intro: "Kala saar 5-tan aad jeceshahay", vote_pick_hint: "Meel kasta dooro macaamiil kala duwan.",
+    vote_place_1: "Meesha 1aad", vote_place_2: "Meesha 2aad", vote_place_3: "Meesha 3aad", vote_place_4: "Meesha 4aad", vote_place_5: "Meesha 5aad",
+    vote_select_placeholder: "Dooro macaamiil…",
+    vote_submit_btn: "Dir Codkayga", vote_change_number: "Isticmaal lambar kale",
+    vote_duplicate_error: "Fadlan meel kasta dooro macaamiil kala duwan.",
+    vote_incomplete_error: "Fadlan buuxi dhammaan 5-ta meelood ka hor intaadan dirin.",
+    vote_error: "Wax baa qaldamay markii codkaaga la dirayay — fadlan isku day mar kale.",
+    vote_thanks_title: "Codka Waa La Diray!",
+    vote_thanks_body: "Waad ku mahadsan tahay codeynta — 5-tan aad doorateen ayaa loo diiwaan geliyay simistarkan.",
+    vote_edit_vote: "Bedel Codkayga",
+    nav_results: "Natiijada", nav_results_desc: "Shaqaalaha oo keliya",
+    results_title: "Natiijada Codbixinta",
+    results_staff_only: "Shaqaalaha oo keliya — geli PIN-ka natiijooyinka si aad u aragto xaaladda hadda.",
+    results_pin_label: "PIN-ka Shaqaalaha", results_unlock_btn: "Arag Natiijada",
+    results_wrong_pin: "PIN khalad ah.",
+    results_no_votes: "Weli cod lama dirin.",
+    results_votes_count: "{n} cod ayaa la diray ilaa hadda.",
+    results_points_label: "dhibco", results_lock_btn: "Xir",
     how_was_it: "Sideed u aragtay?", your_name_optional: "Magacaaga (ikhtiyaari)",
     tell_us_more: "Wax dheeraad ah noo sheeg (ikhtiyaari)",
     review_placeholder: "Maxaad jeclaatay ama maxaan hagaajino?", submit_rating: "Dir Qiimeynta",
@@ -722,6 +835,31 @@ const I18N = {
     no_orders_found: "لم نتمكن من العثور على أي طلبات لهذا الرقم. تحقق من الرقم، أو تواصل مع UB Cafe مباشرة.",
     you_owe: "عليك", youre_paid_up: "لا يوجد عليك شيء", no_invoices: "لا توجد فواتير بعد.",
     paid_in_full: "تم الدفع بالكامل", owe: "المستحق", search_different_number: "ابحث برقم آخر",
+    nav_vote: "التصويت", nav_vote_desc: "أفضل 5 لهذا الفصل",
+    vote_title: "أفضل 5 عملاء لهذا الفصل الدراسي",
+    vote_intro: "يمكن للعملاء المسجّلين ترتيب أفضل 5 عملاء مفضلين لديهم لهذا الفصل. صوت واحد لكل رقم هاتف.",
+    vote_phone_label: "رقم هاتفك", vote_verify_btn: "تحقق واستمر",
+    vote_checking: "جارٍ التحقق…",
+    vote_not_eligible: "لم نجد هذا الرقم ضمن السجلات. تحقق من الرقم، أو تواصل مع UB Cafe.",
+    vote_no_candidates: "لا يوجد عدد كافٍ من العملاء المسجّلين بعد للتصويت عليهم.",
+    vote_pick_intro: "رتّب أفضل 5 لديك", vote_pick_hint: "اختر عميلاً مختلفًا لكل مرتبة.",
+    vote_place_1: "المركز الأول", vote_place_2: "المركز الثاني", vote_place_3: "المركز الثالث", vote_place_4: "المركز الرابع", vote_place_5: "المركز الخامس",
+    vote_select_placeholder: "اختر عميلاً…",
+    vote_submit_btn: "إرسال تصويتي", vote_change_number: "استخدام رقم هاتف آخر",
+    vote_duplicate_error: "يرجى اختيار عميل مختلف لكل مرتبة.",
+    vote_incomplete_error: "يرجى تعبئة جميع المراتب الخمس قبل الإرسال.",
+    vote_error: "حدث خطأ أثناء إرسال تصويتك — يرجى المحاولة مرة أخرى.",
+    vote_thanks_title: "تم إرسال التصويت!",
+    vote_thanks_body: "شكرًا لتصويتك — تم تسجيل أفضل 5 لديك لهذا الفصل الدراسي.",
+    vote_edit_vote: "تغيير تصويتي",
+    nav_results: "النتائج", nav_results_desc: "للموظفين فقط",
+    results_title: "نتائج التصويت",
+    results_staff_only: "للموظفين فقط — أدخل رمز PIN لعرض الترتيب الحالي.",
+    results_pin_label: "رمز PIN للموظفين", results_unlock_btn: "عرض النتائج",
+    results_wrong_pin: "رمز PIN غير صحيح.",
+    results_no_votes: "لم يتم إرسال أي أصوات بعد.",
+    results_votes_count: "تم إرسال {n} بطاقة تصويت حتى الآن.",
+    results_points_label: "نقطة", results_lock_btn: "قفل",
     how_was_it: "كيف كانت تجربتك؟", your_name_optional: "اسمك (اختياري)", tell_us_more: "أخبرنا المزيد (اختياري)",
     review_placeholder: "ما الذي أعجبك أو ما الذي يجب أن نحسّنه؟", submit_rating: "إرسال التقييم",
     thank_you: "شكرًا لك!", feedback_helps: "ملاحظاتك تساعدنا على تقديم خدمة أفضل.", rate_again: "أضف تقييمًا آخر",
@@ -767,6 +905,7 @@ function setLang(lang){
   renderPaymentInfo();
   renderStarPicker();
   if(trackedCustomerId) renderTrackResults(trackedCustomerId);
+  if(voteVerifiedPhone && $('#voteBallotPanel').style.display !== 'none') renderVoteBallot();
 }
 
 $$('.lang-btn').forEach(btn=>{
@@ -780,11 +919,13 @@ const INVOICES_KEY = "ubcafe_invoices";
 const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
 const REVIEWS_KEY = "ubcafe_reviews";
 const ORDER_COUNTER_KEY = "ubcafe_order_counter"; // shared with index.html's Place Order (Waiter), so every order — customer or waiter — gets one unique running number
+const SEMESTER_VOTES_KEY = "ubcafe_semester_votes"; // Top-5-of-the-semester ballots, one per verified voter phone number
 
 let posItems = [];
 let customers = [];
 let saleRequests = [];
 let reviews = [];
+let semesterVotes = [];
 
 // Reads and increments a single shared counter so each order gets a stable, ever-increasing
 // number (ORD-0001, ORD-0002, ...) that survives the request itself later being removed from
@@ -821,6 +962,11 @@ async function loadReviews(){
   try{ reviews = val ? JSON.parse(val) : []; }catch(e){ reviews = []; }
 }
 async function saveReviews(){ await storageSet(REVIEWS_KEY, JSON.stringify(reviews), true); }
+async function loadSemesterVotes(){
+  const val = await storageGet(SEMESTER_VOTES_KEY, true);
+  try{ semesterVotes = val ? JSON.parse(val) : []; }catch(e){ semesterVotes = []; }
+}
+async function saveSemesterVotes(){ await storageSet(SEMESTER_VOTES_KEY, JSON.stringify(semesterVotes), true); }
 
 /* Keep these in sync with PAYMENT_INFO in index.html */
 const PAYMENT_INFO = {
@@ -848,6 +994,8 @@ $$('.nav-item').forEach(tab=>{
     $('#section-'+tab.dataset.section).classList.add('active');
     if(tab.dataset.section==='place') renderOrderScreen();
     if(tab.dataset.section==='rate') renderRateScreen();
+    if(tab.dataset.section==='vote') renderVoteScreen();
+    if(tab.dataset.section==='results') renderResultsScreen();
   });
 });
 
@@ -1357,6 +1505,249 @@ $('#submitReviewBtn').addEventListener('click', async ()=>{
   }
 });
 $('#rateAgainBtn').addEventListener('click', renderRateScreen);
+
+/* ---------------------------------------------------------------------
+   VOTE: TOP 5 CUSTOMERS OF THE SEMESTER
+   Eligibility: phone must match the verified-student roster (no OTP,
+   same approach as the rest of the voting feature). Candidates are
+   auto-generated from customers ranked by total purchases. One ballot
+   per verified student phone, keyed/overwritten on resubmission.
+--------------------------------------------------------------------- */
+let voteVerifiedPhone = null;
+let voteCandidates = [];
+
+function isVerifiedVoterPhone(phoneRaw){
+  const q = normalizePhone(phoneRaw);
+  if(!q || q.length < 6) return false;
+  return customers.some(c => normalizePhone(c.phone) === q);
+}
+
+function computeVoteCandidates(){
+  const totals = {}; // customerId -> total spend
+  invoices.forEach(inv=>{
+    if(!inv.customerId) return;
+    const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+    totals[inv.customerId] = (totals[inv.customerId] || 0) + (Number(owed) || 0);
+  });
+  return customers
+    .map(c => ({ id: c.id, name: c.name, total: totals[c.id] || 0 }))
+    .sort((a,b)=> b.total - a.total || a.name.localeCompare(b.name))
+    .slice(0, 25);
+}
+
+async function renderVoteScreen(){
+  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes()]);
+  voteVerifiedPhone = null;
+  $('#votePhone').value = '';
+  $('#votePhoneMsg').className = 'msg';
+  $('#votePhonePanel').style.display = '';
+  $('#voteBallotPanel').style.display = 'none';
+  $('#voteThanksPanel').style.display = 'none';
+}
+
+$('#voteVerifyBtn').addEventListener('click', async ()=>{
+  const btn = $('#voteVerifyBtn');
+  const msg = $('#votePhoneMsg');
+  const phone = $('#votePhone').value.trim();
+  if(!phone){
+    msg.textContent = t('enter_phone_first');
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = t('vote_checking');
+  try{
+    await loadCustomers(); // refresh in case the customer list was just updated
+    if(!isVerifiedVoterPhone(phone)){
+      msg.textContent = t('vote_not_eligible');
+      msg.className = 'msg show err';
+      return;
+    }
+    await loadInvoices();
+    voteCandidates = computeVoteCandidates();
+    if(voteCandidates.length < 5){
+      msg.textContent = t('vote_no_candidates');
+      msg.className = 'msg show err';
+      return;
+    }
+    voteVerifiedPhone = normalizePhone(phone);
+    msg.className = 'msg';
+    $('#votePhonePanel').style.display = 'none';
+    renderVoteBallot();
+  }catch(e){
+    msg.textContent = t('generic_error') + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+$('#votePhone').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#voteVerifyBtn').click(); });
+
+function renderVoteBallot(){
+  const existing = semesterVotes.find(v => v.voterPhone === voteVerifiedPhone);
+  const prevRankings = existing ? existing.rankings : [null,null,null,null,null];
+
+  let html = '';
+  for(let i=0;i<5;i++){
+    html += `
+      <div class="field">
+        <label>${t('vote_place_'+(i+1))}</label>
+        <select class="vote-rank-select" data-place="${i}" style="font-family:'Inter',sans-serif;font-size:15px;padding:12px 13px;border:1.5px solid var(--paper-line);border-radius:9px;background:#fff;color:var(--ink);width:100%;">
+          <option value="">${t('vote_select_placeholder')}</option>
+        </select>
+      </div>
+    `;
+  }
+  $('#voteRankFields').innerHTML = html;
+
+  function refreshOptions(){
+    const selected = $$('.vote-rank-select').map(sel=>sel.value);
+    $$('.vote-rank-select').forEach(sel=>{
+      const mine = sel.value;
+      const opts = [`<option value="">${t('vote_select_placeholder')}</option>`]
+        .concat(voteCandidates
+          .filter(c => String(c.id) === mine || !selected.includes(String(c.id)))
+          .map(c => `<option value="${String(c.id)}" ${String(c.id)===mine?'selected':''}>${c.name}</option>`)
+        );
+      sel.innerHTML = opts.join('');
+    });
+  }
+
+  $$('.vote-rank-select').forEach((sel, i)=>{
+    if(prevRankings[i]) sel.value = String(prevRankings[i]);
+    sel.addEventListener('change', refreshOptions);
+  });
+  refreshOptions();
+
+  $('#voteBallotMsg').className = 'msg';
+  $('#voteBallotPanel').style.display = '';
+}
+
+$('#voteCancelBtn').addEventListener('click', ()=>{
+  voteVerifiedPhone = null;
+  $('#voteBallotPanel').style.display = 'none';
+  $('#votePhonePanel').style.display = '';
+});
+
+$('#voteSubmitBtn').addEventListener('click', async ()=>{
+  const btn = $('#voteSubmitBtn');
+  const msg = $('#voteBallotMsg');
+  const rankings = $$('.vote-rank-select').map(sel=>sel.value);
+  if(rankings.some(v=>!v)){
+    msg.textContent = t('vote_incomplete_error');
+    msg.className = 'msg show err';
+    return;
+  }
+  if(new Set(rankings).size !== 5){
+    msg.textContent = t('vote_duplicate_error');
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = t('sending');
+  try{
+    await loadSemesterVotes(); // refresh so we don't clobber votes submitted elsewhere in the meantime
+    const idx = semesterVotes.findIndex(v => v.voterPhone === voteVerifiedPhone);
+    const voteRecord = { voterPhone: voteVerifiedPhone, rankings, submittedAt: new Date().toISOString() };
+    if(idx >= 0) semesterVotes[idx] = voteRecord; else semesterVotes.push(voteRecord);
+    await saveSemesterVotes();
+    $('#voteBallotPanel').style.display = 'none';
+    $('#voteThanksPanel').style.display = '';
+  }catch(e){
+    msg.textContent = t('vote_error');
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+
+$('#voteChangeBtn').addEventListener('click', async ()=>{
+  $('#voteThanksPanel').style.display = 'none';
+  await loadSemesterVotes();
+  renderVoteBallot();
+});
+
+/* ---------------------------------------------------------------------
+   RESULTS (STAFF) — weighted leaderboard from semesterVotes.
+   Gated by a simple PIN (not real security, just keeps casual browsers
+   out on this public-facing page). Change RESULTS_STAFF_PIN below.
+--------------------------------------------------------------------- */
+const RESULTS_STAFF_PIN = "2026";
+
+function computeResultsLeaderboard(){
+  const points = {}; // candidateId (string) -> points
+  const nameById = {};
+  customers.forEach(c => { nameById[String(c.id)] = c.name; });
+  const weights = [5,4,3,2,1]; // 1st..5th place
+  semesterVotes.forEach(v=>{
+    (v.rankings || []).forEach((id, idx)=>{
+      if(!id) return;
+      points[id] = (points[id] || 0) + (weights[idx] || 0);
+    });
+  });
+  return Object.keys(points)
+    .map(id => ({ id, name: nameById[id] || id, points: points[id] }))
+    .sort((a,b)=> b.points - a.points)
+    .slice(0, 25);
+}
+
+function renderResultsBoard(){
+  const board = computeResultsLeaderboard();
+  $('#resultsBoardMeta').textContent = t('results_votes_count').replace('{n}', semesterVotes.length);
+  if(board.length === 0){
+    $('#resultsBoardList').innerHTML = `<div class="empty">${t('results_no_votes')}</div>`;
+    return;
+  }
+  $('#resultsBoardList').innerHTML = board.map((r,i)=>`
+    <div class="order-card" style="animation-delay:${Math.min(i,10)*0.03}s;">
+      <div class="oc-top">
+        <div class="oc-title">${i+1}. ${r.name}</div>
+        <span class="status-pill paid">${r.points} ${t('results_points_label')}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderResultsScreen(){
+  $('#resultsPin').value = '';
+  $('#resultsPinMsg').className = 'msg';
+  $('#resultsPinPanel').style.display = '';
+  $('#resultsBoardPanel').style.display = 'none';
+}
+
+$('#resultsUnlockBtn').addEventListener('click', async ()=>{
+  const btn = $('#resultsUnlockBtn');
+  const msg = $('#resultsPinMsg');
+  const pin = $('#resultsPin').value.trim();
+  if(pin !== RESULTS_STAFF_PIN){
+    msg.textContent = t('results_wrong_pin');
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = t('checking');
+  try{
+    await Promise.all([loadCustomers(), loadSemesterVotes()]);
+    msg.className = 'msg';
+    renderResultsBoard();
+    $('#resultsPinPanel').style.display = 'none';
+    $('#resultsBoardPanel').style.display = '';
+  }catch(e){
+    msg.textContent = t('generic_error') + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+$('#resultsPin').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#resultsUnlockBtn').click(); });
+
+$('#resultsLockBtn').addEventListener('click', renderResultsScreen);
 
 /* ---------------------------------------------------------------------
    Init
