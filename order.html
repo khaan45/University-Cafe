@@ -3763,7 +3763,7 @@ function buildResultsListHTML(scored, unmasked, showReward){
     const rewardLine = (showReward && reward)
       ? `<div class="top5-reward">🎁 ${Math.round(reward.pct*100)}%</div>`
       : '';
-    const displayName = r.name;
+    const displayName = unmasked ? r.name : maskCandidateName(r.name);
     return `
     <div class="top5-item">
       <div class="top5-bar-fill" data-pct="${pct}" style="width:0%;"></div>
@@ -4023,7 +4023,7 @@ function renderVoteBallot(){
       <label class="vote-choice-item">
         <input type="radio" name="voteChoice" class="vote-choice-radio" value="${id}">
         <span class="vote-choice-box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="vote-choice-name">${c.name}</span>
+        <span class="vote-choice-name">${maskCandidateName(c.name)}</span>
       </label>
     `;
   }).join('');
