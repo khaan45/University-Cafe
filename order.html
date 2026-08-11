@@ -2464,7 +2464,7 @@ const I18N = {
     vote_checking: "Checking…",
     vote_not_eligible: "We couldn't find that phone number on file. Double-check it, or contact UB Cafe.",
     vote_no_candidates: "There aren't enough customers on file yet to vote on.",
-    vote_pick_intro: "Choose your favorite", vote_pick_hint: "Pick one customer to vote for.",
+    vote_pick_intro: "Choose your favorite", vote_pick_hint: "Pick one customer to vote for. Full names are revealed once voting ends.",
     vote_select_required: "Please choose a favorite before submitting.",
     vote_select_placeholder: "Select a customer…",
     vote_submit_btn: "Submit My Vote", vote_change_number: "Use a different phone number",
@@ -2599,7 +2599,7 @@ const I18N = {
     vote_checking: "Xaqiijinaya…",
     vote_not_eligible: "Uma helin lambarkaas taleefanka diiwaanka. Hubi lambarka, ama la xiriir UB Cafe.",
     vote_no_candidates: "Wali ma jiraan macaamiil ku filan oo diiwaan gashan si loo codeeyo.",
-    vote_pick_intro: "Dooro kaaga ugu jecel", vote_pick_hint: "Dooro hal macaamiil aad u codeynayso.",
+    vote_pick_intro: "Dooro kaaga ugu jecel", vote_pick_hint: "Dooro hal macaamiil aad u codeynayso. Magacyada oo dhammaystiran waxaa la muujin doonaa marka codeyntu dhammaato.",
     vote_select_required: "Fadlan dooro qof ka hor intaadan dirin.",
     vote_select_placeholder: "Dooro macaamiil…",
     vote_submit_btn: "Dir Codkayga", vote_change_number: "Isticmaal lambar kale",
@@ -2735,7 +2735,7 @@ const I18N = {
     vote_checking: "جارٍ التحقق…",
     vote_not_eligible: "لم نجد هذا الرقم ضمن السجلات. تحقق من الرقم، أو تواصل مع UB Cafe.",
     vote_no_candidates: "لا يوجد عدد كافٍ من العملاء المسجّلين بعد للتصويت عليهم.",
-    vote_pick_intro: "اختر المفضل لديك", vote_pick_hint: "اختر عميلاً واحدًا للتصويت له.",
+    vote_pick_intro: "اختر المفضل لديك", vote_pick_hint: "اختر عميلاً واحدًا للتصويت له. سيتم الكشف عن الأسماء الكاملة بعد انتهاء التصويت.",
     vote_select_required: "يرجى اختيار شخص قبل الإرسال.",
     vote_select_placeholder: "اختر عميلاً…",
     vote_submit_btn: "إرسال تصويتي", vote_change_number: "استخدام رقم هاتف آخر",
@@ -3963,7 +3963,7 @@ function renderVoteBallot(){
       <label class="vote-choice-item">
         <input type="radio" name="voteChoice" class="vote-choice-radio" value="${id}">
         <span class="vote-choice-box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="vote-choice-name">${c.name}</span>
+        <span class="vote-choice-name">${maskCandidateName(c.name)}</span>
       </label>
     `;
   }).join('');
