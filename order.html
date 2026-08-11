@@ -4034,15 +4034,11 @@ function renderVoteBallot(){
   showVoteEncouragePopup();
 }
 
-let voteEncourageAutoHideTimer = null;
 function showVoteEncouragePopup(){
   $('#voteEncourageOverlay').style.display = 'flex';
-  if(voteEncourageAutoHideTimer) clearTimeout(voteEncourageAutoHideTimer);
-  voteEncourageAutoHideTimer = setTimeout(hideVoteEncouragePopup, 10000);
 }
 function hideVoteEncouragePopup(){
   $('#voteEncourageOverlay').style.display = 'none';
-  if(voteEncourageAutoHideTimer){ clearTimeout(voteEncourageAutoHideTimer); voteEncourageAutoHideTimer = null; }
 }
 $('#voteEncourageCloseBtn').addEventListener('click', hideVoteEncouragePopup);
 $('#voteEncourageOverlay').addEventListener('click', (e)=>{
