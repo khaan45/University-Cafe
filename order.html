@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="so">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -96,10 +96,24 @@
   .nav-item .nav-desc{font-size:10px;color:var(--ink-soft);margin-top:1px;letter-spacing:.01em;}
   .nav-item.active{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:var(--shadow);transform:translateY(-1px);}
   .nav-item.active .nav-desc{color:var(--paper-line);}
+
+  /* ---------- Vote tab: bigger & more eye-catching (it's the important one) ---------- */
+  .nav-item[data-section="vote"]{
+    border-color:var(--brass);border-width:2px;
+    background:linear-gradient(160deg, rgba(184,137,43,.10), rgba(184,137,43,.02));
+    box-shadow:0 2px 10px rgba(184,137,43,.18);
+  }
+  .nav-item[data-section="vote"] .nav-icon{font-size:30px;filter:drop-shadow(0 1px 2px rgba(184,137,43,.35));}
+  .nav-item[data-section="vote"] .nav-label{font-size:15px;color:var(--brass-dark);}
+  .nav-item[data-section="vote"] .nav-desc{font-size:11px;font-weight:600;}
+  .nav-item[data-section="vote"].active{
+    background:linear-gradient(160deg, var(--ink), #16211c);border-color:var(--brass);
+  }
+  .nav-item[data-section="vote"].active .nav-label{color:var(--brass);}
   .nav-item:hover:not(.active){border-color:var(--brass);transform:translateY(-1px);}
   .nav-item:active{transform:translateY(0) scale(.98);}
 
-  .intro{text-align:center;font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:-6px 0 20px;
+  .intro{text-align:center;width:100%;font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:-6px auto 20px;
     animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) .08s both;}
 
   .section{display:none;animation:riseIn .4s cubic-bezier(.2,.8,.3,1) both;}
@@ -326,6 +340,29 @@
     60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
     100%{transform:scale(1) rotate(-7deg);opacity:1;}
   }
+
+  /* ---------- Vote encouragement popup ---------- */
+  .vote-encourage-overlay{
+    position:fixed;inset:0;background:rgba(30,42,36,0.82);z-index:999;
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    animation:fadeInOverlay .25s ease both;
+  }
+  @keyframes fadeInOverlay{from{opacity:0;}to{opacity:1;}}
+  .vote-encourage-box{
+    background:var(--paper);border:2px solid var(--brass);border-radius:18px;
+    padding:38px 26px;max-width:380px;width:100%;text-align:center;
+    box-shadow:0 18px 50px rgba(0,0,0,.35);
+    animation:popIn .4s cubic-bezier(.2,.9,.3,1.3) both;
+  }
+  @keyframes popIn{0%{transform:scale(.7);opacity:0;}100%{transform:scale(1);opacity:1;}}
+  .vote-encourage-icon{font-size:48px;margin-bottom:14px;}
+  .vote-encourage-text{
+    font-family:'Fraunces',serif;font-weight:900;font-size:28px;line-height:1.25;
+    color:var(--ink);margin-bottom:26px;letter-spacing:.01em;
+  }
+  html[dir="rtl"] .vote-encourage-text{font-family:'Cairo',sans-serif;}
+  .vote-encourage-box button{width:100%;}
+
   .confirm-seal-gold{
     border-color:var(--brass);color:var(--brass-dark);position:relative;
   }
@@ -670,7 +707,7 @@ body{ zoom: 1.15; }
       <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_intro">Registered customers can rank their top 5 favorite customers of the semester. One vote per phone number.</p>
       <div class="field">
         <label for="votePhone" data-i18n="vote_phone_label">Your Phone Number</label>
-        <input type="text" id="votePhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="phone_placeholder">
+        <input type="text" id="votePhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="vote_phone_placeholder">
       </div>
       <button class="primary" id="voteVerifyBtn" data-i18n="vote_verify_btn">Verify &amp; Continue</button>
       <div class="msg" id="votePhoneMsg"></div>
@@ -687,7 +724,7 @@ body{ zoom: 1.15; }
       </div>
       <div class="field">
         <label for="voteRegPhone" data-i18n="vote_register_phone_label">Your Phone Number</label>
-        <input type="text" id="voteRegPhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="phone_placeholder">
+        <input type="text" id="voteRegPhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="vote_phone_placeholder">
       </div>
       <button class="primary" id="voteRegisterBtn" data-i18n="vote_register_btn">Register &amp; Continue</button>
       <button type="button" id="voteBackToVerifyBtn" class="link-btn" data-i18n="vote_register_back">I already have an account</button>
@@ -748,6 +785,15 @@ body{ zoom: 1.15; }
     </div>
   </div>
 
+</div>
+
+<!-- ===================== VOTE ENCOURAGEMENT POPUP ===================== -->
+<div id="voteEncourageOverlay" class="vote-encourage-overlay" style="display:none;">
+  <div class="vote-encourage-box">
+    <div class="vote-encourage-icon">🗳️</div>
+    <div class="vote-encourage-text" data-i18n="vote_encourage_text">VOTE FOR WHO YOU LOVE ON THIS LIST</div>
+    <button class="primary" id="voteEncourageCloseBtn" data-i18n="vote_encourage_close">Let's Go</button>
+  </div>
 </div>
 
 <script>
@@ -2387,6 +2433,7 @@ const I18N = {
     your_cart: "Your Cart", total: "Total",
     your_name: "Your Name", your_phone: "Your Phone Number", note_optional: "Note (optional)",
     name_placeholder: "e.g. Ahmed", phone_placeholder: "e.g. 0634449111", note_placeholder: "e.g. Table 5",
+    vote_phone_placeholder: "Enter the number you ordered with last semester (Telesom only)",
     item_note_placeholder: "+ Special instructions (e.g. no sugar)",
     send_order: "Send Order to Counter",
     add_items_hint: "Tap items above to add them to your order.",
@@ -2420,7 +2467,7 @@ const I18N = {
     voting_window_saved: "Voting period saved.",
     reward_pool_title: "Prize Pool",
     reward_pool_split_hint: "Split by final rank: 1st 40% · 2nd 25% · 3rd 15% · 4th 10% · 5th 10%.",
-    reward_pool_total_label: "Total Prize Pool (SLSH)",
+    reward_pool_total_label: "Total Prize Pool (USD $)",
     reward_pool_save_btn: "Save Prize Pool",
     reward_pool_invalid: "Please enter a valid prize pool amount.",
     reward_pool_saved: "Prize pool saved.",
@@ -2464,15 +2511,13 @@ const I18N = {
     vote_checking: "Checking…",
     vote_not_eligible: "We couldn't find that phone number on file. Double-check it, or contact UB Cafe.",
     vote_no_candidates: "There aren't enough customers on file yet to vote on.",
-    vote_pick_intro: "Choose your favorite", vote_pick_hint: "Pick one customer to vote for. Full names are revealed once voting ends.",
+    vote_pick_intro: "Choose your favorite", vote_pick_hint: "Pick one customer to vote for.",
+    vote_encourage_text: "VOTE FOR WHO YOU LOVE ON THIS LIST",
+    vote_encourage_close: "Let's Go",
     vote_select_required: "Please choose a favorite before submitting.",
     vote_select_placeholder: "Select a customer…",
     vote_submit_btn: "Submit My Vote", vote_change_number: "Use a different phone number",
     vote_error: "Something went wrong submitting your vote — please try again.",
-    vote_checking_location: "Checking your location…",
-    vote_campus_not_configured: "Campus location hasn't been set up yet — please contact UB Cafe staff.",
-    vote_location_denied: "We need your location to confirm you're on campus. Please allow location access and try again.",
-    vote_off_campus: "Thank you for your effort. Please visit University of Burao to cast your vote.",
     vote_thanks_title: "Vote Submitted!",
     vote_thanks_body: "Thanks for voting — your top 5 has been recorded for this semester.",
     vote_already_voted_title: "You've Already Voted",
@@ -2521,6 +2566,7 @@ const I18N = {
     your_cart: "Dambiishaada", total: "Wadarta",
     your_name: "Magacaaga", your_phone: "Lambarka Taleefankaaga", note_optional: "Fiiro gaar ah (ikhtiyaari)",
     name_placeholder: "tusaale Ahmed", phone_placeholder: "tusaale 0634449111", note_placeholder: "tusaale Miiska 5",
+    vote_phone_placeholder: "Gali numberkii aad wax ka dirjirtay Semesterkii hore (Telesom kaliya)",
     item_note_placeholder: "+ Fadlan sheeg wax gaar ah (tusaale sokor la'aan)",
     send_order: "U Dir Dalabka Kaawuntarka",
     add_items_hint: "Taabo alaabta kore si aad ugu darto dalabkaaga.",
@@ -2555,7 +2601,7 @@ const I18N = {
     voting_window_saved: "Muddada codeynta waa la keydiyay.",
     reward_pool_title: "Kaydka Abaalmarinta",
     reward_pool_split_hint: "Waxaa loo qaybiyaa boosaska ugu dambeeya: 1aad 40% · 2aad 25% · 3aad 15% · 4aad 10% · 5aad 10%.",
-    reward_pool_total_label: "Wadarta Kaydka Abaalmarinta (SLSH)",
+    reward_pool_total_label: "Wadarta Kaydka Abaalmarinta (USD $)",
     reward_pool_save_btn: "Keydi Kaydka Abaalmarinta",
     reward_pool_invalid: "Fadlan geli qadar sax ah oo kaydka abaalmarinta ah.",
     reward_pool_saved: "Kaydka abaalmarinta waa la keydiyay.",
@@ -2599,15 +2645,13 @@ const I18N = {
     vote_checking: "Xaqiijinaya…",
     vote_not_eligible: "Uma helin lambarkaas taleefanka diiwaanka. Hubi lambarka, ama la xiriir UB Cafe.",
     vote_no_candidates: "Wali ma jiraan macaamiil ku filan oo diiwaan gashan si loo codeeyo.",
-    vote_pick_intro: "Dooro kaaga ugu jecel", vote_pick_hint: "Dooro hal macaamiil aad u codeynayso. Magacyada oo dhammaystiran waxaa la muujin doonaa marka codeyntu dhammaato.",
+    vote_pick_intro: "Dooro kaaga ugu jecel", vote_pick_hint: "Dooro hal macaamiil aad u codeynayso.",
+    vote_encourage_text: "U CODEE QOFKAAD JECESHAHAY LIISKAN",
+    vote_encourage_close: "Aan Bilownaa",
     vote_select_required: "Fadlan dooro qof ka hor intaadan dirin.",
     vote_select_placeholder: "Dooro macaamiil…",
     vote_submit_btn: "Dir Codkayga", vote_change_number: "Isticmaal lambar kale",
     vote_error: "Wax baa qaldamay markii codkaaga la dirayay — fadlan isku day mar kale.",
-    vote_checking_location: "Hubinaya goobtaada…",
-    vote_campus_not_configured: "Goobta jaamacadda weli lama dejin — fadlan la xiriir shaqaalaha UB Cafe.",
-    vote_location_denied: "Waxaan u baahanahay goobtaada si aan u xaqiijino inaad joogto kaampaska. Fadlan ogolow helitaanka goobta oo isku day mar kale.",
-    vote_off_campus: "Waad ku mahadsan tahay dadaalkaaga. Fadlan booqo Jaamacadda Burco si aad u codeyso.",
     vote_thanks_title: "Codka Waa La Diray!",
     vote_thanks_body: "Waad ku mahadsan tahay codeynta — 5-tan aad doorateen ayaa loo diiwaan geliyay simistarkan.",
     vote_already_voted_title: "Horeba Waad Codaysay",
@@ -2658,6 +2702,7 @@ const I18N = {
     your_cart: "سلتك", total: "الإجمالي",
     your_name: "اسمك", your_phone: "رقم هاتفك", note_optional: "ملاحظة (اختياري)",
     name_placeholder: "مثال: أحمد", phone_placeholder: "مثال: 0634449111", note_placeholder: "مثال: طاولة 5",
+    vote_phone_placeholder: "أدخل الرقم الذي استخدمته للطلب في الفصل الدراسي الماضي (تيليصوم فقط)",
     item_note_placeholder: "+ تعليمات خاصة (مثال: بدون سكر)",
     send_order: "إرسال الطلب إلى الكاونتر",
     add_items_hint: "اضغط على الأصناف أعلاه لإضافتها إلى طلبك.",
@@ -2691,7 +2736,7 @@ const I18N = {
     voting_window_saved: "تم حفظ فترة التصويت.",
     reward_pool_title: "صندوق الجائزة",
     reward_pool_split_hint: "يُقسّم حسب الترتيب النهائي: الأول 40% · الثاني 25% · الثالث 15% · الرابع 10% · الخامس 10%.",
-    reward_pool_total_label: "إجمالي صندوق الجائزة (شلن صومالي)",
+    reward_pool_total_label: "إجمالي صندوق الجائزة (دولار أمريكي)",
     reward_pool_save_btn: "حفظ صندوق الجائزة",
     reward_pool_invalid: "يرجى إدخال مبلغ صحيح لصندوق الجائزة.",
     reward_pool_saved: "تم حفظ صندوق الجائزة.",
@@ -2735,15 +2780,13 @@ const I18N = {
     vote_checking: "جارٍ التحقق…",
     vote_not_eligible: "لم نجد هذا الرقم ضمن السجلات. تحقق من الرقم، أو تواصل مع UB Cafe.",
     vote_no_candidates: "لا يوجد عدد كافٍ من العملاء المسجّلين بعد للتصويت عليهم.",
-    vote_pick_intro: "اختر المفضل لديك", vote_pick_hint: "اختر عميلاً واحدًا للتصويت له. سيتم الكشف عن الأسماء الكاملة بعد انتهاء التصويت.",
+    vote_pick_intro: "اختر المفضل لديك", vote_pick_hint: "اختر عميلاً واحدًا للتصويت له.",
+    vote_encourage_text: "صوّت لمن تحبه من هذه القائمة",
+    vote_encourage_close: "هيا بنا",
     vote_select_required: "يرجى اختيار شخص قبل الإرسال.",
     vote_select_placeholder: "اختر عميلاً…",
     vote_submit_btn: "إرسال تصويتي", vote_change_number: "استخدام رقم هاتف آخر",
     vote_error: "حدث خطأ أثناء إرسال تصويتك — يرجى المحاولة مرة أخرى.",
-    vote_checking_location: "جارٍ التحقق من موقعك…",
-    vote_campus_not_configured: "لم يتم إعداد موقع الحرم الجامعي بعد — يرجى التواصل مع موظفي UB Cafe.",
-    vote_location_denied: "نحتاج إلى موقعك للتأكد من أنك داخل الحرم الجامعي. يرجى السماح بالوصول إلى الموقع والمحاولة مرة أخرى.",
-    vote_off_campus: "شكرًا لجهدك. يرجى زيارة جامعة بوراو للإدلاء بصوتك.",
     vote_thanks_title: "تم إرسال التصويت!",
     vote_thanks_body: "شكرًا لتصويتك — تم تسجيل أفضل 5 لديك لهذا الفصل الدراسي.",
     vote_already_voted_title: "لقد قمت بالتصويت مسبقًا",
@@ -2786,7 +2829,7 @@ const I18N = {
 };
 
 let currentLang = (function(){
-  try{ return window.localStorage.getItem('ubcafe_lang') || 'en'; }catch(e){ return 'en'; }
+  try{ return window.localStorage.getItem('ubcafe_lang') || 'so'; }catch(e){ return 'so'; }
 })();
 
 function t(key){
@@ -2829,7 +2872,6 @@ const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
 const REVIEWS_KEY = "ubcafe_reviews";
 const ORDER_COUNTER_KEY = "ubcafe_order_counter"; // shared with index.html's Place Order (Waiter), so every order — customer or waiter — gets one unique running number
 const SEMESTER_VOTES_KEY = "ubcafe_semester_votes"; // Top-5-of-the-semester ballots, one per verified voter phone number
-const WORKPLACE_LOCATION_KEY = "ubcafe_workplace_location"; // set by staff in index.html; reused here to require voters be on campus
 const VOTING_WINDOW_KEY = "ubcafe_voting_window"; // {startAt, endAt} ISO strings — set by staff in the Results tab
 const REWARD_POOL_KEY = "ubcafe_reward_pool"; // {totalAmount} — set by staff in the Results tab
 
@@ -2842,7 +2884,6 @@ let customers = [];
 let saleRequests = [];
 let reviews = [];
 let semesterVotes = [];
-let workplaceLocation = null; // {lat, lng, radiusMeters}
 let votingWindow = null; // {startAt, endAt}
 let rewardPool = null; // {totalAmount}
 
@@ -2886,20 +2927,6 @@ async function loadSemesterVotes(){
   try{ semesterVotes = val ? JSON.parse(val) : []; }catch(e){ semesterVotes = []; }
 }
 async function saveSemesterVotes(){ await storageSet(SEMESTER_VOTES_KEY, JSON.stringify(semesterVotes), true); }
-async function loadWorkplaceLocation(){
-  const val = await storageGet(WORKPLACE_LOCATION_KEY, true);
-  try{ workplaceLocation = val ? JSON.parse(val) : null; }catch(e){ workplaceLocation = null; }
-}
-function distanceMeters(lat1, lng1, lat2, lng2){
-  // Haversine formula — great-circle distance between two lat/lng points, in
-  // meters. Matches the same function used for staff check-ins in index.html.
-  const R = 6371000;
-  const toRad = d => d * Math.PI / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
 
 async function loadVotingWindow(){
   const val = await storageGet(VOTING_WINDOW_KEY, true);
@@ -2959,7 +2986,7 @@ $$('.nav-item').forEach(tab=>{
     $$('.section').forEach(s=>s.classList.remove('active'));
     tab.classList.add('active');
     $('#section-'+tab.dataset.section).classList.add('active');
-    if(tab.dataset.section!=='vote'){ stopVoteLiveResultsSync(); stopVoteWindowRecheck(); }
+    if(tab.dataset.section!=='vote'){ stopVoteLiveResultsSync(); hideVoteEncouragePopup(); }
     if(tab.dataset.section==='place') renderOrderScreen();
     if(tab.dataset.section==='rate') renderRateScreen();
     if(tab.dataset.section==='vote') renderVoteScreen();
@@ -3598,6 +3625,26 @@ function renderVotingWindowState(){
   const start = votingWindow ? formatVotingDateTime(votingWindow.startAt) : '';
   const end = votingWindow ? formatVotingDateTime(votingWindow.endAt) : '';
 
+  // While voting is actively open, hide every other tab so people are
+  // focused on voting — only Vote stays reachable. Restore them the
+  // moment it's not open (not started yet, or closed).
+  const otherTabs = $$('.nav-item').filter(t => t.dataset.section !== 'vote');
+  if(status === 'open'){
+    otherTabs.forEach(t => t.style.display = 'none');
+    // If a now-hidden tab was active (e.g. window opened while someone was
+    // on Order), snap the view over to Vote instead of leaving a blank tab.
+    const activeTab = $('.nav-item.active');
+    if(activeTab && activeTab.dataset.section !== 'vote'){
+      $$('.nav-item').forEach(t=>t.classList.remove('active'));
+      $$('.section').forEach(s=>s.classList.remove('active'));
+      $('.nav-item[data-section="vote"]').classList.add('active');
+      $('#section-vote').classList.add('active');
+      scrollToVotePhoneField();
+    }
+  } else {
+    otherTabs.forEach(t => t.style.display = '');
+  }
+
   if(status === 'not_configured'){
     badge.style.display = 'none';
   } else {
@@ -3673,10 +3720,23 @@ async function renderVoteScreen(){
   $('#voteRegisterPanel').style.display = 'none';
   $('#voteBallotPanel').style.display = 'none';
   $('#voteThanksPanel').style.display = 'none';
+  hideVoteEncouragePopup();
   renderVotingWindowState();
   renderLiveResults();
   startVoteLiveResultsSync();
   startVoteWindowRecheck();
+  scrollToVotePhoneField();
+}
+
+// Auto-scrolls the phone number field into view when voting is open, so
+// people land straight on what they need to fill in instead of having to
+// scroll past the header and live scoreboard themselves.
+function scrollToVotePhoneField(){
+  if(getVotingWindowStatus() !== 'open') return;
+  requestAnimationFrame(()=>{
+    const field = $('#votePhone');
+    if(field) field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
 }
 
 /* ---------------------------------------------------------------------
@@ -3703,7 +3763,7 @@ function buildResultsListHTML(scored, unmasked, showReward){
     const rewardLine = (showReward && reward)
       ? `<div class="top5-reward">🎁 ${Math.round(reward.pct*100)}%</div>`
       : '';
-    const displayName = unmasked ? r.name : maskCandidateName(r.name);
+    const displayName = r.name;
     return `
     <div class="top5-item">
       <div class="top5-bar-fill" data-pct="${pct}" style="width:0%;"></div>
@@ -3963,7 +4023,7 @@ function renderVoteBallot(){
       <label class="vote-choice-item">
         <input type="radio" name="voteChoice" class="vote-choice-radio" value="${id}">
         <span class="vote-choice-box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="vote-choice-name">${maskCandidateName(c.name)}</span>
+        <span class="vote-choice-name">${c.name}</span>
       </label>
     `;
   }).join('');
@@ -3971,20 +4031,29 @@ function renderVoteBallot(){
 
   $('#voteBallotMsg').className = 'msg';
   $('#voteBallotPanel').style.display = '';
+  showVoteEncouragePopup();
 }
+
+let voteEncourageAutoHideTimer = null;
+function showVoteEncouragePopup(){
+  $('#voteEncourageOverlay').style.display = 'flex';
+  if(voteEncourageAutoHideTimer) clearTimeout(voteEncourageAutoHideTimer);
+  voteEncourageAutoHideTimer = setTimeout(hideVoteEncouragePopup, 10000);
+}
+function hideVoteEncouragePopup(){
+  $('#voteEncourageOverlay').style.display = 'none';
+  if(voteEncourageAutoHideTimer){ clearTimeout(voteEncourageAutoHideTimer); voteEncourageAutoHideTimer = null; }
+}
+$('#voteEncourageCloseBtn').addEventListener('click', hideVoteEncouragePopup);
+$('#voteEncourageOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'voteEncourageOverlay') hideVoteEncouragePopup();
+});
 
 $('#voteCancelBtn').addEventListener('click', ()=>{
   voteVerifiedPhone = null;
   $('#voteBallotPanel').style.display = 'none';
   $('#votePhonePanel').style.display = '';
 });
-
-function getCurrentPositionAsync(options){
-  return new Promise((resolve, reject)=>{
-    if(!navigator.geolocation){ reject(new Error('unsupported')); return; }
-    navigator.geolocation.getCurrentPosition(resolve, reject, options);
-  });
-}
 
 $('#voteSubmitBtn').addEventListener('click', async ()=>{
   const btn = $('#voteSubmitBtn');
@@ -4012,30 +4081,6 @@ $('#voteSubmitBtn').addEventListener('click', async ()=>{
       renderVotingWindowState();
       return;
     }
-    // Voting is restricted to campus — reuses the same location staff set
-    // for attendance check-ins in index.html (ubcafe_workplace_location).
-    btn.textContent = t('vote_checking_location');
-    await loadWorkplaceLocation();
-    if(!workplaceLocation){
-      msg.textContent = t('vote_campus_not_configured');
-      msg.className = 'msg show err';
-      return;
-    }
-    let pos;
-    try{
-      pos = await getCurrentPositionAsync({ enableHighAccuracy: true, timeout: 12000 });
-    }catch(e){
-      msg.textContent = t('vote_location_denied');
-      msg.className = 'msg show err';
-      return;
-    }
-    const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, workplaceLocation.lat, workplaceLocation.lng);
-    if(dist > workplaceLocation.radiusMeters){
-      msg.textContent = t('vote_off_campus');
-      msg.className = 'msg show err';
-      return;
-    }
-
     btn.textContent = t('sending');
     await loadSemesterVotes(); // refresh so we don't clobber votes submitted elsewhere in the meantime
     const idx = semesterVotes.findIndex(v => canonicalPhone(v.voterPhone) === voteVerifiedPhone);
@@ -4088,7 +4133,12 @@ applyStaticTranslations();
     renderVoteScreen();
   } else {
     renderOrderScreen();
+    renderVotingWindowState();
   }
+  // Runs regardless of which tab is active, so tabs hide/reveal themselves
+  // the moment the voting window opens or closes — not just while someone
+  // happens to already be on the Vote tab.
+  startVoteWindowRecheck();
 })();
 </script>
 </body>
