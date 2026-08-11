@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
 <title>UB Cafe — Order & Check Your Account</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -82,17 +83,17 @@
 
   /* ---------- Navigation bar ---------- */
   .nav-bar{
-    display:flex;gap:14px;margin-bottom:26px;position:sticky;top:12px;z-index:10;
+    display:flex;flex-wrap:wrap;gap:12px;margin-bottom:26px;position:sticky;top:12px;z-index:10;
     animation:dropIn .6s cubic-bezier(.2,.9,.3,1.2) .05s both;
   }
   .nav-item{
-    flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 12px 17px;border-radius:13px;
+    flex:1 1 calc(33.333% - 8px);min-width:96px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:20px 10px 18px;border-radius:13px;
     border:1.5px solid var(--paper-line);background:var(--card);color:var(--ink-soft);cursor:pointer;text-align:center;
     transition:all .18s cubic-bezier(.2,.8,.3,1);-webkit-tap-highlight-color:transparent;box-shadow:0 1px 2px rgba(30,42,36,.04);
   }
-  .nav-item .nav-icon{font-size:20px;line-height:1;}
-  .nav-item .nav-label{font-family:'Inter',sans-serif;font-weight:700;font-size:12px;margin-top:3px;}
-  .nav-item .nav-desc{font-size:9.5px;color:var(--ink-soft);margin-top:1px;letter-spacing:.01em;}
+  .nav-item .nav-icon{font-size:21px;line-height:1;}
+  .nav-item .nav-label{font-family:'Inter',sans-serif;font-weight:700;font-size:12.5px;margin-top:3px;}
+  .nav-item .nav-desc{font-size:10px;color:var(--ink-soft);margin-top:1px;letter-spacing:.01em;}
   .nav-item.active{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:var(--shadow);transform:translateY(-1px);}
   .nav-item.active .nav-desc{color:var(--paper-line);}
   .nav-item:hover:not(.active){border-color:var(--brass);transform:translateY(-1px);}
@@ -129,6 +130,12 @@
     font-family:'Inter',sans-serif;font-weight:600;font-size:13.5px;background:var(--paper);color:var(--ink);
     border:1.5px solid var(--ink);padding:11px 16px;border-radius:9px;cursor:pointer;width:100%;
   }
+  .link-btn{
+    display:block;width:100%;background:none;border:none;font-family:'Inter',sans-serif;font-weight:600;
+    font-size:12.5px;color:var(--brass-dark);text-decoration:underline;text-underline-offset:2px;
+    cursor:pointer;margin-top:12px;padding:2px;text-align:center;
+  }
+  .link-btn:hover{color:var(--ink);}
 
   .msg{font-size:13px;margin-top:10px;padding:9px 12px;border-radius:8px;display:none;text-align:center;}
   .msg.show{display:block;}
@@ -136,7 +143,115 @@
   .msg.ok{background:var(--ok-bg);color:var(--credit);}
 
   .hint{font-size:11.5px;color:var(--ink-soft);text-align:center;margin-top:12px;line-height:1.6;}
+
+  /* ---------- Vote section header (campus election banner) ---------- */
+  .vote-header{text-align:center;margin-bottom:18px;animation:dropIn .5s cubic-bezier(.2,.9,.3,1.2) both;}
+  .vote-eyebrow{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.14em;
+    color:var(--brass-dark);margin-bottom:6px;
+  }
+  .vote-heading{font-family:'Fraunces',serif;font-weight:900;font-size:26px;line-height:1.15;margin:0 0 12px;color:var(--ink);}
+  .vote-subrule{width:64px;height:3px;margin:0 auto;background:repeating-linear-gradient(90deg,var(--brass) 0 6px,transparent 6px 11px);border-radius:2px;}
+  .voting-window-badge{
+    display:inline-block;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;
+    padding:5px 13px;border-radius:999px;letter-spacing:.02em;
+  }
+  .voting-window-badge.open{background:var(--ok-bg);color:var(--credit);}
+  .voting-window-badge.not-started{background:#EFE6D0;color:var(--brass-dark);}
+  .voting-window-badge.closed{background:var(--danger-bg);color:var(--debit);}
+  .results-window-block{margin-top:16px;padding-top:16px;border-top:1px dashed var(--paper-line);}
+  .reward-breakdown{display:flex;flex-direction:column;gap:6px;margin-top:12px;}
+  .reward-breakdown .rb-row{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:6px 10px;background:rgba(0,0,0,0.03);border-radius:7px;}
+  .reward-breakdown .rb-rank{font-weight:700;color:var(--brass-dark);}
+  .reward-breakdown .rb-amount{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
+  .top5-reward{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--brass-dark);white-space:nowrap;margin-top:1px;}
+  .congrats-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+  .congrats-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;background:rgba(0,0,0,0.03);border-radius:9px;}
+  .congrats-row .cg-name{font-weight:600;font-size:13px;}
+  .congrats-row .cg-rank{font-size:11px;color:var(--ink-soft);}
+  .congrats-row .cg-send{
+    font-family:'Inter',sans-serif;font-weight:700;font-size:12px;color:#fff;background:#25D366;
+    border:none;border-radius:7px;padding:8px 13px;cursor:pointer;white-space:nowrap;text-decoration:none;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .congrats-row .cg-send:hover{opacity:.9;}
+  .congrats-row .cg-no-phone{font-size:11px;color:var(--ink-soft);font-style:italic;}
+  .notice-board{
+    margin-top:22px;padding-top:18px;border-top:2px dashed var(--brass);text-align:left;
+  }
+  html[dir="rtl"] .notice-board{text-align:right;}
+  .notice-board-title{
+    font-family:'Fraunces',serif;font-weight:700;font-size:15px;text-align:center;
+    margin-bottom:12px;color:var(--ink);
+  }
+
+  /* ---------- Ballot card (phone verify + choice panels) ---------- */
+  .ballot-card{position:relative;overflow:hidden;}
+  .ballot-card > p, .ballot-card > .field{padding-right:44px;}
+  html[dir="rtl"] .ballot-card > p, html[dir="rtl"] .ballot-card > .field{padding-right:0;padding-left:44px;}
+  .ballot-ribbon{
+    position:absolute;top:11px;right:-31px;background:var(--brass);color:#fff;font-family:'Inter',sans-serif;
+    font-weight:700;font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:2px 32px;
+    transform:rotate(40deg);box-shadow:0 1px 3px rgba(0,0,0,.2);pointer-events:none;
+  }
+  html[dir="rtl"] .ballot-ribbon{right:auto;left:-31px;transform:rotate(-40deg);}
+
+  /* ---------- Live leaderboard: horizontal score bars with medal ranks ---------- */
+  .top5-panel{margin-bottom:14px;}
+  .top5-panel .top5-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:10px;text-align:center;}
+  .top5-formula-hint{font-size:13px;font-weight:700;color:var(--ink-soft);text-align:center;margin:-4px 0 10px;font-style:italic;}
+  .transparency-note{
+    display:flex;align-items:flex-start;gap:8px;font-size:12.5px;font-weight:700;line-height:1.5;color:var(--ink);
+    background:rgba(184,137,43,.14);border-left:3px solid var(--brass);border-radius:8px;padding:9px 12px;margin-bottom:12px;text-align:left;
+  }
+  html[dir="rtl"] .transparency-note{text-align:right;border-left:none;border-right:3px solid var(--brass);}
+  .top5-list{display:flex;flex-direction:column;gap:8px;}
+  .top5-empty{text-align:center;font-size:12.5px;color:var(--ink-soft);padding:6px 0;}
   .empty{text-align:center;padding:24px 10px;color:var(--ink-soft);font-size:13px;}
+  .top5-item{
+    position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;
+    padding:9px 11px;border-radius:9px;background:rgba(0,0,0,0.03);
+  }
+  .top5-item .top5-bar-fill{
+    position:absolute;left:0;top:0;bottom:0;z-index:0;background:linear-gradient(90deg, rgba(184,137,43,.20), rgba(184,137,43,.08));
+    width:0%;transition:width .7s cubic-bezier(.2,.8,.3,1);
+  }
+  html[dir="rtl"] .top5-item .top5-bar-fill{left:auto;right:0;}
+  .top5-item > *{position:relative;z-index:1;}
+  .top5-rank{
+    font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;width:24px;height:24px;border-radius:50%;
+    background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;flex:none;
+  }
+  .top5-rank.medal-1{background:#C9A227;color:#fff;box-shadow:0 0 0 2px rgba(201,162,39,.25);}
+  .top5-rank.medal-2{background:#9AA0A6;color:#fff;}
+  .top5-rank.medal-3{background:#B5764A;color:#fff;}
+  .top5-name{flex:1;font-weight:600;font-size:13.5px;}
+  .top5-score{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-soft);white-space:nowrap;}
+
+  /* ---------- Ballot choice list: paper stub with a custom check box ---------- */
+  .vote-choice-item{
+    display:flex;align-items:center;gap:12px;padding:13px 14px;margin-bottom:9px;
+    border:1.5px dashed var(--paper-line);border-radius:10px;background:#fff;cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .vote-choice-item:hover{border-color:var(--brass);transform:translateX(2px);}
+  html[dir="rtl"] .vote-choice-item:hover{transform:translateX(-2px);}
+  .vote-choice-item:has(.vote-choice-radio:checked){
+    border-style:solid;border-color:var(--ink);background:rgba(184,137,43,.06);
+  }
+  .vote-choice-radio{position:absolute;opacity:0;width:0;height:0;}
+  .vote-choice-box{
+    flex:none;width:20px;height:20px;border-radius:5px;border:1.5px solid var(--paper-line);background:#fff;
+    display:flex;align-items:center;justify-content:center;transition:all .15s ease;
+  }
+  .vote-choice-item:has(.vote-choice-radio:checked) .vote-choice-box{
+    background:var(--ink);border-color:var(--ink);
+  }
+  .vote-choice-box svg{width:12px;height:12px;opacity:0;transform:scale(.5);transition:all .15s ease;}
+  .vote-choice-item:has(.vote-choice-radio:checked) .vote-choice-box svg{opacity:1;transform:scale(1);}
+  .vote-choice-name{font-weight:600;font-size:14.5px;}
+
+
 
   /* ---------- Menu / category chips ---------- */
   .cat-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
@@ -211,6 +326,17 @@
     60%{transform:scale(1.06) rotate(-6deg);opacity:1;}
     100%{transform:scale(1) rotate(-7deg);opacity:1;}
   }
+  .confirm-seal-gold{
+    border-color:var(--brass);color:var(--brass-dark);position:relative;
+  }
+  .confirm-seal-gold::after{
+    content:'';position:absolute;inset:-8px;border-radius:50%;border:1.5px solid var(--brass);
+    opacity:0;animation:goldPulse 1.8s ease-out .5s infinite;
+  }
+  @keyframes goldPulse{
+    0%{transform:scale(.85);opacity:.55;}
+    100%{transform:scale(1.35);opacity:0;}
+  }
   .confirm-wrap h2{font-family:'Fraunces',serif;font-weight:700;font-size:19px;margin:0 0 8px;}
   .confirm-order-no{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--brass-dark);margin-bottom:10px;letter-spacing:.03em;}
   .confirm-status{font-weight:700;font-size:14.5px;margin-top:12px;}
@@ -234,6 +360,12 @@
   /* ---------- Payment info ---------- */
   .payment-info{font-size:12px;line-height:1.9;color:var(--ink-soft);}
   .payment-info b{color:var(--ink);}
+  .qr-code-box{display:flex;justify-content:center;align-items:center;padding:12px 0 6px;}
+  .qr-code-box svg{border-radius:8px;}
+  .qr-url-text{
+    text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);
+    word-break:break-all;margin-bottom:12px;
+  }
   .zaad-pay-block{
     display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:14px;
     border-top:1px dashed var(--paper-line);
@@ -277,6 +409,13 @@
     display:block;text-align:center;margin-top:14px;color:var(--ink-soft);font-size:13px;cursor:pointer;
     text-decoration:underline;background:none;border:none;font-family:'Inter',sans-serif;width:100%;padding:8px;
   }
+/* ===================== EXTRA CSS: LARGER FONTS APP-WIDE ===================== */
+/* Most text in this file uses fixed px sizes rather than rem/em, so a plain
+   body{font-size:...} override wouldn't cascade to it. `zoom` scales the
+   whole rendered page — text, buttons, inputs, icons, spacing — together and
+   recalculates layout (unlike transform:scale, which just stretches pixels
+   and breaks click targets/wrapping). Supported in all current browsers. */
+body{ zoom: 1.15; }
 </style>
 </head>
 <body>
@@ -400,11 +539,6 @@
       <span class="nav-label" data-i18n="nav_vote">Vote</span>
       <span class="nav-desc" data-i18n="nav_vote_desc">Top 5 of the semester</span>
     </div>
-    <div class="nav-item" data-section="results">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label" data-i18n="nav_results">Results</span>
-      <span class="nav-desc" data-i18n="nav_results_desc">Staff only</span>
-    </div>
     <div class="nav-item" data-section="rate">
       <span class="nav-icon">⭐</span>
       <span class="nav-label" data-i18n="nav_rate">Rate Us</span>
@@ -467,6 +601,14 @@
       <div class="field" style="margin-bottom:8px;"><label data-i18n="payment_info">Payment Info</label></div>
       <div class="payment-info" id="paymentInfo"></div>
     </div>
+
+    <div class="panel narrow" style="margin-top:14px;">
+      <div class="field" style="margin-bottom:6px;"><label data-i18n="scan_to_order_title">📱 Scan to Order</label></div>
+      <p class="hint" style="margin-top:0;" data-i18n="scan_to_order_hint">Share this with friends — scan to open the order page.</p>
+      <div id="qrCodeContainer" class="qr-code-box"></div>
+      <div class="qr-url-text">https://khaan45.github.io/University-Cafe/order</div>
+      <button class="secondary" id="downloadQrBtn" data-i18n="download_qr_btn">Download QR Code</button>
+    </div>
   </div>
 
   <!-- ===================== TRACK ORDER ===================== -->
@@ -497,8 +639,34 @@
 
   <!-- ===================== VOTE: TOP 5 OF THE SEMESTER ===================== -->
   <div class="section narrow" id="section-vote">
-    <div class="panel" id="votePhonePanel">
-      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_title">Top 5 Customers of the Semester</label></div>
+    <div class="vote-header">
+      <div class="vote-eyebrow">🎓 <span data-i18n="vote_eyebrow">UB Cafe Election</span></div>
+      <h1 class="vote-heading" data-i18n="vote_title">Customer of the Semester</h1>
+      <div class="vote-subrule"></div>
+      <div id="votingWindowBadge" class="voting-window-badge" style="display:none;"></div>
+    </div>
+
+    <div class="panel top5-panel">
+      <div class="top5-title" data-i18n="live_results_title">Live Results</div>
+      <div class="top5-formula-hint" data-i18n="score_formula_hint">Score = 40% purchase loyalty + 60% votes</div>
+      <div class="transparency-note">⚖️ <span data-i18n="candidate_selection_note">These 5 are picked automatically — the biggest spenders this semester, recalculated live. No staff selection.</span></div>
+      <div id="voteLiveResultsList" class="top5-list"></div>
+    </div>
+
+    <div class="panel narrow" id="voteClosedPanel" style="display:none;">
+      <div class="confirm-wrap">
+        <div class="confirm-seal confirm-seal-gold" id="voteClosedIcon">🗳️</div>
+        <h2 id="voteClosedTitle">Voting Isn't Open Yet</h2>
+        <p id="voteClosedBody" style="color:var(--ink-soft);font-size:13.5px;"></p>
+      </div>
+      <div id="voteClosedResultsBoard" class="notice-board" style="display:none;">
+        <div class="notice-board-title">📌 <span data-i18n="notice_board_title">Final Results</span></div>
+        <div id="voteClosedResultsList" class="top5-list"></div>
+      </div>
+    </div>
+
+    <div class="panel ballot-card" id="votePhonePanel">
+      <div class="ballot-ribbon" data-i18n="ballot_ribbon">Official Ballot</div>
       <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_intro">Registered customers can rank their top 5 favorite customers of the semester. One vote per phone number.</p>
       <div class="field">
         <label for="votePhone" data-i18n="vote_phone_label">Your Phone Number</label>
@@ -506,11 +674,32 @@
       </div>
       <button class="primary" id="voteVerifyBtn" data-i18n="vote_verify_btn">Verify &amp; Continue</button>
       <div class="msg" id="votePhoneMsg"></div>
+      <button type="button" id="voteShowRegisterBtn" class="link-btn" data-i18n="vote_new_customer_link">New here? Register to vote</button>
     </div>
 
-    <div class="panel" id="voteBallotPanel" style="display:none;">
-      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_pick_intro">Rank your top 5</label></div>
-      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_pick_hint">Choose a different customer for each place.</p>
+    <div class="panel ballot-card" id="voteRegisterPanel" style="display:none;">
+      <div class="ballot-ribbon" data-i18n="ballot_ribbon">Official Ballot</div>
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_register_title">Register to Vote</label></div>
+      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_register_intro">First time here? Add your name and phone number, then place an order — once it's paid, you can vote.</p>
+      <div class="field">
+        <label for="voteRegName" data-i18n="vote_register_name_label">Your Name</label>
+        <input type="text" id="voteRegName" placeholder="e.g. Amina Xasan" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="voteRegPhone" data-i18n="vote_register_phone_label">Your Phone Number</label>
+        <input type="text" id="voteRegPhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="phone_placeholder">
+      </div>
+      <button class="primary" id="voteRegisterBtn" data-i18n="vote_register_btn">Register &amp; Continue</button>
+      <button type="button" id="voteBackToVerifyBtn" class="link-btn" data-i18n="vote_register_back">I already have an account</button>
+      <div class="msg" id="voteRegisterMsg"></div>
+      <button class="primary" id="voteGoOrderBtn" style="margin-top:12px;display:none;" data-i18n="vote_go_order_btn">Place an Order</button>
+    </div>
+
+    <div class="panel ballot-card" id="voteBallotPanel" style="display:none;">
+      <div class="ballot-ribbon" data-i18n="ballot_ribbon">Official Ballot</div>
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="vote_pick_intro">Choose your favorite</label></div>
+      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="vote_pick_hint">Pick one customer to vote for.</p>
+      <div class="transparency-note">⚖️ <span data-i18n="candidate_selection_note">These 5 are picked automatically — the biggest spenders this semester, recalculated live. No staff selection.</span></div>
       <div id="voteRankFields"></div>
       <button class="primary" id="voteSubmitBtn" data-i18n="vote_submit_btn">Submit My Vote</button>
       <button class="secondary" id="voteCancelBtn" style="margin-top:10px;" data-i18n="vote_change_number">Use a different phone number</button>
@@ -519,32 +708,10 @@
 
     <div class="panel narrow" id="voteThanksPanel" style="display:none;">
       <div class="confirm-wrap">
-        <div class="confirm-seal">🏆</div>
-        <h2 data-i18n="vote_thanks_title">Vote Submitted!</h2>
-        <p style="color:var(--ink-soft);font-size:13.5px;" data-i18n="vote_thanks_body">Thanks for voting — your top 5 has been recorded for this semester.</p>
-        <button class="secondary" id="voteChangeBtn" style="margin-top:18px;" data-i18n="vote_edit_vote">Change My Vote</button>
+        <div class="confirm-seal confirm-seal-gold">🏆</div>
+        <h2 id="voteThanksTitle">Vote Submitted!</h2>
+        <p id="voteThanksBody" style="color:var(--ink-soft);font-size:13.5px;">Thanks for voting — your top 5 has been recorded for this semester.</p>
       </div>
-    </div>
-  </div>
-
-  <!-- ===================== RESULTS (STAFF) ===================== -->
-  <div class="section narrow" id="section-results">
-    <div class="panel" id="resultsPinPanel">
-      <div class="field" style="margin-bottom:4px;"><label data-i18n="results_title">Vote Results</label></div>
-      <p class="hint" style="margin-top:0;text-align:left;" data-i18n="results_staff_only">Staff only — enter the results PIN to view the current standings.</p>
-      <div class="field">
-        <label for="resultsPin" data-i18n="results_pin_label">Staff PIN</label>
-        <input type="text" id="resultsPin" inputmode="numeric" placeholder="••••">
-      </div>
-      <button class="primary" id="resultsUnlockBtn" data-i18n="results_unlock_btn">View Results</button>
-      <div class="msg" id="resultsPinMsg"></div>
-    </div>
-
-    <div class="panel" id="resultsBoardPanel" style="display:none;">
-      <div class="field" style="margin-bottom:6px;"><label data-i18n="results_title">Vote Results</label></div>
-      <div id="resultsBoardMeta" class="hint" style="margin-top:0;text-align:left;"></div>
-      <div id="resultsBoardList"></div>
-      <button class="secondary" id="resultsLockBtn" style="margin-top:14px;" data-i18n="results_lock_btn">Lock</button>
     </div>
   </div>
 
@@ -583,6 +750,1545 @@
 
 </div>
 
+<script>
+//---------------------------------------------------------------------
+//
+// QR Code Generator for JavaScript
+//
+// Copyright (c) 2009 Kazuhiko Arase
+//
+// URL: http://www.d-project.com/
+//
+// Licensed under the MIT license:
+// http://www.opensource.org/licenses/mit-license.php
+//
+// The word 'QR Code' is registered trademark of
+// DENSO WAVE INCORPORATED
+// http://www.denso-wave.com/qrcode/faqpatent-e.html
+//
+//---------------------------------------------------------------------
+
+var qrcode = function() {
+
+ //---------------------------------------------------------------------
+ // qrcode
+ //---------------------------------------------------------------------
+
+ /**
+ * qrcode
+ * @param typeNumber 1 to 40
+ * @param errorCorrectionLevel 'L','M','Q','H'
+ */
+ var qrcode = function(typeNumber, errorCorrectionLevel) {
+
+ var PAD0 = 0xEC;
+ var PAD1 = 0x11;
+
+ var _typeNumber = typeNumber;
+ var _errorCorrectionLevel = QRErrorCorrectionLevel[errorCorrectionLevel];
+ var _modules = null;
+ var _moduleCount = 0;
+ var _dataCache = null;
+ var _dataList = [];
+
+ var _this = {};
+
+ var makeImpl = function(test, maskPattern) {
+
+ _moduleCount = _typeNumber * 4 + 17;
+ _modules = function(moduleCount) {
+ var modules = new Array(moduleCount);
+ for (var row = 0; row < moduleCount; row += 1) {
+ modules[row] = new Array(moduleCount);
+ for (var col = 0; col < moduleCount; col += 1) {
+ modules[row][col] = null;
+ }
+ }
+ return modules;
+ }(_moduleCount);
+
+ setupPositionProbePattern(0, 0);
+ setupPositionProbePattern(_moduleCount - 7, 0);
+ setupPositionProbePattern(0, _moduleCount - 7);
+ setupPositionAdjustPattern();
+ setupTimingPattern();
+ setupTypeInfo(test, maskPattern);
+
+ if (_typeNumber >= 7) {
+ setupTypeNumber(test);
+ }
+
+ if (_dataCache == null) {
+ _dataCache = createData(_typeNumber, _errorCorrectionLevel, _dataList);
+ }
+
+ mapData(_dataCache, maskPattern);
+ };
+
+ var setupPositionProbePattern = function(row, col) {
+
+ for (var r = -1; r <= 7; r += 1) {
+
+ if (row + r <= -1 || _moduleCount <= row + r) continue;
+
+ for (var c = -1; c <= 7; c += 1) {
+
+ if (col + c <= -1 || _moduleCount <= col + c) continue;
+
+ if ( (0 <= r && r <= 6 && (c == 0 || c == 6) )
+ || (0 <= c && c <= 6 && (r == 0 || r == 6) )
+ || (2 <= r && r <= 4 && 2 <= c && c <= 4) ) {
+ _modules[row + r][col + c] = true;
+ } else {
+ _modules[row + r][col + c] = false;
+ }
+ }
+ }
+ };
+
+ var getBestMaskPattern = function() {
+
+ var minLostPoint = 0;
+ var pattern = 0;
+
+ for (var i = 0; i < 8; i += 1) {
+
+ makeImpl(true, i);
+
+ var lostPoint = QRUtil.getLostPoint(_this);
+
+ if (i == 0 || minLostPoint > lostPoint) {
+ minLostPoint = lostPoint;
+ pattern = i;
+ }
+ }
+
+ return pattern;
+ };
+
+ var setupTimingPattern = function() {
+
+ for (var r = 8; r < _moduleCount - 8; r += 1) {
+ if (_modules[r][6] != null) {
+ continue;
+ }
+ _modules[r][6] = (r % 2 == 0);
+ }
+
+ for (var c = 8; c < _moduleCount - 8; c += 1) {
+ if (_modules[6][c] != null) {
+ continue;
+ }
+ _modules[6][c] = (c % 2 == 0);
+ }
+ };
+
+ var setupPositionAdjustPattern = function() {
+
+ var pos = QRUtil.getPatternPosition(_typeNumber);
+
+ for (var i = 0; i < pos.length; i += 1) {
+
+ for (var j = 0; j < pos.length; j += 1) {
+
+ var row = pos[i];
+ var col = pos[j];
+
+ if (_modules[row][col] != null) {
+ continue;
+ }
+
+ for (var r = -2; r <= 2; r += 1) {
+
+ for (var c = -2; c <= 2; c += 1) {
+
+ if (r == -2 || r == 2 || c == -2 || c == 2
+ || (r == 0 && c == 0) ) {
+ _modules[row + r][col + c] = true;
+ } else {
+ _modules[row + r][col + c] = false;
+ }
+ }
+ }
+ }
+ }
+ };
+
+ var setupTypeNumber = function(test) {
+
+ var bits = QRUtil.getBCHTypeNumber(_typeNumber);
+
+ for (var i = 0; i < 18; i += 1) {
+ var mod = (!test && ( (bits >> i) & 1) == 1);
+ _modules[Math.floor(i / 3)][i % 3 + _moduleCount - 8 - 3] = mod;
+ }
+
+ for (var i = 0; i < 18; i += 1) {
+ var mod = (!test && ( (bits >> i) & 1) == 1);
+ _modules[i % 3 + _moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+ }
+ };
+
+ var setupTypeInfo = function(test, maskPattern) {
+
+ var data = (_errorCorrectionLevel << 3) | maskPattern;
+ var bits = QRUtil.getBCHTypeInfo(data);
+
+ // vertical
+ for (var i = 0; i < 15; i += 1) {
+
+ var mod = (!test && ( (bits >> i) & 1) == 1);
+
+ if (i < 6) {
+ _modules[i][8] = mod;
+ } else if (i < 8) {
+ _modules[i + 1][8] = mod;
+ } else {
+ _modules[_moduleCount - 15 + i][8] = mod;
+ }
+ }
+
+ // horizontal
+ for (var i = 0; i < 15; i += 1) {
+
+ var mod = (!test && ( (bits >> i) & 1) == 1);
+
+ if (i < 8) {
+ _modules[8][_moduleCount - i - 1] = mod;
+ } else if (i < 9) {
+ _modules[8][15 - i - 1 + 1] = mod;
+ } else {
+ _modules[8][15 - i - 1] = mod;
+ }
+ }
+
+ // fixed module
+ _modules[_moduleCount - 8][8] = (!test);
+ };
+
+ var mapData = function(data, maskPattern) {
+
+ var inc = -1;
+ var row = _moduleCount - 1;
+ var bitIndex = 7;
+ var byteIndex = 0;
+ var maskFunc = QRUtil.getMaskFunction(maskPattern);
+
+ for (var col = _moduleCount - 1; col > 0; col -= 2) {
+
+ if (col == 6) col -= 1;
+
+ while (true) {
+
+ for (var c = 0; c < 2; c += 1) {
+
+ if (_modules[row][col - c] == null) {
+
+ var dark = false;
+
+ if (byteIndex < data.length) {
+ dark = ( ( (data[byteIndex] >>> bitIndex) & 1) == 1);
+ }
+
+ var mask = maskFunc(row, col - c);
+
+ if (mask) {
+ dark = !dark;
+ }
+
+ _modules[row][col - c] = dark;
+ bitIndex -= 1;
+
+ if (bitIndex == -1) {
+ byteIndex += 1;
+ bitIndex = 7;
+ }
+ }
+ }
+
+ row += inc;
+
+ if (row < 0 || _moduleCount <= row) {
+ row -= inc;
+ inc = -inc;
+ break;
+ }
+ }
+ }
+ };
+
+ var createBytes = function(buffer, rsBlocks) {
+
+ var offset = 0;
+
+ var maxDcCount = 0;
+ var maxEcCount = 0;
+
+ var dcdata = new Array(rsBlocks.length);
+ var ecdata = new Array(rsBlocks.length);
+
+ for (var r = 0; r < rsBlocks.length; r += 1) {
+
+ var dcCount = rsBlocks[r].dataCount;
+ var ecCount = rsBlocks[r].totalCount - dcCount;
+
+ maxDcCount = Math.max(maxDcCount, dcCount);
+ maxEcCount = Math.max(maxEcCount, ecCount);
+
+ dcdata[r] = new Array(dcCount);
+
+ for (var i = 0; i < dcdata[r].length; i += 1) {
+ dcdata[r][i] = 0xff & buffer.getBuffer()[i + offset];
+ }
+ offset += dcCount;
+
+ var rsPoly = QRUtil.getErrorCorrectPolynomial(ecCount);
+ var rawPoly = qrPolynomial(dcdata[r], rsPoly.getLength() - 1);
+
+ var modPoly = rawPoly.mod(rsPoly);
+ ecdata[r] = new Array(rsPoly.getLength() - 1);
+ for (var i = 0; i < ecdata[r].length; i += 1) {
+ var modIndex = i + modPoly.getLength() - ecdata[r].length;
+ ecdata[r][i] = (modIndex >= 0)? modPoly.getAt(modIndex) : 0;
+ }
+ }
+
+ var totalCodeCount = 0;
+ for (var i = 0; i < rsBlocks.length; i += 1) {
+ totalCodeCount += rsBlocks[i].totalCount;
+ }
+
+ var data = new Array(totalCodeCount);
+ var index = 0;
+
+ for (var i = 0; i < maxDcCount; i += 1) {
+ for (var r = 0; r < rsBlocks.length; r += 1) {
+ if (i < dcdata[r].length) {
+ data[index] = dcdata[r][i];
+ index += 1;
+ }
+ }
+ }
+
+ for (var i = 0; i < maxEcCount; i += 1) {
+ for (var r = 0; r < rsBlocks.length; r += 1) {
+ if (i < ecdata[r].length) {
+ data[index] = ecdata[r][i];
+ index += 1;
+ }
+ }
+ }
+
+ return data;
+ };
+
+ var createData = function(typeNumber, errorCorrectionLevel, dataList) {
+
+ var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectionLevel);
+
+ var buffer = qrBitBuffer();
+
+ for (var i = 0; i < dataList.length; i += 1) {
+ var data = dataList[i];
+ buffer.put(data.getMode(), 4);
+ buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+ data.write(buffer);
+ }
+
+ // calc num max data.
+ var totalDataCount = 0;
+ for (var i = 0; i < rsBlocks.length; i += 1) {
+ totalDataCount += rsBlocks[i].dataCount;
+ }
+
+ if (buffer.getLengthInBits() > totalDataCount * 8) {
+ throw 'code length overflow. ('
+ + buffer.getLengthInBits()
+ + '>'
+ + totalDataCount * 8
+ + ')';
+ }
+
+ // end code
+ if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
+ buffer.put(0, 4);
+ }
+
+ // padding
+ while (buffer.getLengthInBits() % 8 != 0) {
+ buffer.putBit(false);
+ }
+
+ // padding
+ while (true) {
+
+ if (buffer.getLengthInBits() >= totalDataCount * 8) {
+ break;
+ }
+ buffer.put(PAD0, 8);
+
+ if (buffer.getLengthInBits() >= totalDataCount * 8) {
+ break;
+ }
+ buffer.put(PAD1, 8);
+ }
+
+ return createBytes(buffer, rsBlocks);
+ };
+
+ _this.addData = function(data, mode) {
+
+ mode = mode || 'Byte';
+
+ var newData = null;
+
+ switch(mode) {
+ case 'Numeric' :
+ newData = qrNumber(data);
+ break;
+ case 'Alphanumeric' :
+ newData = qrAlphaNum(data);
+ break;
+ case 'Byte' :
+ newData = qr8BitByte(data);
+ break;
+ case 'Kanji' :
+ newData = qrKanji(data);
+ break;
+ default :
+ throw 'mode:' + mode;
+ }
+
+ _dataList.push(newData);
+ _dataCache = null;
+ };
+
+ _this.isDark = function(row, col) {
+ if (row < 0 || _moduleCount <= row || col < 0 || _moduleCount <= col) {
+ throw row + ',' + col;
+ }
+ return _modules[row][col];
+ };
+
+ _this.getModuleCount = function() {
+ return _moduleCount;
+ };
+
+ _this.make = function() {
+ if (_typeNumber < 1) {
+ var typeNumber = 1;
+
+ for (; typeNumber < 40; typeNumber++) {
+ var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, _errorCorrectionLevel);
+ var buffer = qrBitBuffer();
+
+ for (var i = 0; i < _dataList.length; i++) {
+ var data = _dataList[i];
+ buffer.put(data.getMode(), 4);
+ buffer.put(data.getLength(), QRUtil.getLengthInBits(data.getMode(), typeNumber) );
+ data.write(buffer);
+ }
+
+ var totalDataCount = 0;
+ for (var i = 0; i < rsBlocks.length; i++) {
+ totalDataCount += rsBlocks[i].dataCount;
+ }
+
+ if (buffer.getLengthInBits() <= totalDataCount * 8) {
+ break;
+ }
+ }
+
+ _typeNumber = typeNumber;
+ }
+
+ makeImpl(false, getBestMaskPattern() );
+ };
+
+ _this.createTableTag = function(cellSize, margin) {
+
+ cellSize = cellSize || 2;
+ margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+ var qrHtml = '';
+
+ qrHtml += '<table style="';
+ qrHtml += ' border-width: 0px; border-style: none;';
+ qrHtml += ' border-collapse: collapse;';
+ qrHtml += ' padding: 0px; margin: ' + margin + 'px;';
+ qrHtml += '">';
+ qrHtml += '<tbody>';
+
+ for (var r = 0; r < _this.getModuleCount(); r += 1) {
+
+ qrHtml += '<tr>';
+
+ for (var c = 0; c < _this.getModuleCount(); c += 1) {
+ qrHtml += '<td style="';
+ qrHtml += ' border-width: 0px; border-style: none;';
+ qrHtml += ' border-collapse: collapse;';
+ qrHtml += ' padding: 0px; margin: 0px;';
+ qrHtml += ' width: ' + cellSize + 'px;';
+ qrHtml += ' height: ' + cellSize + 'px;';
+ qrHtml += ' background-color: ';
+ qrHtml += _this.isDark(r, c)? '#000000' : '#ffffff';
+ qrHtml += ';';
+ qrHtml += '"/>';
+ }
+
+ qrHtml += '</tr>';
+ }
+
+ qrHtml += '</tbody>';
+ qrHtml += '</table>';
+
+ return qrHtml;
+ };
+
+ _this.createSvgTag = function(cellSize, margin, alt, title) {
+
+ var opts = {};
+ if (typeof arguments[0] == 'object') {
+ // Called by options.
+ opts = arguments[0];
+ // overwrite cellSize and margin.
+ cellSize = opts.cellSize;
+ margin = opts.margin;
+ alt = opts.alt;
+ title = opts.title;
+ }
+
+ cellSize = cellSize || 2;
+ margin = (typeof margin == 'undefined')? cellSize * 4 : margin;
+
+ // Compose alt property surrogate
+ alt = (typeof alt === 'string') ? {text: alt} : alt || {};
+ alt.text = alt.text || null;
+ alt.id = (alt.text) ? alt.id || 'qrcode-description' : null;
+
+ // Compose title property surrogate
+ title = (typeof title === 'string') ? {text: title} : title || {};
+ title.text = title.text || null;
+ title.id = (title.text) ? title.id || 'qrcode-title' : null;
+
+ var size = _this.getModuleCount() * cellSize + margin * 2;
+ var c, mc, r, mr, qrSvg='', rect;
+
+ rect = 'l' + cellSize + ',0 0,' + cellSize +
+ ' -' + cellSize + ',0 0,-' + cellSize + 'z ';
+
+ qrSvg += '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"';
+ qrSvg += !opts.scalable ? ' width="' + size + 'px" height="' + size + 'px"' : '';
+ qrSvg += ' viewBox="0 0 ' + size + ' ' + size + '" ';
+ qrSvg += ' preserveAspectRatio="xMinYMin meet"';
+ qrSvg += (title.text || alt.text) ? ' role="img" aria-labelledby="' +
+ escapeXml([title.id, alt.id].join(' ').trim() ) + '"' : '';
+ qrSvg += '>';
+ qrSvg += (title.text) ? '<title id="' + escapeXml(title.id) + '">' +
+ escapeXml(title.text) + '</title>' : '';
+ qrSvg += (alt.text) ? '<description id="' + escapeXml(alt.id) + '">' +
+ escapeXml(alt.text) + '</description>' : '';
+ qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>';
+ qrSvg += '<path d="';
+
+ for (r = 0; r < _this.getModuleCount(); r += 1) {
+ mr = r * cellSize + margin;
+ for (c = 0; c < _this.getModuleCount(); c += 1) {
+ if (_this.isDark(r, c) ) {
+ mc = c*cellSize+margin;
+ qrSvg += 'M' + mc + ',' + mr + rect;
+ }
+ }
+ }
+
+ qrSvg += '" stroke="transparent" fill="black"/>';
+ qrSvg += '</svg>';
+
+ return qrSvg;
+ };
+
+ var escapeXml = function(s) {
+ var escaped = '';
+ for (var i = 0; i < s.length; i += 1) {
+ var c = s.charAt(i);
+ switch(c) {
+ case '<': escaped += '&lt;'; break;
+ case '>': escaped += '&gt;'; break;
+ case '&': escaped += '&amp;'; break;
+ case '"': escaped += '&quot;'; break;
+ default : escaped += c; break;
+ }
+ }
+ return escaped;
+ };
+
+ _this.renderTo2dContext = function(context, cellSize) {
+ cellSize = cellSize || 2;
+ var length = _this.getModuleCount();
+ for (var row = 0; row < length; row++) {
+ for (var col = 0; col < length; col++) {
+ context.fillStyle = _this.isDark(row, col) ? 'black' : 'white';
+ context.fillRect(row * cellSize, col * cellSize, cellSize, cellSize);
+ }
+ }
+ }
+
+ return _this;
+ };
+
+ //---------------------------------------------------------------------
+ // qrcode.stringToBytes
+ //---------------------------------------------------------------------
+
+ qrcode.stringToBytesFuncs = {
+ 'default' : function(s) {
+ var bytes = [];
+ for (var i = 0; i < s.length; i += 1) {
+ var c = s.charCodeAt(i);
+ bytes.push(c & 0xff);
+ }
+ return bytes;
+ }
+ };
+
+ qrcode.stringToBytes = qrcode.stringToBytesFuncs['default'];
+
+ //---------------------------------------------------------------------
+ // QRMode
+ //---------------------------------------------------------------------
+
+ var QRMode = {
+ MODE_NUMBER : 1 << 0,
+ MODE_ALPHA_NUM : 1 << 1,
+ MODE_8BIT_BYTE : 1 << 2,
+ MODE_KANJI : 1 << 3
+ };
+
+ //---------------------------------------------------------------------
+ // QRErrorCorrectionLevel
+ //---------------------------------------------------------------------
+
+ var QRErrorCorrectionLevel = {
+ L : 1,
+ M : 0,
+ Q : 3,
+ H : 2
+ };
+
+ //---------------------------------------------------------------------
+ // QRMaskPattern
+ //---------------------------------------------------------------------
+
+ var QRMaskPattern = {
+ PATTERN000 : 0,
+ PATTERN001 : 1,
+ PATTERN010 : 2,
+ PATTERN011 : 3,
+ PATTERN100 : 4,
+ PATTERN101 : 5,
+ PATTERN110 : 6,
+ PATTERN111 : 7
+ };
+
+ //---------------------------------------------------------------------
+ // QRUtil
+ //---------------------------------------------------------------------
+
+ var QRUtil = function() {
+
+ var PATTERN_POSITION_TABLE = [
+ [],
+ [6, 18],
+ [6, 22],
+ [6, 26],
+ [6, 30],
+ [6, 34],
+ [6, 22, 38],
+ [6, 24, 42],
+ [6, 26, 46],
+ [6, 28, 50],
+ [6, 30, 54],
+ [6, 32, 58],
+ [6, 34, 62],
+ [6, 26, 46, 66],
+ [6, 26, 48, 70],
+ [6, 26, 50, 74],
+ [6, 30, 54, 78],
+ [6, 30, 56, 82],
+ [6, 30, 58, 86],
+ [6, 34, 62, 90],
+ [6, 28, 50, 72, 94],
+ [6, 26, 50, 74, 98],
+ [6, 30, 54, 78, 102],
+ [6, 28, 54, 80, 106],
+ [6, 32, 58, 84, 110],
+ [6, 30, 58, 86, 114],
+ [6, 34, 62, 90, 118],
+ [6, 26, 50, 74, 98, 122],
+ [6, 30, 54, 78, 102, 126],
+ [6, 26, 52, 78, 104, 130],
+ [6, 30, 56, 82, 108, 134],
+ [6, 34, 60, 86, 112, 138],
+ [6, 30, 58, 86, 114, 142],
+ [6, 34, 62, 90, 118, 146],
+ [6, 30, 54, 78, 102, 126, 150],
+ [6, 24, 50, 76, 102, 128, 154],
+ [6, 28, 54, 80, 106, 132, 158],
+ [6, 32, 58, 84, 110, 136, 162],
+ [6, 26, 54, 82, 110, 138, 166],
+ [6, 30, 58, 86, 114, 142, 170]
+ ];
+ var G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+ var G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
+ var G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
+
+ var _this = {};
+
+ var getBCHDigit = function(data) {
+ var digit = 0;
+ while (data != 0) {
+ digit += 1;
+ data >>>= 1;
+ }
+ return digit;
+ };
+
+ _this.getBCHTypeInfo = function(data) {
+ var d = data << 10;
+ while (getBCHDigit(d) - getBCHDigit(G15) >= 0) {
+ d ^= (G15 << (getBCHDigit(d) - getBCHDigit(G15) ) );
+ }
+ return ( (data << 10) | d) ^ G15_MASK;
+ };
+
+ _this.getBCHTypeNumber = function(data) {
+ var d = data << 12;
+ while (getBCHDigit(d) - getBCHDigit(G18) >= 0) {
+ d ^= (G18 << (getBCHDigit(d) - getBCHDigit(G18) ) );
+ }
+ return (data << 12) | d;
+ };
+
+ _this.getPatternPosition = function(typeNumber) {
+ return PATTERN_POSITION_TABLE[typeNumber - 1];
+ };
+
+ _this.getMaskFunction = function(maskPattern) {
+
+ switch (maskPattern) {
+
+ case QRMaskPattern.PATTERN000 :
+ return function(i, j) { return (i + j) % 2 == 0; };
+ case QRMaskPattern.PATTERN001 :
+ return function(i, j) { return i % 2 == 0; };
+ case QRMaskPattern.PATTERN010 :
+ return function(i, j) { return j % 3 == 0; };
+ case QRMaskPattern.PATTERN011 :
+ return function(i, j) { return (i + j) % 3 == 0; };
+ case QRMaskPattern.PATTERN100 :
+ return function(i, j) { return (Math.floor(i / 2) + Math.floor(j / 3) ) % 2 == 0; };
+ case QRMaskPattern.PATTERN101 :
+ return function(i, j) { return (i * j) % 2 + (i * j) % 3 == 0; };
+ case QRMaskPattern.PATTERN110 :
+ return function(i, j) { return ( (i * j) % 2 + (i * j) % 3) % 2 == 0; };
+ case QRMaskPattern.PATTERN111 :
+ return function(i, j) { return ( (i * j) % 3 + (i + j) % 2) % 2 == 0; };
+
+ default :
+ throw 'bad maskPattern:' + maskPattern;
+ }
+ };
+
+ _this.getErrorCorrectPolynomial = function(errorCorrectLength) {
+ var a = qrPolynomial([1], 0);
+ for (var i = 0; i < errorCorrectLength; i += 1) {
+ a = a.multiply(qrPolynomial([1, QRMath.gexp(i)], 0) );
+ }
+ return a;
+ };
+
+ _this.getLengthInBits = function(mode, type) {
+
+ if (1 <= type && type < 10) {
+
+ // 1 - 9
+
+ switch(mode) {
+ case QRMode.MODE_NUMBER : return 10;
+ case QRMode.MODE_ALPHA_NUM : return 9;
+ case QRMode.MODE_8BIT_BYTE : return 8;
+ case QRMode.MODE_KANJI : return 8;
+ default :
+ throw 'mode:' + mode;
+ }
+
+ } else if (type < 27) {
+
+ // 10 - 26
+
+ switch(mode) {
+ case QRMode.MODE_NUMBER : return 12;
+ case QRMode.MODE_ALPHA_NUM : return 11;
+ case QRMode.MODE_8BIT_BYTE : return 16;
+ case QRMode.MODE_KANJI : return 10;
+ default :
+ throw 'mode:' + mode;
+ }
+
+ } else if (type < 41) {
+
+ // 27 - 40
+
+ switch(mode) {
+ case QRMode.MODE_NUMBER : return 14;
+ case QRMode.MODE_ALPHA_NUM : return 13;
+ case QRMode.MODE_8BIT_BYTE : return 16;
+ case QRMode.MODE_KANJI : return 12;
+ default :
+ throw 'mode:' + mode;
+ }
+
+ } else {
+ throw 'type:' + type;
+ }
+ };
+
+ _this.getLostPoint = function(qrcode) {
+
+ var moduleCount = qrcode.getModuleCount();
+
+ var lostPoint = 0;
+
+ // LEVEL1
+
+ for (var row = 0; row < moduleCount; row += 1) {
+ for (var col = 0; col < moduleCount; col += 1) {
+
+ var sameCount = 0;
+ var dark = qrcode.isDark(row, col);
+
+ for (var r = -1; r <= 1; r += 1) {
+
+ if (row + r < 0 || moduleCount <= row + r) {
+ continue;
+ }
+
+ for (var c = -1; c <= 1; c += 1) {
+
+ if (col + c < 0 || moduleCount <= col + c) {
+ continue;
+ }
+
+ if (r == 0 && c == 0) {
+ continue;
+ }
+
+ if (dark == qrcode.isDark(row + r, col + c) ) {
+ sameCount += 1;
+ }
+ }
+ }
+
+ if (sameCount > 5) {
+ lostPoint += (3 + sameCount - 5);
+ }
+ }
+ }
+
+ // LEVEL2
+
+ for (var row = 0; row < moduleCount - 1; row += 1) {
+ for (var col = 0; col < moduleCount - 1; col += 1) {
+ var count = 0;
+ if (qrcode.isDark(row, col) ) count += 1;
+ if (qrcode.isDark(row + 1, col) ) count += 1;
+ if (qrcode.isDark(row, col + 1) ) count += 1;
+ if (qrcode.isDark(row + 1, col + 1) ) count += 1;
+ if (count == 0 || count == 4) {
+ lostPoint += 3;
+ }
+ }
+ }
+
+ // LEVEL3
+
+ for (var row = 0; row < moduleCount; row += 1) {
+ for (var col = 0; col < moduleCount - 6; col += 1) {
+ if (qrcode.isDark(row, col)
+ && !qrcode.isDark(row, col + 1)
+ && qrcode.isDark(row, col + 2)
+ && qrcode.isDark(row, col + 3)
+ && qrcode.isDark(row, col + 4)
+ && !qrcode.isDark(row, col + 5)
+ && qrcode.isDark(row, col + 6) ) {
+ lostPoint += 40;
+ }
+ }
+ }
+
+ for (var col = 0; col < moduleCount; col += 1) {
+ for (var row = 0; row < moduleCount - 6; row += 1) {
+ if (qrcode.isDark(row, col)
+ && !qrcode.isDark(row + 1, col)
+ && qrcode.isDark(row + 2, col)
+ && qrcode.isDark(row + 3, col)
+ && qrcode.isDark(row + 4, col)
+ && !qrcode.isDark(row + 5, col)
+ && qrcode.isDark(row + 6, col) ) {
+ lostPoint += 40;
+ }
+ }
+ }
+
+ // LEVEL4
+
+ var darkCount = 0;
+
+ for (var col = 0; col < moduleCount; col += 1) {
+ for (var row = 0; row < moduleCount; row += 1) {
+ if (qrcode.isDark(row, col) ) {
+ darkCount += 1;
+ }
+ }
+ }
+
+ var ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+ lostPoint += ratio * 10;
+
+ return lostPoint;
+ };
+
+ return _this;
+ }();
+
+ //---------------------------------------------------------------------
+ // QRMath
+ //---------------------------------------------------------------------
+
+ var QRMath = function() {
+
+ var EXP_TABLE = new Array(256);
+ var LOG_TABLE = new Array(256);
+
+ // initialize tables
+ for (var i = 0; i < 8; i += 1) {
+ EXP_TABLE[i] = 1 << i;
+ }
+ for (var i = 8; i < 256; i += 1) {
+ EXP_TABLE[i] = EXP_TABLE[i - 4]
+ ^ EXP_TABLE[i - 5]
+ ^ EXP_TABLE[i - 6]
+ ^ EXP_TABLE[i - 8];
+ }
+ for (var i = 0; i < 255; i += 1) {
+ LOG_TABLE[EXP_TABLE[i] ] = i;
+ }
+
+ var _this = {};
+
+ _this.glog = function(n) {
+
+ if (n < 1) {
+ throw 'glog(' + n + ')';
+ }
+
+ return LOG_TABLE[n];
+ };
+
+ _this.gexp = function(n) {
+
+ while (n < 0) {
+ n += 255;
+ }
+
+ while (n >= 256) {
+ n -= 255;
+ }
+
+ return EXP_TABLE[n];
+ };
+
+ return _this;
+ }();
+
+ //---------------------------------------------------------------------
+ // qrPolynomial
+ //---------------------------------------------------------------------
+
+ function qrPolynomial(num, shift) {
+
+ if (typeof num.length == 'undefined') {
+ throw num.length + '/' + shift;
+ }
+
+ var _num = function() {
+ var offset = 0;
+ while (offset < num.length && num[offset] == 0) {
+ offset += 1;
+ }
+ var _num = new Array(num.length - offset + shift);
+ for (var i = 0; i < num.length - offset; i += 1) {
+ _num[i] = num[i + offset];
+ }
+ return _num;
+ }();
+
+ var _this = {};
+
+ _this.getAt = function(index) {
+ return _num[index];
+ };
+
+ _this.getLength = function() {
+ return _num.length;
+ };
+
+ _this.multiply = function(e) {
+
+ var num = new Array(_this.getLength() + e.getLength() - 1);
+
+ for (var i = 0; i < _this.getLength(); i += 1) {
+ for (var j = 0; j < e.getLength(); j += 1) {
+ num[i + j] ^= QRMath.gexp(QRMath.glog(_this.getAt(i) ) + QRMath.glog(e.getAt(j) ) );
+ }
+ }
+
+ return qrPolynomial(num, 0);
+ };
+
+ _this.mod = function(e) {
+
+ if (_this.getLength() - e.getLength() < 0) {
+ return _this;
+ }
+
+ var ratio = QRMath.glog(_this.getAt(0) ) - QRMath.glog(e.getAt(0) );
+
+ var num = new Array(_this.getLength() );
+ for (var i = 0; i < _this.getLength(); i += 1) {
+ num[i] = _this.getAt(i);
+ }
+
+ for (var i = 0; i < e.getLength(); i += 1) {
+ num[i] ^= QRMath.gexp(QRMath.glog(e.getAt(i) ) + ratio);
+ }
+
+ // recursive call
+ return qrPolynomial(num, 0).mod(e);
+ };
+
+ return _this;
+ };
+
+ //---------------------------------------------------------------------
+ // QRRSBlock
+ //---------------------------------------------------------------------
+
+ var QRRSBlock = function() {
+
+ var RS_BLOCK_TABLE = [
+
+ // L
+ // M
+ // Q
+ // H
+
+ // 1
+ [1, 26, 19],
+ [1, 26, 16],
+ [1, 26, 13],
+ [1, 26, 9],
+
+ // 2
+ [1, 44, 34],
+ [1, 44, 28],
+ [1, 44, 22],
+ [1, 44, 16],
+
+ // 3
+ [1, 70, 55],
+ [1, 70, 44],
+ [2, 35, 17],
+ [2, 35, 13],
+
+ // 4
+ [1, 100, 80],
+ [2, 50, 32],
+ [2, 50, 24],
+ [4, 25, 9],
+
+ // 5
+ [1, 134, 108],
+ [2, 67, 43],
+ [2, 33, 15, 2, 34, 16],
+ [2, 33, 11, 2, 34, 12],
+
+ // 6
+ [2, 86, 68],
+ [4, 43, 27],
+ [4, 43, 19],
+ [4, 43, 15],
+
+ // 7
+ [2, 98, 78],
+ [4, 49, 31],
+ [2, 32, 14, 4, 33, 15],
+ [4, 39, 13, 1, 40, 14],
+
+ // 8
+ [2, 121, 97],
+ [2, 60, 38, 2, 61, 39],
+ [4, 40, 18, 2, 41, 19],
+ [4, 40, 14, 2, 41, 15],
+
+ // 9
+ [2, 146, 116],
+ [3, 58, 36, 2, 59, 37],
+ [4, 36, 16, 4, 37, 17],
+ [4, 36, 12, 4, 37, 13],
+
+ // 10
+ [2, 86, 68, 2, 87, 69],
+ [4, 69, 43, 1, 70, 44],
+ [6, 43, 19, 2, 44, 20],
+ [6, 43, 15, 2, 44, 16],
+
+ // 11
+ [4, 101, 81],
+ [1, 80, 50, 4, 81, 51],
+ [4, 50, 22, 4, 51, 23],
+ [3, 36, 12, 8, 37, 13],
+
+ // 12
+ [2, 116, 92, 2, 117, 93],
+ [6, 58, 36, 2, 59, 37],
+ [4, 46, 20, 6, 47, 21],
+ [7, 42, 14, 4, 43, 15],
+
+ // 13
+ [4, 133, 107],
+ [8, 59, 37, 1, 60, 38],
+ [8, 44, 20, 4, 45, 21],
+ [12, 33, 11, 4, 34, 12],
+
+ // 14
+ [3, 145, 115, 1, 146, 116],
+ [4, 64, 40, 5, 65, 41],
+ [11, 36, 16, 5, 37, 17],
+ [11, 36, 12, 5, 37, 13],
+
+ // 15
+ [5, 109, 87, 1, 110, 88],
+ [5, 65, 41, 5, 66, 42],
+ [5, 54, 24, 7, 55, 25],
+ [11, 36, 12, 7, 37, 13],
+
+ // 16
+ [5, 122, 98, 1, 123, 99],
+ [7, 73, 45, 3, 74, 46],
+ [15, 43, 19, 2, 44, 20],
+ [3, 45, 15, 13, 46, 16],
+
+ // 17
+ [1, 135, 107, 5, 136, 108],
+ [10, 74, 46, 1, 75, 47],
+ [1, 50, 22, 15, 51, 23],
+ [2, 42, 14, 17, 43, 15],
+
+ // 18
+ [5, 150, 120, 1, 151, 121],
+ [9, 69, 43, 4, 70, 44],
+ [17, 50, 22, 1, 51, 23],
+ [2, 42, 14, 19, 43, 15],
+
+ // 19
+ [3, 141, 113, 4, 142, 114],
+ [3, 70, 44, 11, 71, 45],
+ [17, 47, 21, 4, 48, 22],
+ [9, 39, 13, 16, 40, 14],
+
+ // 20
+ [3, 135, 107, 5, 136, 108],
+ [3, 67, 41, 13, 68, 42],
+ [15, 54, 24, 5, 55, 25],
+ [15, 43, 15, 10, 44, 16],
+
+ // 21
+ [4, 144, 116, 4, 145, 117],
+ [17, 68, 42],
+ [17, 50, 22, 6, 51, 23],
+ [19, 46, 16, 6, 47, 17],
+
+ // 22
+ [2, 139, 111, 7, 140, 112],
+ [17, 74, 46],
+ [7, 54, 24, 16, 55, 25],
+ [34, 37, 13],
+
+ // 23
+ [4, 151, 121, 5, 152, 122],
+ [4, 75, 47, 14, 76, 48],
+ [11, 54, 24, 14, 55, 25],
+ [16, 45, 15, 14, 46, 16],
+
+ // 24
+ [6, 147, 117, 4, 148, 118],
+ [6, 73, 45, 14, 74, 46],
+ [11, 54, 24, 16, 55, 25],
+ [30, 46, 16, 2, 47, 17],
+
+ // 25
+ [8, 132, 106, 4, 133, 107],
+ [8, 75, 47, 13, 76, 48],
+ [7, 54, 24, 22, 55, 25],
+ [22, 45, 15, 13, 46, 16],
+
+ // 26
+ [10, 142, 114, 2, 143, 115],
+ [19, 74, 46, 4, 75, 47],
+ [28, 50, 22, 6, 51, 23],
+ [33, 46, 16, 4, 47, 17],
+
+ // 27
+ [8, 152, 122, 4, 153, 123],
+ [22, 73, 45, 3, 74, 46],
+ [8, 53, 23, 26, 54, 24],
+ [12, 45, 15, 28, 46, 16],
+
+ // 28
+ [3, 147, 117, 10, 148, 118],
+ [3, 73, 45, 23, 74, 46],
+ [4, 54, 24, 31, 55, 25],
+ [11, 45, 15, 31, 46, 16],
+
+ // 29
+ [7, 146, 116, 7, 147, 117],
+ [21, 73, 45, 7, 74, 46],
+ [1, 53, 23, 37, 54, 24],
+ [19, 45, 15, 26, 46, 16],
+
+ // 30
+ [5, 145, 115, 10, 146, 116],
+ [19, 75, 47, 10, 76, 48],
+ [15, 54, 24, 25, 55, 25],
+ [23, 45, 15, 25, 46, 16],
+
+ // 31
+ [13, 145, 115, 3, 146, 116],
+ [2, 74, 46, 29, 75, 47],
+ [42, 54, 24, 1, 55, 25],
+ [23, 45, 15, 28, 46, 16],
+
+ // 32
+ [17, 145, 115],
+ [10, 74, 46, 23, 75, 47],
+ [10, 54, 24, 35, 55, 25],
+ [19, 45, 15, 35, 46, 16],
+
+ // 33
+ [17, 145, 115, 1, 146, 116],
+ [14, 74, 46, 21, 75, 47],
+ [29, 54, 24, 19, 55, 25],
+ [11, 45, 15, 46, 46, 16],
+
+ // 34
+ [13, 145, 115, 6, 146, 116],
+ [14, 74, 46, 23, 75, 47],
+ [44, 54, 24, 7, 55, 25],
+ [59, 46, 16, 1, 47, 17],
+
+ // 35
+ [12, 151, 121, 7, 152, 122],
+ [12, 75, 47, 26, 76, 48],
+ [39, 54, 24, 14, 55, 25],
+ [22, 45, 15, 41, 46, 16],
+
+ // 36
+ [6, 151, 121, 14, 152, 122],
+ [6, 75, 47, 34, 76, 48],
+ [46, 54, 24, 10, 55, 25],
+ [2, 45, 15, 64, 46, 16],
+
+ // 37
+ [17, 152, 122, 4, 153, 123],
+ [29, 74, 46, 14, 75, 47],
+ [49, 54, 24, 10, 55, 25],
+ [24, 45, 15, 46, 46, 16],
+
+ // 38
+ [4, 152, 122, 18, 153, 123],
+ [13, 74, 46, 32, 75, 47],
+ [48, 54, 24, 14, 55, 25],
+ [42, 45, 15, 32, 46, 16],
+
+ // 39
+ [20, 147, 117, 4, 148, 118],
+ [40, 75, 47, 7, 76, 48],
+ [43, 54, 24, 22, 55, 25],
+ [10, 45, 15, 67, 46, 16],
+
+ // 40
+ [19, 148, 118, 6, 149, 119],
+ [18, 75, 47, 31, 76, 48],
+ [34, 54, 24, 34, 55, 25],
+ [20, 45, 15, 61, 46, 16]
+ ];
+
+ var qrRSBlock = function(totalCount, dataCount) {
+ var _this = {};
+ _this.totalCount = totalCount;
+ _this.dataCount = dataCount;
+ return _this;
+ };
+
+ var _this = {};
+
+ var getRsBlockTable = function(typeNumber, errorCorrectionLevel) {
+
+ switch(errorCorrectionLevel) {
+ case QRErrorCorrectionLevel.L :
+ return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
+ case QRErrorCorrectionLevel.M :
+ return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 1];
+ case QRErrorCorrectionLevel.Q :
+ return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 2];
+ case QRErrorCorrectionLevel.H :
+ return RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
+ default :
+ return undefined;
+ }
+ };
+
+ _this.getRSBlocks = function(typeNumber, errorCorrectionLevel) {
+
+ var rsBlock = getRsBlockTable(typeNumber, errorCorrectionLevel);
+
+ if (typeof rsBlock == 'undefined') {
+ throw 'bad rs block @ typeNumber:' + typeNumber +
+ '/errorCorrectionLevel:' + errorCorrectionLevel;
+ }
+
+ var length = rsBlock.length / 3;
+
+ var list = [];
+
+ for (var i = 0; i < length; i += 1) {
+
+ var count = rsBlock[i * 3 + 0];
+ var totalCount = rsBlock[i * 3 + 1];
+ var dataCount = rsBlock[i * 3 + 2];
+
+ for (var j = 0; j < count; j += 1) {
+ list.push(qrRSBlock(totalCount, dataCount) );
+ }
+ }
+
+ return list;
+ };
+
+ return _this;
+ }();
+
+ //---------------------------------------------------------------------
+ // qrBitBuffer
+ //---------------------------------------------------------------------
+
+ var qrBitBuffer = function() {
+
+ var _buffer = [];
+ var _length = 0;
+
+ var _this = {};
+
+ _this.getBuffer = function() {
+ return _buffer;
+ };
+
+ _this.getAt = function(index) {
+ var bufIndex = Math.floor(index / 8);
+ return ( (_buffer[bufIndex] >>> (7 - index % 8) ) & 1) == 1;
+ };
+
+ _this.put = function(num, length) {
+ for (var i = 0; i < length; i += 1) {
+ _this.putBit( ( (num >>> (length - i - 1) ) & 1) == 1);
+ }
+ };
+
+ _this.getLengthInBits = function() {
+ return _length;
+ };
+
+ _this.putBit = function(bit) {
+
+ var bufIndex = Math.floor(_length / 8);
+ if (_buffer.length <= bufIndex) {
+ _buffer.push(0);
+ }
+
+ if (bit) {
+ _buffer[bufIndex] |= (0x80 >>> (_length % 8) );
+ }
+
+ _length += 1;
+ };
+
+ return _this;
+ };
+
+ //---------------------------------------------------------------------
+ // qrNumber
+ //---------------------------------------------------------------------
+
+ var qrNumber = function(data) {
+
+ var _mode = QRMode.MODE_NUMBER;
+ var _data = data;
+
+ var _this = {};
+
+ _this.getMode = function() {
+ return _mode;
+ };
+
+ _this.getLength = function(buffer) {
+ return _data.length;
+ };
+
+ _this.write = function(buffer) {
+
+ var data = _data;
+
+ var i = 0;
+
+ while (i + 2 < data.length) {
+ buffer.put(strToNum(data.substring(i, i + 3) ), 10);
+ i += 3;
+ }
+
+ if (i < data.length) {
+ if (data.length - i == 1) {
+ buffer.put(strToNum(data.substring(i, i + 1) ), 4);
+ } else if (data.length - i == 2) {
+ buffer.put(strToNum(data.substring(i, i + 2) ), 7);
+ }
+ }
+ };
+
+ var strToNum = function(s) {
+ var num = 0;
+ for (var i = 0; i < s.length; i += 1) {
+ num = num * 10 + chatToNum(s.charAt(i) );
+ }
+ return num;
+ };
+
+ var chatToNum = function(c) {
+ if ('0' <= c && c <= '9') {
+ return c.charCodeAt(0) - '0'.charCodeAt(0);
+ }
+ throw 'illegal char :' + c;
+ };
+
+ return _this;
+ };
+
+ //---------------------------------------------------------------------
+ // qrAlphaNum
+ //---------------------------------------------------------------------
+
+ var qrAlphaNum = function(data) {
+
+ var _mode = QRMode.MODE_ALPHA_NUM;
+ var _data = data;
+
+ var _this = {};
+
+ _this.getMode = function() {
+ return _mode;
+ };
+
+ _this.getLength = function(buffer) {
+ return _data.length;
+ };
+
+ _this.write = function(buffer) {
+
+ var s = _data;
+
+ var i = 0;
+
+ while (i + 1 < s.length) {
+ buffer.put(
+ getCode(s.charAt(i) ) * 45 +
+ getCode(s.charAt(i + 1) ), 11);
+ i += 2;
+ }
+
+ if (i < s.length) {
+ buffer.put(getCode(s.charAt(i) ), 6);
+ }
+ };
+
+ var getCode = function(c) {
+
+ if ('0' <= c && c <= '9') {
+ return c.charCodeAt(0) - '0'.charCodeAt(0);
+ } else if ('A' <= c && c <= 'Z') {
+ return c.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+ } else {
+ switch (c) {
+ case ' ' : return 36;
+ case '$' : return 37;
+ case '%' : return 38;
+ case '*' : return 39;
+ case '+' : return 40;
+ case '-' : return 41;
+ case '.' : return 42;
+ case '/' : return 43;
+ case ':' : return 44;
+ default :
+ throw 'illegal char :' + c;
+ }
+ }
+ };
+
+ return _this;
+ };
+
+ //---------------------------------------------------------------------
+ // qr8BitByte
+ //---------------------------------------------------------------------
+
+ var qr8BitByte = function(data) {
+
+ var _mode = QRMode.MODE_8BIT_BYTE;
+ var _data = data;
+ var _bytes = qrcode.stringToBytes(data);
+
+ var _this = {};
+
+ _this.getMode = function() {
+ return _mode;
+ };
+
+ _this.getLength = function(buffer) {
+ return _bytes.length;
+ };
+
+ _this.write = function(buffer) {
+ for (var i = 0; i < _bytes.length; i += 1) {
+ buffer.put(_bytes[i], 8);
+ }
+ };
+
+ return _this;
+ };
+
+ return qrcode;
+}();
+
+</script>
 <script>
 /* ---------------------------------------------------------------------
    Storage shim — identical to the main app, so this reads/writes the
@@ -687,6 +2393,9 @@ const I18N = {
     menu_empty: "Nothing on the menu yet — please check with the counter.",
     order_sent_title: "Order Sent!", place_another_order: "Place Another Order",
     payment_info: "Payment Info", pay_ahead_or_counter: "Pay Ahead or At the Counter", need_help: "Need help? Call",
+    scan_to_order_title: "📱 Scan to Order",
+    scan_to_order_hint: "Share this with friends — scan to open the order page.",
+    download_qr_btn: "Download QR Code",
     pay_via_zaad: "Pay via Zaad", scan_to_pay: "Scan with your phone to pay", tap_to_dial: "Tap below on your phone to dial:",
     track_phone_label: "The phone number you ordered with", check_status: "Check Status",
     enter_phone_track: "Enter the phone number you ordered with.",
@@ -699,22 +2408,75 @@ const I18N = {
     you_owe: "You Owe", youre_paid_up: "You're Paid Up", no_invoices: "No invoices on file yet.",
     paid_in_full: "Paid in full", owe: "Owe", search_different_number: "Search a different number",
     nav_vote: "Vote", nav_vote_desc: "Top 5 of the semester",
-    vote_title: "Top 5 Customers of the Semester",
-    vote_intro: "Registered customers can rank their top 5 favorite customers of the semester. One vote per phone number.",
+    live_results_title: "Live Results",
+    live_results_votes_label: "votes",
+    live_results_empty: "No votes yet — be the first!",
+    score_formula_hint: "Score = 40% purchase loyalty + 60% votes",
+    candidate_selection_note: "These 5 are picked automatically — the biggest spenders this semester, recalculated live. No staff selection.",
+    voting_window_title: "Voting Period",
+    voting_window_start_label: "Begins", voting_window_end_label: "Ends",
+    voting_window_save_btn: "Save Voting Period",
+    voting_window_invalid: "The end time must be after the start time.",
+    voting_window_saved: "Voting period saved.",
+    reward_pool_title: "Prize Pool",
+    reward_pool_split_hint: "Split by final rank: 1st 40% · 2nd 25% · 3rd 15% · 4th 10% · 5th 10%.",
+    reward_pool_total_label: "Total Prize Pool (SLSH)",
+    reward_pool_save_btn: "Save Prize Pool",
+    reward_pool_invalid: "Please enter a valid prize pool amount.",
+    reward_pool_saved: "Prize pool saved.",
+    reward_pool_of_pool: "of prize pool",
+    reward_rank_1: "1st Place", reward_rank_2: "2nd Place", reward_rank_3: "3rd Place",
+    reward_rank_4: "4th Place", reward_rank_5: "5th Place",
+    voting_window_status_not_configured: "Not set yet — voting is closed until you set a start and end time.",
+    voting_window_status_not_started: "Voting opens {start}.",
+    voting_window_status_open: "Voting is open now — closes {end}.",
+    voting_window_status_closed: "Voting closed at {end}.",
+    voting_window_badge_open: "🟢 Voting Open — closes {end}",
+    voting_window_badge_not_started: "🟡 Voting Opens {start}",
+    voting_window_badge_closed: "🔴 Voting Closed",
+    vote_closed_not_configured_title: "Voting Isn't Open Yet",
+    vote_closed_not_configured_body: "The voting period hasn't been set up yet. Please check back soon.",
+    vote_closed_not_started_title: "Voting Isn't Open Yet",
+    vote_closed_not_started_body: "Voting opens {start}. Come back then to cast your vote!",
+    vote_closed_closed_title: "Voting Has Closed",
+    vote_closed_closed_body: "Voting ended {end}. Thanks to everyone who took part!",
+    notice_board_title: "Final Results",
+    congrats_title: "Congratulate Winners",
+    congrats_hint: "Voting has closed. Send each winner a congratulations message on WhatsApp — opens with the message pre-filled so you can review before sending.",
+    congrats_send_btn: "Send on WhatsApp",
+    congrats_no_phone: "No phone on file",
+    congrats_message_template: "🎉 Congratulations {name}! You've been voted UB Cafe's #{rank} Customer of the Semester, earning {reward}% of the prize pool. Thank you for being part of our community! 🏆",
+    vote_title: "Customer of the Semester",
+    vote_eyebrow: "UB Cafe Election",
+    ballot_ribbon: "Official Ballot",
+    vote_new_customer_link: "New here? Register to vote",
+    vote_register_title: "Register to Vote",
+    vote_register_intro: "First time here? Add your name and phone number, then place an order — once it's paid, you can vote.",
+    vote_register_name_label: "Your Name",
+    vote_register_phone_label: "Your Phone Number",
+    vote_register_btn: "Register & Continue",
+    vote_register_back: "I already have an account",
+    vote_register_phone_required: "Please enter your phone number.",
+    vote_register_needs_purchase: "Almost there — place and pay for an order first, then come back here to vote.",
+    vote_go_order_btn: "Place an Order",
+    vote_intro: "Registered customers can vote for their favorite customer of the semester. One vote per phone number.",
     vote_phone_label: "Your Phone Number", vote_verify_btn: "Verify & Continue",
     vote_checking: "Checking…",
     vote_not_eligible: "We couldn't find that phone number on file. Double-check it, or contact UB Cafe.",
     vote_no_candidates: "There aren't enough customers on file yet to vote on.",
-    vote_pick_intro: "Rank your top 5", vote_pick_hint: "Choose a different customer for each place.",
-    vote_place_1: "1st Place", vote_place_2: "2nd Place", vote_place_3: "3rd Place", vote_place_4: "4th Place", vote_place_5: "5th Place",
+    vote_pick_intro: "Choose your favorite", vote_pick_hint: "Pick one customer to vote for.",
+    vote_select_required: "Please choose a favorite before submitting.",
     vote_select_placeholder: "Select a customer…",
     vote_submit_btn: "Submit My Vote", vote_change_number: "Use a different phone number",
-    vote_duplicate_error: "Please select a different customer for each place.",
-    vote_incomplete_error: "Please fill all 5 places before submitting.",
     vote_error: "Something went wrong submitting your vote — please try again.",
+    vote_checking_location: "Checking your location…",
+    vote_campus_not_configured: "Campus location hasn't been set up yet — please contact UB Cafe staff.",
+    vote_location_denied: "We need your location to confirm you're on campus. Please allow location access and try again.",
+    vote_off_campus: "Thank you for your effort. Please visit University of Burao to cast your vote.",
     vote_thanks_title: "Vote Submitted!",
     vote_thanks_body: "Thanks for voting — your top 5 has been recorded for this semester.",
-    vote_edit_vote: "Change My Vote",
+    vote_already_voted_title: "You've Already Voted",
+    vote_already_voted_body: "Only one vote per person is allowed. Your earlier vote for this semester has already been recorded.",
     nav_results: "Results", nav_results_desc: "Staff only",
     results_title: "Vote Results",
     results_staff_only: "Staff only — enter the results PIN to view the current standings.",
@@ -722,7 +2484,18 @@ const I18N = {
     results_wrong_pin: "Incorrect PIN.",
     results_no_votes: "No votes have been submitted yet.",
     results_votes_count: "{n} ballots submitted so far.",
-    results_points_label: "pts", results_lock_btn: "Lock",
+    results_points_label: "pts", results_votes_label: "votes", results_lock_btn: "Lock",
+    results_unknown_customer: "Unknown customer",
+    results_cleanup_btn: "Remove Unknown Votes",
+    results_cleanup_done: "Removed {n} unresolvable vote entries (from {v} ballots).",
+    results_cleanup_none: "No unknown votes found — nothing to remove.",
+    results_merge_dupes_btn: "Merge Duplicate Voters",
+    results_merge_dupes_done: "Merged {n} duplicate ballot(s) from {v} voter(s) who had voted under more than one phone format — kept their most recent choice only.",
+    results_merge_dupes_none: "No duplicate voters found — nothing to merge.",
+    results_clear_votes_btn: "Clear All Votes",
+    results_clear_votes_confirm: "This will permanently delete all {n} vote(s). This cannot be undone. Continue?",
+    results_clear_votes_done: "All votes cleared.",
+    results_clear_votes_none: "There are no votes to clear.",
     how_was_it: "How was it?", your_name_optional: "Your Name (optional)", tell_us_more: "Tell us more (optional)",
     review_placeholder: "What did you like or what should we improve?", submit_rating: "Submit Rating",
     thank_you: "Thank You!", feedback_helps: "Your feedback helps us do better.", rate_again: "Leave Another Rating",
@@ -754,6 +2527,9 @@ const I18N = {
     menu_empty: "Wali menu lama helin — fadlan la xiriir kaawuntarka.",
     order_sent_title: "Dalabka Waa La Diray!", place_another_order: "Samee Dalab Kale",
     payment_info: "Macluumaadka Lacag-bixinta", pay_ahead_or_counter: "Hore U Bixi Ama Kaawuntarka Ku Bixi",
+    scan_to_order_title: "📱 Iskaan Ka Dalbo",
+    scan_to_order_hint: "La wadaag saaxiibadaa — iskaan ka samee si aad u furto boggga dalabka.",
+    download_qr_btn: "Soo Deji Koodhka QR",
     need_help: "Caawimaad ma u baahan tahay? Wac",
     pay_via_zaad: "Ku Bixi Zaad", scan_to_pay: "Ku sawir taleefankaaga si aad u bixiso", tap_to_dial: "Taabo hoose taleefankaaga si aad u wacdo:",
     track_phone_label: "Lambarka aad ku dalbatay", check_status: "Hubi Xaaladda",
@@ -767,22 +2543,75 @@ const I18N = {
     you_owe: "Waxaad Ku Leedahay", youre_paid_up: "Wax kuma saarna", no_invoices: "Weli qaansheegyo ma jiraan.",
     paid_in_full: "Dhammaan waa la bixiyay", owe: "Waxaad ku leedahay", search_different_number: "Raadi lambar kale",
     nav_vote: "Codee", nav_vote_desc: "Top 5-ta Simistarka",
-    vote_title: "5-ta Ugu Fiican ee Macaamiisha Simistarka",
-    vote_intro: "Macaamiisha diiwaangashan ayaa kala saari kara 5-ta macaamiil ee ay ugu jecel yihiin simistarkan. Cod hal mar oo lambar taleefan ah.",
+    live_results_title: "Natiijada Toos ah",
+    live_results_votes_label: "cod",
+    live_results_empty: "Wali cod ma jiro — kuu noqo kan ugu horreeya!",
+    score_formula_hint: "Dhibcaha = 40% daacadnimada iibka + 60% codadka",
+    candidate_selection_note: "5-tan waxaa si toos ah loo doortaa — kuwa ugu kharashka badan simistarkan, oo si joogto ah loo xisaabiyo. Shaqaaluhu ma doortaan.",
+    voting_window_title: "Muddada Codeynta",
+    voting_window_start_label: "Bilaabmaysa", voting_window_end_label: "Dhammaanaysa",
+    voting_window_save_btn: "Keydi Muddada Codeynta",
+    voting_window_invalid: "Waqtiga dhammaadku waa inuu ka dambeeyaa waqtiga bilowga.",
+    voting_window_saved: "Muddada codeynta waa la keydiyay.",
+    reward_pool_title: "Kaydka Abaalmarinta",
+    reward_pool_split_hint: "Waxaa loo qaybiyaa boosaska ugu dambeeya: 1aad 40% · 2aad 25% · 3aad 15% · 4aad 10% · 5aad 10%.",
+    reward_pool_total_label: "Wadarta Kaydka Abaalmarinta (SLSH)",
+    reward_pool_save_btn: "Keydi Kaydka Abaalmarinta",
+    reward_pool_invalid: "Fadlan geli qadar sax ah oo kaydka abaalmarinta ah.",
+    reward_pool_saved: "Kaydka abaalmarinta waa la keydiyay.",
+    reward_pool_of_pool: "oo kaydka abaalmarinta ah",
+    reward_rank_1: "Boosaska 1aad", reward_rank_2: "Boosaska 2aad", reward_rank_3: "Boosaska 3aad",
+    reward_rank_4: "Boosaska 4aad", reward_rank_5: "Boosaska 5aad",
+    voting_window_status_not_configured: "Wali lama dejin — codeyntu way xiran tahay ilaa aad dejiso waqti bilow iyo dhammaad ah.",
+    voting_window_status_not_started: "Codeyntu waxay bilaabmeysaa {start}.",
+    voting_window_status_open: "Codeyntu hadda way furan tahay — way xirmaysaa {end}.",
+    voting_window_status_closed: "Codeyntu waxay xiratay {end}.",
+    voting_window_badge_open: "🟢 Codeyntu Way Furan Tahay — xirmaysa {end}",
+    voting_window_badge_not_started: "🟡 Codeyntu Waxay Bilaabmeysaa {start}",
+    voting_window_badge_closed: "🔴 Codeyntu Way Xiran Tahay",
+    vote_closed_not_configured_title: "Codeyntu Weli Ma Furna",
+    vote_closed_not_configured_body: "Muddada codeynta weli lama dejin. Fadlan dib u soo hubi dhawaan.",
+    vote_closed_not_started_title: "Codeyntu Weli Ma Furna",
+    vote_closed_not_started_body: "Codeyntu waxay bilaabmeysaa {start}. Markaas soo noqo si aad u codeyso!",
+    vote_closed_closed_title: "Codeyntu Way Xiran Tahay",
+    vote_closed_closed_body: "Codeyntu waxay xiratay {end}. Waad ku mahadsan tihiin dhammaan kuwii ka qeyb qaatay!",
+    notice_board_title: "Natiijada Ugu Dambeysa",
+    congrats_title: "Ku Hambalyee Guuleystayaasha",
+    congrats_hint: "Codeyntu way xiratay. Guuleystaha kasta u dir farriin ku hambalyeynaya WhatsApp — waxay furantaa iyadoo farriintu horay loo qoray si aad u eegto ka hor inta aadan dirin.",
+    congrats_send_btn: "Ku Dir WhatsApp",
+    congrats_no_phone: "Lambar taleefan lagama helin",
+    congrats_message_template: "🎉 Hambalyo {name}! Waxaa lagaaga codeeyay inaad tahay Macaamiisha #{rank} ee UB Cafe Simistarkan, waxaadna heleysaa {reward}% kaydka abaalmarinta. Waad ku mahadsan tahay inaad ka mid tahay bulshadeena! 🏆",
+    vote_title: "Macaamiisha Simistarka",
+    vote_eyebrow: "Doorashada UB Cafe",
+    ballot_ribbon: "Waraaqda Codbixinta Rasmiga ah",
+    vote_new_customer_link: "Cusub tahay? Isdiiwaan geli si aad u codeyso",
+    vote_register_title: "Isdiiwaan Geli si aad u Codeyso",
+    vote_register_intro: "Markaan hore halkan timid? Gali magacaaga iyo lambarka taleefankaaga, ka dibna dalbo oo bixi order — marka la bixiyo, waad codeyn kartaa.",
+    vote_register_name_label: "Magacaaga",
+    vote_register_phone_label: "Lambarka Taleefankaaga",
+    vote_register_btn: "Isdiiwaan Geli & Sii Wad",
+    vote_register_back: "Horeba akoon baan leeyahay",
+    vote_register_phone_required: "Fadlan geli lambarka taleefankaaga.",
+    vote_register_needs_purchase: "Wax yar ayaa haray — marka hore dalbo oo bixi order, kadibna soo noqo halkan si aad u codeyso.",
+    vote_go_order_btn: "Dalbo Order",
+    vote_intro: "Macaamiisha diiwaangashan waxay u codeyn karaan macaamiishooda ugu jecel simistarkan. Cod hal mar oo lambar taleefan ah.",
     vote_phone_label: "Lambarka Taleefankaaga", vote_verify_btn: "Xaqiiji & Sii Wad",
     vote_checking: "Xaqiijinaya…",
     vote_not_eligible: "Uma helin lambarkaas taleefanka diiwaanka. Hubi lambarka, ama la xiriir UB Cafe.",
     vote_no_candidates: "Wali ma jiraan macaamiil ku filan oo diiwaan gashan si loo codeeyo.",
-    vote_pick_intro: "Kala saar 5-tan aad jeceshahay", vote_pick_hint: "Meel kasta dooro macaamiil kala duwan.",
-    vote_place_1: "Meesha 1aad", vote_place_2: "Meesha 2aad", vote_place_3: "Meesha 3aad", vote_place_4: "Meesha 4aad", vote_place_5: "Meesha 5aad",
+    vote_pick_intro: "Dooro kaaga ugu jecel", vote_pick_hint: "Dooro hal macaamiil aad u codeynayso.",
+    vote_select_required: "Fadlan dooro qof ka hor intaadan dirin.",
     vote_select_placeholder: "Dooro macaamiil…",
     vote_submit_btn: "Dir Codkayga", vote_change_number: "Isticmaal lambar kale",
-    vote_duplicate_error: "Fadlan meel kasta dooro macaamiil kala duwan.",
-    vote_incomplete_error: "Fadlan buuxi dhammaan 5-ta meelood ka hor intaadan dirin.",
     vote_error: "Wax baa qaldamay markii codkaaga la dirayay — fadlan isku day mar kale.",
+    vote_checking_location: "Hubinaya goobtaada…",
+    vote_campus_not_configured: "Goobta jaamacadda weli lama dejin — fadlan la xiriir shaqaalaha UB Cafe.",
+    vote_location_denied: "Waxaan u baahanahay goobtaada si aan u xaqiijino inaad joogto kaampaska. Fadlan ogolow helitaanka goobta oo isku day mar kale.",
+    vote_off_campus: "Waad ku mahadsan tahay dadaalkaaga. Fadlan booqo Jaamacadda Burco si aad u codeyso.",
     vote_thanks_title: "Codka Waa La Diray!",
     vote_thanks_body: "Waad ku mahadsan tahay codeynta — 5-tan aad doorateen ayaa loo diiwaan geliyay simistarkan.",
-    vote_edit_vote: "Bedel Codkayga",
+    vote_already_voted_title: "Horeba Waad Codaysay",
+    vote_already_voted_body: "Hal cod oo qofkiiba ayaa la ogol yahay. Codkaagii hore ee simistarkan waa la diiwaan geliyay.",
     nav_results: "Natiijada", nav_results_desc: "Shaqaalaha oo keliya",
     results_title: "Natiijada Codbixinta",
     results_staff_only: "Shaqaalaha oo keliya — geli PIN-ka natiijooyinka si aad u aragto xaaladda hadda.",
@@ -790,7 +2619,18 @@ const I18N = {
     results_wrong_pin: "PIN khalad ah.",
     results_no_votes: "Weli cod lama dirin.",
     results_votes_count: "{n} cod ayaa la diray ilaa hadda.",
-    results_points_label: "dhibco", results_lock_btn: "Xir",
+    results_points_label: "dhibco", results_votes_label: "cod", results_lock_btn: "Xir",
+    results_unknown_customer: "Macaamiil aan la garanayn",
+    results_cleanup_btn: "Ka Saar Codadka Aan La Garanayn",
+    results_cleanup_done: "Waa laga saaray {n} gal oo aan la garanayn (ka mid ah {v} cod).",
+    results_cleanup_none: "Cod aan la garanayn lama helin — waxba lama saarin.",
+    results_merge_dupes_btn: "Isku Dar Codbixiyeyaasha Isku Mid Ah",
+    results_merge_dupes_done: "Waa la isku daray {n} cod oo labanlaab ah oo ka yimid {v} qof oo u codeeyay lambar taleefan oo qaab kala duwan — waxaa la haystaa codkoodii ugu dambeeyay oo keliya.",
+    results_merge_dupes_none: "Codbixiyeyaal isku mid ah lama helin — waxba lama isku darin.",
+    results_clear_votes_btn: "Tirtir Dhammaan Codadka",
+    results_clear_votes_confirm: "Tani si joogto ah ayay u tirtiri doontaa dhammaan {n} cod. Tallaabadan lama noqon karo. Ma sii wadaysaa?",
+    results_clear_votes_done: "Dhammaan codadka waa la tirtiray.",
+    results_clear_votes_none: "Ma jiraan cod la tirtiro.",
     how_was_it: "Sideed u aragtay?", your_name_optional: "Magacaaga (ikhtiyaari)",
     tell_us_more: "Wax dheeraad ah noo sheeg (ikhtiyaari)",
     review_placeholder: "Maxaad jeclaatay ama maxaan hagaajino?", submit_rating: "Dir Qiimeynta",
@@ -824,6 +2664,9 @@ const I18N = {
     menu_empty: "لا توجد عناصر في القائمة بعد — يرجى مراجعة الكاونتر.",
     order_sent_title: "تم إرسال الطلب!", place_another_order: "إجراء طلب آخر",
     payment_info: "معلومات الدفع", pay_ahead_or_counter: "ادفع مسبقًا أو عند الكاونتر", need_help: "بحاجة للمساعدة؟ اتصل",
+    scan_to_order_title: "📱 امسح للطلب",
+    scan_to_order_hint: "شارك هذا مع أصدقائك — امسح لفتح صفحة الطلب.",
+    download_qr_btn: "تحميل رمز QR",
     pay_via_zaad: "الدفع عبر Zaad", scan_to_pay: "امسح بهاتفك للدفع", tap_to_dial: "اضغط أدناه من هاتفك للاتصال:",
     track_phone_label: "رقم الهاتف الذي استخدمته للطلب", check_status: "تحقق من الحالة",
     enter_phone_track: "أدخل رقم الهاتف الذي طلبت به.",
@@ -836,22 +2679,75 @@ const I18N = {
     you_owe: "عليك", youre_paid_up: "لا يوجد عليك شيء", no_invoices: "لا توجد فواتير بعد.",
     paid_in_full: "تم الدفع بالكامل", owe: "المستحق", search_different_number: "ابحث برقم آخر",
     nav_vote: "التصويت", nav_vote_desc: "أفضل 5 لهذا الفصل",
-    vote_title: "أفضل 5 عملاء لهذا الفصل الدراسي",
-    vote_intro: "يمكن للعملاء المسجّلين ترتيب أفضل 5 عملاء مفضلين لديهم لهذا الفصل. صوت واحد لكل رقم هاتف.",
+    live_results_title: "النتائج المباشرة",
+    live_results_votes_label: "صوت",
+    live_results_empty: "لا توجد أصوات بعد — كن أول من يصوّت!",
+    score_formula_hint: "النتيجة = 40% ولاء الشراء + 60% الأصوات",
+    candidate_selection_note: "يتم اختيار هؤلاء الخمسة تلقائيًا — الأعلى إنفاقًا هذا الفصل، ويُعاد حسابهم لحظيًا. لا يختارهم الموظفون.",
+    voting_window_title: "فترة التصويت",
+    voting_window_start_label: "تبدأ", voting_window_end_label: "تنتهي",
+    voting_window_save_btn: "حفظ فترة التصويت",
+    voting_window_invalid: "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
+    voting_window_saved: "تم حفظ فترة التصويت.",
+    reward_pool_title: "صندوق الجائزة",
+    reward_pool_split_hint: "يُقسّم حسب الترتيب النهائي: الأول 40% · الثاني 25% · الثالث 15% · الرابع 10% · الخامس 10%.",
+    reward_pool_total_label: "إجمالي صندوق الجائزة (شلن صومالي)",
+    reward_pool_save_btn: "حفظ صندوق الجائزة",
+    reward_pool_invalid: "يرجى إدخال مبلغ صحيح لصندوق الجائزة.",
+    reward_pool_saved: "تم حفظ صندوق الجائزة.",
+    reward_pool_of_pool: "من صندوق الجائزة",
+    reward_rank_1: "المركز الأول", reward_rank_2: "المركز الثاني", reward_rank_3: "المركز الثالث",
+    reward_rank_4: "المركز الرابع", reward_rank_5: "المركز الخامس",
+    voting_window_status_not_configured: "لم يتم التحديد بعد — التصويت مغلق حتى تحدد وقت البدء والانتهاء.",
+    voting_window_status_not_started: "يبدأ التصويت في {start}.",
+    voting_window_status_open: "التصويت مفتوح الآن — يُغلق في {end}.",
+    voting_window_status_closed: "أُغلق التصويت في {end}.",
+    voting_window_badge_open: "🟢 التصويت مفتوح — يُغلق في {end}",
+    voting_window_badge_not_started: "🟡 يبدأ التصويت في {start}",
+    voting_window_badge_closed: "🔴 التصويت مغلق",
+    vote_closed_not_configured_title: "التصويت لم يفتح بعد",
+    vote_closed_not_configured_body: "لم يتم تحديد فترة التصويت بعد. يرجى التحقق مرة أخرى قريبًا.",
+    vote_closed_not_started_title: "التصويت لم يفتح بعد",
+    vote_closed_not_started_body: "يبدأ التصويت في {start}. عد حينها للإدلاء بصوتك!",
+    vote_closed_closed_title: "أُغلق التصويت",
+    vote_closed_closed_body: "انتهى التصويت في {end}. شكرًا لكل من شارك!",
+    notice_board_title: "النتائج النهائية",
+    congrats_title: "تهنئة الفائزين",
+    congrats_hint: "أُغلق التصويت. أرسل لكل فائز رسالة تهنئة عبر واتساب — تُفتح الرسالة معبأة مسبقًا لمراجعتها قبل الإرسال.",
+    congrats_send_btn: "إرسال عبر واتساب",
+    congrats_no_phone: "لا يوجد رقم هاتف مسجّل",
+    congrats_message_template: "🎉 تهانينا {name}! تم اختيارك كعميل UB Cafe رقم {rank} لهذا الفصل الدراسي، وستحصل على {reward}% من صندوق الجائزة. شكرًا لكونك جزءًا من مجتمعنا! 🏆",
+    vote_title: "عميل الفصل الدراسي",
+    vote_eyebrow: "انتخابات UB Cafe",
+    ballot_ribbon: "ورقة اقتراع رسمية",
+    vote_new_customer_link: "زائر جديد؟ سجّل للتصويت",
+    vote_register_title: "التسجيل للتصويت",
+    vote_register_intro: "أول مرة هنا؟ أضف اسمك ورقم هاتفك، ثم اطلب واد فع — بمجرد الدفع يمكنك التصويت.",
+    vote_register_name_label: "اسمك",
+    vote_register_phone_label: "رقم هاتفك",
+    vote_register_btn: "سجّل واستمر",
+    vote_register_back: "لدي حساب بالفعل",
+    vote_register_phone_required: "يرجى إدخال رقم هاتفك.",
+    vote_register_needs_purchase: "خطوة أخيرة — قم بطلب ودفع طلب أولاً، ثم عد إلى هنا للتصويت.",
+    vote_go_order_btn: "تقديم طلب",
+    vote_intro: "يمكن للعملاء المسجّلين التصويت لعميلهم المفضل لهذا الفصل. صوت واحد لكل رقم هاتف.",
     vote_phone_label: "رقم هاتفك", vote_verify_btn: "تحقق واستمر",
     vote_checking: "جارٍ التحقق…",
     vote_not_eligible: "لم نجد هذا الرقم ضمن السجلات. تحقق من الرقم، أو تواصل مع UB Cafe.",
     vote_no_candidates: "لا يوجد عدد كافٍ من العملاء المسجّلين بعد للتصويت عليهم.",
-    vote_pick_intro: "رتّب أفضل 5 لديك", vote_pick_hint: "اختر عميلاً مختلفًا لكل مرتبة.",
-    vote_place_1: "المركز الأول", vote_place_2: "المركز الثاني", vote_place_3: "المركز الثالث", vote_place_4: "المركز الرابع", vote_place_5: "المركز الخامس",
+    vote_pick_intro: "اختر المفضل لديك", vote_pick_hint: "اختر عميلاً واحدًا للتصويت له.",
+    vote_select_required: "يرجى اختيار شخص قبل الإرسال.",
     vote_select_placeholder: "اختر عميلاً…",
     vote_submit_btn: "إرسال تصويتي", vote_change_number: "استخدام رقم هاتف آخر",
-    vote_duplicate_error: "يرجى اختيار عميل مختلف لكل مرتبة.",
-    vote_incomplete_error: "يرجى تعبئة جميع المراتب الخمس قبل الإرسال.",
     vote_error: "حدث خطأ أثناء إرسال تصويتك — يرجى المحاولة مرة أخرى.",
+    vote_checking_location: "جارٍ التحقق من موقعك…",
+    vote_campus_not_configured: "لم يتم إعداد موقع الحرم الجامعي بعد — يرجى التواصل مع موظفي UB Cafe.",
+    vote_location_denied: "نحتاج إلى موقعك للتأكد من أنك داخل الحرم الجامعي. يرجى السماح بالوصول إلى الموقع والمحاولة مرة أخرى.",
+    vote_off_campus: "شكرًا لجهدك. يرجى زيارة جامعة بوراو للإدلاء بصوتك.",
     vote_thanks_title: "تم إرسال التصويت!",
     vote_thanks_body: "شكرًا لتصويتك — تم تسجيل أفضل 5 لديك لهذا الفصل الدراسي.",
-    vote_edit_vote: "تغيير تصويتي",
+    vote_already_voted_title: "لقد قمت بالتصويت مسبقًا",
+    vote_already_voted_body: "يُسمح بصوت واحد فقط لكل شخص. تم تسجيل تصويتك السابق لهذا الفصل بالفعل.",
     nav_results: "النتائج", nav_results_desc: "للموظفين فقط",
     results_title: "نتائج التصويت",
     results_staff_only: "للموظفين فقط — أدخل رمز PIN لعرض الترتيب الحالي.",
@@ -859,7 +2755,18 @@ const I18N = {
     results_wrong_pin: "رمز PIN غير صحيح.",
     results_no_votes: "لم يتم إرسال أي أصوات بعد.",
     results_votes_count: "تم إرسال {n} بطاقة تصويت حتى الآن.",
-    results_points_label: "نقطة", results_lock_btn: "قفل",
+    results_points_label: "نقطة", results_votes_label: "صوت", results_lock_btn: "قفل",
+    results_unknown_customer: "عميل غير معروف",
+    results_cleanup_btn: "إزالة الأصوات غير المعروفة",
+    results_cleanup_done: "تمت إزالة {n} إدخال غير قابل للتحديد (من {v} بطاقة تصويت).",
+    results_cleanup_none: "لم يتم العثور على أصوات غير معروفة — لا شيء لإزالته.",
+    results_merge_dupes_btn: "دمج المصوّتين المكررين",
+    results_merge_dupes_done: "تم دمج {n} تصويت مكرر من {v} ناخب قام بالتصويت بأكثر من صيغة لرقم الهاتف — تم الاحتفاظ باختياره الأخير فقط.",
+    results_merge_dupes_none: "لم يتم العثور على مصوّتين مكررين — لا شيء لدمجه.",
+    results_clear_votes_btn: "مسح جميع الأصوات",
+    results_clear_votes_confirm: "سيؤدي هذا إلى حذف جميع الأصوات ({n}) نهائيًا. لا يمكن التراجع عن هذا. هل تريد المتابعة؟",
+    results_clear_votes_done: "تم مسح جميع الأصوات.",
+    results_clear_votes_none: "لا توجد أصوات لمسحها.",
     how_was_it: "كيف كانت تجربتك؟", your_name_optional: "اسمك (اختياري)", tell_us_more: "أخبرنا المزيد (اختياري)",
     review_placeholder: "ما الذي أعجبك أو ما الذي يجب أن نحسّنه؟", submit_rating: "إرسال التقييم",
     thank_you: "شكرًا لك!", feedback_helps: "ملاحظاتك تساعدنا على تقديم خدمة أفضل.", rate_again: "أضف تقييمًا آخر",
@@ -906,6 +2813,8 @@ function setLang(lang){
   renderStarPicker();
   if(trackedCustomerId) renderTrackResults(trackedCustomerId);
   if(voteVerifiedPhone && $('#voteBallotPanel').style.display !== 'none') renderVoteBallot();
+  if(voteThanksState && $('#voteThanksPanel').style.display !== 'none') showVoteThanksPanel(voteThanksState);
+  if($('#section-vote').classList.contains('active')){ renderLiveResults(); renderVotingWindowState(); }
 }
 
 $$('.lang-btn').forEach(btn=>{
@@ -920,12 +2829,22 @@ const SALE_REQUESTS_KEY = "ubcafe_sale_requests";
 const REVIEWS_KEY = "ubcafe_reviews";
 const ORDER_COUNTER_KEY = "ubcafe_order_counter"; // shared with index.html's Place Order (Waiter), so every order — customer or waiter — gets one unique running number
 const SEMESTER_VOTES_KEY = "ubcafe_semester_votes"; // Top-5-of-the-semester ballots, one per verified voter phone number
+const WORKPLACE_LOCATION_KEY = "ubcafe_workplace_location"; // set by staff in index.html; reused here to require voters be on campus
+const VOTING_WINDOW_KEY = "ubcafe_voting_window"; // {startAt, endAt} ISO strings — set by staff in the Results tab
+const REWARD_POOL_KEY = "ubcafe_reward_pool"; // {totalAmount} — set by staff in the Results tab
+
+// Fixed split of the prize pool by final rank: 1st=40%, 2nd=25%, 3rd=15%,
+// 4th=10%, 5th=10%. Index 0 = 1st place.
+const REWARD_SPLITS = [0.40, 0.25, 0.15, 0.10, 0.10];
 
 let posItems = [];
 let customers = [];
 let saleRequests = [];
 let reviews = [];
 let semesterVotes = [];
+let workplaceLocation = null; // {lat, lng, radiusMeters}
+let votingWindow = null; // {startAt, endAt}
+let rewardPool = null; // {totalAmount}
 
 // Reads and increments a single shared counter so each order gets a stable, ever-increasing
 // number (ORD-0001, ORD-0002, ...) that survives the request itself later being removed from
@@ -967,6 +2886,54 @@ async function loadSemesterVotes(){
   try{ semesterVotes = val ? JSON.parse(val) : []; }catch(e){ semesterVotes = []; }
 }
 async function saveSemesterVotes(){ await storageSet(SEMESTER_VOTES_KEY, JSON.stringify(semesterVotes), true); }
+async function loadWorkplaceLocation(){
+  const val = await storageGet(WORKPLACE_LOCATION_KEY, true);
+  try{ workplaceLocation = val ? JSON.parse(val) : null; }catch(e){ workplaceLocation = null; }
+}
+function distanceMeters(lat1, lng1, lat2, lng2){
+  // Haversine formula — great-circle distance between two lat/lng points, in
+  // meters. Matches the same function used for staff check-ins in index.html.
+  const R = 6371000;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function loadVotingWindow(){
+  const val = await storageGet(VOTING_WINDOW_KEY, true);
+  try{ votingWindow = val ? JSON.parse(val) : null; }catch(e){ votingWindow = null; }
+}
+async function saveVotingWindow(){ await storageSet(VOTING_WINDOW_KEY, JSON.stringify(votingWindow), true); }
+
+// Returns the current state of the election window: 'not_configured' (staff
+// hasn't set dates yet), 'not_started', 'open', or 'closed'.
+function getVotingWindowStatus(){
+  if(!votingWindow || !votingWindow.startAt || !votingWindow.endAt) return 'not_configured';
+  const now = new Date();
+  const start = new Date(votingWindow.startAt);
+  const end = new Date(votingWindow.endAt);
+  if(now < start) return 'not_started';
+  if(now > end) return 'closed';
+  return 'open';
+}
+
+async function loadRewardPool(){
+  const val = await storageGet(REWARD_POOL_KEY, true);
+  try{ rewardPool = val ? JSON.parse(val) : null; }catch(e){ rewardPool = null; }
+}
+async function saveRewardPool(){ await storageSet(REWARD_POOL_KEY, JSON.stringify(rewardPool), true); }
+
+// Returns { pct, amount } for a given rank index (0 = 1st place), or null
+// past 5th place. amount is null if no prize pool total has been set yet.
+function rewardForRank(rankIndex){
+  if(rankIndex < 0 || rankIndex >= REWARD_SPLITS.length) return null;
+  const pct = REWARD_SPLITS[rankIndex];
+  const total = rewardPool && rewardPool.totalAmount;
+  const amount = (total !== undefined && total !== null && total !== '') ? Number(total) * pct : null;
+  return { pct, amount };
+}
 
 /* Keep these in sync with PAYMENT_INFO in index.html */
 const PAYMENT_INFO = {
@@ -992,10 +2959,10 @@ $$('.nav-item').forEach(tab=>{
     $$('.section').forEach(s=>s.classList.remove('active'));
     tab.classList.add('active');
     $('#section-'+tab.dataset.section).classList.add('active');
+    if(tab.dataset.section!=='vote'){ stopVoteLiveResultsSync(); stopVoteWindowRecheck(); }
     if(tab.dataset.section==='place') renderOrderScreen();
     if(tab.dataset.section==='rate') renderRateScreen();
     if(tab.dataset.section==='vote') renderVoteScreen();
-    if(tab.dataset.section==='results') renderResultsScreen();
   });
 });
 
@@ -1157,6 +3124,53 @@ function renderPaymentInfo(){
     ${buildZaadPayBlockHtml()}
   `;
 }
+
+/* ---------------------------------------------------------------------
+   Scan to Order — QR code linking to the public order page. Generated
+   entirely client-side (no network/CDN dependency) using an embedded
+   QR encoder. Download button rasterizes the SVG to a PNG for printing.
+--------------------------------------------------------------------- */
+const ORDER_PAGE_URL = "https://khaan45.github.io/University-Cafe/order";
+
+function renderOrderQRCode(){
+  const container = $('#qrCodeContainer');
+  if(!container) return;
+  try{
+    const qr = qrcode(0, 'M');
+    qr.addData(ORDER_PAGE_URL);
+    qr.make();
+    container.innerHTML = qr.createSvgTag({ cellSize: 6, margin: 16 });
+  }catch(e){
+    container.innerHTML = '';
+  }
+}
+
+function downloadQRCodeAsPNG(filename){
+  const svgEl = document.querySelector('#qrCodeContainer svg');
+  if(!svgEl) return;
+  const svgData = new XMLSerializer().serializeToString(svgEl);
+  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  img.onload = function(){
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = filename;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+}
+
+$('#downloadQrBtn')?.addEventListener('click', ()=>{ downloadQRCodeAsPNG('ub-cafe-order-qr.png'); });
+renderOrderQRCode();
 
 async function renderOrderScreen(){
   stopStatusTracking();
@@ -1327,6 +3341,24 @@ async function loadInvoices(){
   try{ invoices = val ? JSON.parse(val) : []; }catch(e){ invoices = []; }
 }
 function normalizePhone(p){ return String(p||'').replace(/[^\d]/g, ''); }
+
+// Collapses the three common ways a Somali number gets written — with
+// country code (252634449111), with a leading 0 (0634449111), or bare
+// (634449111) — down to the same 9-digit core, so eligibility matching
+// isn't tripped up by formatting differences between what's on file and
+// what someone types.
+function canonicalPhone(p){
+  let d = normalizePhone(p);
+  if(d.startsWith('252') && d.length > 9) d = d.slice(3);
+  if(d.startsWith('0') && d.length === 10) d = d.slice(1);
+  return d;
+}
+// Full international form for wa.me links: country code + the 9-digit core,
+// no plus sign, no leading zero (wa.me's required format).
+function waPhone(p){
+  const core = canonicalPhone(p);
+  return core ? '252' + core : null;
+}
 function invoiceBalance(inv){
   const paid = (inv.payments||[]).reduce((s,p)=>s+p.amount, 0);
   const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
@@ -1514,12 +3546,25 @@ $('#rateAgainBtn').addEventListener('click', renderRateScreen);
    per verified student phone, keyed/overwritten on resubmission.
 --------------------------------------------------------------------- */
 let voteVerifiedPhone = null;
+let voteThanksState = null; // 'submitted' | 'already' — which message the thanks panel should show
+
+function showVoteThanksPanel(state){
+  voteThanksState = state;
+  if(state === 'already'){
+    $('#voteThanksTitle').textContent = t('vote_already_voted_title');
+    $('#voteThanksBody').textContent = t('vote_already_voted_body');
+  } else {
+    $('#voteThanksTitle').textContent = t('vote_thanks_title');
+    $('#voteThanksBody').textContent = t('vote_thanks_body');
+  }
+  $('#voteThanksPanel').style.display = '';
+}
 let voteCandidates = [];
 
 function isVerifiedVoterPhone(phoneRaw){
-  const q = normalizePhone(phoneRaw);
+  const q = canonicalPhone(phoneRaw);
   if(!q || q.length < 6) return false;
-  return customers.some(c => normalizePhone(c.phone) === q);
+  return customers.some(c => canonicalPhone(c.phone) === q);
 }
 
 function computeVoteCandidates(){
@@ -1529,20 +3574,198 @@ function computeVoteCandidates(){
     const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
     totals[inv.customerId] = (totals[inv.customerId] || 0) + (Number(owed) || 0);
   });
+  // Ballot choices are limited to the current top 5 spenders — voters rank
+  // among these 5 rather than picking from the full customer list.
   return customers
     .map(c => ({ id: c.id, name: c.name, total: totals[c.id] || 0 }))
     .sort((a,b)=> b.total - a.total || a.name.localeCompare(b.name))
-    .slice(0, 25);
+    .slice(0, 5);
+}
+
+function formatVotingDateTime(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+}
+
+// Shows the appropriate panel for the current voting-window state and
+// updates the small badge under the section header. Called on entering
+// the Vote tab and periodically while it's open, so the page transitions
+// automatically as the window opens/closes without needing a reload.
+function renderVotingWindowState(){
+  const status = getVotingWindowStatus();
+  const badge = $('#votingWindowBadge');
+  const closedPanel = $('#voteClosedPanel');
+  const start = votingWindow ? formatVotingDateTime(votingWindow.startAt) : '';
+  const end = votingWindow ? formatVotingDateTime(votingWindow.endAt) : '';
+
+  if(status === 'not_configured'){
+    badge.style.display = 'none';
+  } else {
+    badge.style.display = '';
+    if(status === 'open'){
+      badge.textContent = t('voting_window_badge_open').replace('{end}', end);
+      badge.className = 'voting-window-badge open';
+    } else if(status === 'not_started'){
+      badge.textContent = t('voting_window_badge_not_started').replace('{start}', start);
+      badge.className = 'voting-window-badge not-started';
+    } else if(status === 'closed'){
+      badge.textContent = t('voting_window_badge_closed');
+      badge.className = 'voting-window-badge closed';
+    }
+  }
+
+  if(status === 'open'){
+    closedPanel.style.display = 'none';
+    // Only reveal the entry panel if we're not already deeper in the flow
+    // (mid-ballot, or showing the thanks screen) — don't yank the ballot
+    // out from under someone who started before the badge refreshed.
+    if($('#voteBallotPanel').style.display === 'none' && $('#voteThanksPanel').style.display === 'none' && $('#voteRegisterPanel').style.display === 'none'){
+      $('#votePhonePanel').style.display = '';
+    }
+    return;
+  }
+
+  // Not open: hide every entry point, show the closed/not-started message.
+  $('#votePhonePanel').style.display = 'none';
+  $('#voteRegisterPanel').style.display = 'none';
+  $('#voteBallotPanel').style.display = 'none';
+  $('#voteThanksPanel').style.display = 'none';
+  closedPanel.style.display = '';
+  const icon = status === 'closed' ? '🔒' : (status === 'not_started' ? '⏳' : '🗳️');
+  $('#voteClosedIcon').textContent = icon;
+  if(status === 'not_started'){
+    $('#voteClosedTitle').textContent = t('vote_closed_not_started_title');
+    $('#voteClosedBody').textContent = t('vote_closed_not_started_body').replace('{start}', start);
+    $('#voteClosedResultsBoard').style.display = 'none';
+  } else if(status === 'closed'){
+    $('#voteClosedTitle').textContent = t('vote_closed_closed_title');
+    $('#voteClosedBody').textContent = t('vote_closed_closed_body').replace('{end}', end);
+    // The "notice board" — final standings shown right alongside the
+    // closing message, so the result is clear the moment voting ends.
+    $('#voteClosedResultsList').innerHTML = buildResultsListHTML(computeCandidateScores(), true, true);
+    $('#voteClosedResultsBoard').style.display = '';
+    requestAnimationFrame(()=>{
+      $$('#voteClosedResultsList .top5-bar-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+    });
+  } else {
+    $('#voteClosedTitle').textContent = t('vote_closed_not_configured_title');
+    $('#voteClosedBody').textContent = t('vote_closed_not_configured_body');
+    $('#voteClosedResultsBoard').style.display = 'none';
+  }
+}
+
+let voteWindowRecheckTimer = null;
+function startVoteWindowRecheck(){
+  if(voteWindowRecheckTimer) return;
+  voteWindowRecheckTimer = setInterval(renderVotingWindowState, 30000);
+}
+function stopVoteWindowRecheck(){
+  if(voteWindowRecheckTimer){ clearInterval(voteWindowRecheckTimer); voteWindowRecheckTimer = null; }
 }
 
 async function renderVoteScreen(){
-  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes()]);
+  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes(), loadVotingWindow(), loadRewardPool()]);
   voteVerifiedPhone = null;
+  voteThanksState = null;
   $('#votePhone').value = '';
   $('#votePhoneMsg').className = 'msg';
   $('#votePhonePanel').style.display = '';
+  $('#voteRegisterPanel').style.display = 'none';
   $('#voteBallotPanel').style.display = 'none';
   $('#voteThanksPanel').style.display = 'none';
+  renderVotingWindowState();
+  renderLiveResults();
+  startVoteLiveResultsSync();
+  startVoteWindowRecheck();
+}
+
+/* ---------------------------------------------------------------------
+   Live Results — shown on the Vote page: every current top-5 candidate
+   with their live vote count, updating in real time via Firestore
+   subscription so voters see the score change as ballots come in.
+--------------------------------------------------------------------- */
+// Masks a name for the public scoreboard: first 3 letters visible, rest
+// hidden. Only used on the public live display — the ballot itself and
+// the staff Results tab keep full names so voters know who they're
+// picking and staff can administer the vote properly.
+function maskCandidateName(name){
+  const trimmed = String(name||'').trim();
+  if(trimmed.length <= 3) return trimmed;
+  return trimmed.slice(0, 3) + '***';
+}
+
+function buildResultsListHTML(scored, unmasked, showReward){
+  if(scored.length === 0) return `<div class="top5-empty">${t('live_results_empty')}</div>`;
+  return scored.map((r,i)=>{
+    const medalClass = i < 3 ? ` medal-${i+1}` : '';
+    const pct = Math.max(0, Math.min(100, r.score));
+    const reward = rewardForRank(i);
+    const rewardLine = (showReward && reward)
+      ? `<div class="top5-reward">🎁 ${Math.round(reward.pct*100)}%</div>`
+      : '';
+    const displayName = unmasked ? r.name : maskCandidateName(r.name);
+    return `
+    <div class="top5-item">
+      <div class="top5-bar-fill" data-pct="${pct}" style="width:0%;"></div>
+      <div class="top5-rank${medalClass}">${i+1}</div>
+      <div class="top5-name">${displayName}${rewardLine}</div>
+      <div class="top5-score">${r.score.toFixed(1)}% <span style="opacity:.65;">(${r.votes} ${t('live_results_votes_label')})</span></div>
+    </div>
+  `;
+  }).join('');
+}
+
+function renderLiveResults(){
+  const list = $('#voteLiveResultsList');
+  if(!list) return;
+  const scored = computeCandidateScores();
+  list.innerHTML = buildResultsListHTML(scored, false, false);
+  // Animate the bars in on the next frame (starting from width:0 lets the
+  // CSS transition actually play, instead of snapping straight to value).
+  requestAnimationFrame(()=>{
+    $$('.top5-bar-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+  });
+}
+
+let unsubVoteLiveResults = null;
+function startVoteLiveResultsSync(){
+  if(unsubVoteLiveResults) return; // already subscribed — never stack duplicate listeners
+  unsubVoteLiveResults = subscribeToKey(SEMESTER_VOTES_KEY, (value)=>{
+    try{ semesterVotes = value ? JSON.parse(value) : []; }catch(e){ semesterVotes = []; }
+    renderLiveResults();
+  });
+}
+function stopVoteLiveResultsSync(){
+  if(unsubVoteLiveResults){ unsubVoteLiveResults(); unsubVoteLiveResults = null; }
+}
+
+// Shared by the normal Verify flow and the new-customer Register flow:
+// given a phone already known to belong to a customer, checks candidate
+// availability and prior-vote status, then shows the right panel.
+async function proceedToBallotFlow(phone, sourcePanelId, msg){
+  await loadInvoices();
+  voteCandidates = computeVoteCandidates();
+  if(voteCandidates.length < 5){
+    msg.textContent = t('vote_no_candidates');
+    msg.className = 'msg show err';
+    return;
+  }
+  voteVerifiedPhone = canonicalPhone(phone);
+
+  // One vote per person, no changes afterward: check for an existing
+  // ballot under this canonical phone before letting them see the ballot.
+  await loadSemesterVotes(); // refresh in case a vote was just cast elsewhere
+  const alreadyVoted = semesterVotes.some(v => canonicalPhone(v.voterPhone) === voteVerifiedPhone);
+  if(alreadyVoted){
+    msg.className = 'msg';
+    $(sourcePanelId).style.display = 'none';
+    showVoteThanksPanel('already');
+    return;
+  }
+
+  msg.className = 'msg';
+  $(sourcePanelId).style.display = 'none';
+  renderVoteBallot();
 }
 
 $('#voteVerifyBtn').addEventListener('click', async ()=>{
@@ -1558,23 +3781,18 @@ $('#voteVerifyBtn').addEventListener('click', async ()=>{
   const original = btn.textContent;
   btn.textContent = t('vote_checking');
   try{
+    await loadVotingWindow(); // re-check in case the window just closed/hasn't opened
+    if(getVotingWindowStatus() !== 'open'){
+      renderVotingWindowState();
+      return;
+    }
     await loadCustomers(); // refresh in case the customer list was just updated
     if(!isVerifiedVoterPhone(phone)){
       msg.textContent = t('vote_not_eligible');
       msg.className = 'msg show err';
       return;
     }
-    await loadInvoices();
-    voteCandidates = computeVoteCandidates();
-    if(voteCandidates.length < 5){
-      msg.textContent = t('vote_no_candidates');
-      msg.className = 'msg show err';
-      return;
-    }
-    voteVerifiedPhone = normalizePhone(phone);
-    msg.className = 'msg';
-    $('#votePhonePanel').style.display = 'none';
-    renderVoteBallot();
+    await proceedToBallotFlow(phone, '#votePhonePanel', msg);
   }catch(e){
     msg.textContent = t('generic_error') + e.message;
     msg.className = 'msg show err';
@@ -1585,41 +3803,171 @@ $('#voteVerifyBtn').addEventListener('click', async ()=>{
 });
 $('#votePhone').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#voteVerifyBtn').click(); });
 
-function renderVoteBallot(){
-  const existing = semesterVotes.find(v => v.voterPhone === voteVerifiedPhone);
-  const prevRankings = existing ? existing.rankings : [null,null,null,null,null];
+/* ---------------------------------------------------------------------
+   New-customer registration, right from the Vote page — creates a
+   customer record (same logic the Order tab uses: match by phone,
+   otherwise create) so someone who's never ordered can still register
+   and vote immediately.
+--------------------------------------------------------------------- */
+$('#voteShowRegisterBtn').addEventListener('click', ()=>{
+  $('#votePhonePanel').style.display = 'none';
+  $('#voteRegisterPanel').style.display = '';
+  $('#voteRegName').value = '';
+  $('#voteRegPhone').value = '';
+  $('#voteRegisterMsg').className = 'msg';
+  $('#voteGoOrderBtn').style.display = 'none';
+});
+$('#voteBackToVerifyBtn').addEventListener('click', ()=>{
+  $('#voteRegisterPanel').style.display = 'none';
+  $('#votePhonePanel').style.display = '';
+});
 
-  let html = '';
-  for(let i=0;i<5;i++){
-    html += `
-      <div class="field">
-        <label>${t('vote_place_'+(i+1))}</label>
-        <select class="vote-rank-select" data-place="${i}" style="font-family:'Inter',sans-serif;font-size:15px;padding:12px 13px;border:1.5px solid var(--paper-line);border-radius:9px;background:#fff;color:var(--ink);width:100%;">
-          <option value="">${t('vote_select_placeholder')}</option>
-        </select>
-      </div>
-    `;
+$('#voteRegisterBtn').addEventListener('click', async ()=>{
+  const btn = $('#voteRegisterBtn');
+  const msg = $('#voteRegisterMsg');
+  const name = $('#voteRegName').value.trim();
+  const phone = $('#voteRegPhone').value.trim();
+  if(!name){
+    msg.textContent = t('name_required');
+    msg.className = 'msg show err';
+    return;
   }
-  $('#voteRankFields').innerHTML = html;
+  if(!phone){
+    msg.textContent = t('vote_register_phone_required');
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = t('vote_checking');
+  $('#voteGoOrderBtn').style.display = 'none';
+  try{
+    await loadVotingWindow(); // re-check in case the window just closed/hasn't opened
+    if(getVotingWindowStatus() !== 'open'){
+      renderVotingWindowState();
+      return;
+    }
+    await loadCustomers(); // refresh so we don't miss a customer added elsewhere in the meantime
+    // Match an existing customer ONLY by exact phone (never search/browse the
+    // list), same rule the Order tab uses, so a returning customer doesn't
+    // get a duplicate record created.
+    const normalizedPhone = normalizePhone(phone);
+    let existing = customers.find(c => normalizePhone(c.phone) === normalizedPhone);
+    if(!existing){
+      existing = { id: Date.now(), name, phone, address: '' };
+      customers.push(existing);
+      await saveCustomers();
+    }
 
-  function refreshOptions(){
-    const selected = $$('.vote-rank-select').map(sel=>sel.value);
-    $$('.vote-rank-select').forEach(sel=>{
-      const mine = sel.value;
-      const opts = [`<option value="">${t('vote_select_placeholder')}</option>`]
-        .concat(voteCandidates
-          .filter(c => String(c.id) === mine || !selected.includes(String(c.id)))
-          .map(c => `<option value="${String(c.id)}" ${String(c.id)===mine?'selected':''}>${c.name}</option>`)
-        );
-      sel.innerHTML = opts.join('');
+    // Anyone registering directly (skipping the Order tab) must have at
+    // least one paid order before they can vote — otherwise self-registration
+    // would let someone vote with zero real investment in the cafe.
+    await loadInvoices();
+    const hasPaidOrder = invoices.some(inv => {
+      if(inv.customerId !== existing.id) return false;
+      const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+      return (Number(owed) || 0) > 0;
     });
-  }
+    if(!hasPaidOrder){
+      msg.textContent = t('vote_register_needs_purchase');
+      msg.className = 'msg show err';
+      $('#voteGoOrderBtn').style.display = '';
+      return;
+    }
 
-  $$('.vote-rank-select').forEach((sel, i)=>{
-    if(prevRankings[i]) sel.value = String(prevRankings[i]);
-    sel.addEventListener('change', refreshOptions);
+    await proceedToBallotFlow(phone, '#voteRegisterPanel', msg);
+  }catch(e){
+    msg.textContent = t('generic_error') + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+$('#voteRegPhone').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#voteRegisterBtn').click(); });
+$('#voteGoOrderBtn').addEventListener('click', ()=>{
+  $('.nav-item[data-section="place"]').click();
+});
+
+function getVoteChoice(v){
+  // Reads a ballot regardless of schema: new single-choice votes store
+  // candidateId/candidateName directly; older ranked-ballot votes are
+  // read via their former 1st-place pick for continuity.
+  if(v.candidateId) return { id: v.candidateId, name: v.candidateName || null };
+  if(v.rankings && v.rankings[0]) return { id: v.rankings[0], name: (v.rankingNames && v.rankingNames[0]) || null };
+  return null;
+}
+
+/* ---------------------------------------------------------------------
+   Composite candidate score — 40% customer loyalty (purchase total) +
+   60% votes received. Each component is normalized against the leader
+   on that axis (i.e. the top spender gets 100 loyalty points, the most-
+   voted gets 100 vote points), then blended. Shared by the public Vote
+   page's live scoreboard and the staff Results tab so both always agree.
+--------------------------------------------------------------------- */
+function computeCandidateScores(){
+  const spendTotals = {}; // customerId -> total spend (loyalty)
+  invoices.forEach(inv=>{
+    if(!inv.customerId) return;
+    const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
+    spendTotals[inv.customerId] = (spendTotals[inv.customerId] || 0) + (Number(owed) || 0);
   });
-  refreshOptions();
+  const nameById = {};
+  const phoneById = {};
+  customers.forEach(c => { nameById[String(c.id)] = c.name; phoneById[String(c.id)] = c.phone; });
+
+  const voteCounts = {};
+  const namesSeen = {};
+  semesterVotes.forEach(v=>{
+    const choice = getVoteChoice(v);
+    if(!choice || !choice.id) return;
+    voteCounts[choice.id] = (voteCounts[choice.id] || 0) + 1;
+    // Prefer the name snapshotted at vote time (stable even if the customer
+    // record is later deleted/renamed/re-imported).
+    if(!namesSeen[choice.id] || choice.name){
+      namesSeen[choice.id] = choice.name || nameById[choice.id] || namesSeen[choice.id];
+    }
+  });
+
+  // Candidate set = current top-5 spenders ∪ anyone who has ever received a
+  // vote, so the current top 5 always show (even at 0 votes) and nobody's
+  // past votes silently disappear if they drop out of the current top 5.
+  const ids = new Set();
+  computeVoteCandidates().forEach(c => ids.add(String(c.id)));
+  Object.keys(voteCounts).forEach(id => ids.add(id));
+
+  const rows = Array.from(ids).map(id => ({
+    id,
+    name: namesSeen[id] || nameById[id] || t('results_unknown_customer'),
+    phone: phoneById[id] || null,
+    spend: spendTotals[id] || 0,
+    votes: voteCounts[id] || 0
+  }));
+
+  const maxSpend = Math.max(0, ...rows.map(r => r.spend));
+  const maxVotes = Math.max(0, ...rows.map(r => r.votes));
+
+  rows.forEach(r=>{
+    const loyaltyPct = maxSpend > 0 ? (r.spend / maxSpend) * 100 : 0;
+    const votePct = maxVotes > 0 ? (r.votes / maxVotes) * 100 : 0;
+    r.score = 0.4 * loyaltyPct + 0.6 * votePct;
+  });
+
+  return rows.sort((a,b)=> b.score - a.score || b.votes - a.votes || a.name.localeCompare(b.name));
+}
+
+function renderVoteBallot(){
+  const html = voteCandidates.map(c => {
+    const id = String(c.id);
+    return `
+      <label class="vote-choice-item">
+        <input type="radio" name="voteChoice" class="vote-choice-radio" value="${id}">
+        <span class="vote-choice-box"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="vote-choice-name">${c.name}</span>
+      </label>
+    `;
+  }).join('');
+  $('#voteRankFields').innerHTML = html;
 
   $('#voteBallotMsg').className = 'msg';
   $('#voteBallotPanel').style.display = '';
@@ -1631,31 +3979,79 @@ $('#voteCancelBtn').addEventListener('click', ()=>{
   $('#votePhonePanel').style.display = '';
 });
 
+function getCurrentPositionAsync(options){
+  return new Promise((resolve, reject)=>{
+    if(!navigator.geolocation){ reject(new Error('unsupported')); return; }
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  });
+}
+
 $('#voteSubmitBtn').addEventListener('click', async ()=>{
   const btn = $('#voteSubmitBtn');
   const msg = $('#voteBallotMsg');
-  const rankings = $$('.vote-rank-select').map(sel=>sel.value);
-  if(rankings.some(v=>!v)){
-    msg.textContent = t('vote_incomplete_error');
+  const selected = $$('.vote-choice-radio').find(r => r.checked);
+  if(!selected){
+    msg.textContent = t('vote_select_required');
     msg.className = 'msg show err';
     return;
   }
-  if(new Set(rankings).size !== 5){
-    msg.textContent = t('vote_duplicate_error');
-    msg.className = 'msg show err';
-    return;
-  }
+  const candidateId = selected.value;
+  // Snapshot the candidate's name at the moment of voting. Results should
+  // always show a name, even if that customer record is later deleted,
+  // renamed, or re-imported under a new id.
+  const candidate = voteCandidates.find(c => String(c.id) === candidateId);
+  const candidateName = candidate ? candidate.name : null;
   btn.disabled = true;
   const original = btn.textContent;
-  btn.textContent = t('sending');
   try{
+    // Re-check the voting window right before we commit — it may have
+    // closed while this person was filling out the ballot.
+    await loadVotingWindow();
+    if(getVotingWindowStatus() !== 'open'){
+      $('#voteBallotPanel').style.display = 'none';
+      renderVotingWindowState();
+      return;
+    }
+    // Voting is restricted to campus — reuses the same location staff set
+    // for attendance check-ins in index.html (ubcafe_workplace_location).
+    btn.textContent = t('vote_checking_location');
+    await loadWorkplaceLocation();
+    if(!workplaceLocation){
+      msg.textContent = t('vote_campus_not_configured');
+      msg.className = 'msg show err';
+      return;
+    }
+    let pos;
+    try{
+      pos = await getCurrentPositionAsync({ enableHighAccuracy: true, timeout: 12000 });
+    }catch(e){
+      msg.textContent = t('vote_location_denied');
+      msg.className = 'msg show err';
+      return;
+    }
+    const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, workplaceLocation.lat, workplaceLocation.lng);
+    if(dist > workplaceLocation.radiusMeters){
+      msg.textContent = t('vote_off_campus');
+      msg.className = 'msg show err';
+      return;
+    }
+
+    btn.textContent = t('sending');
     await loadSemesterVotes(); // refresh so we don't clobber votes submitted elsewhere in the meantime
-    const idx = semesterVotes.findIndex(v => v.voterPhone === voteVerifiedPhone);
-    const voteRecord = { voterPhone: voteVerifiedPhone, rankings, submittedAt: new Date().toISOString() };
-    if(idx >= 0) semesterVotes[idx] = voteRecord; else semesterVotes.push(voteRecord);
+    const idx = semesterVotes.findIndex(v => canonicalPhone(v.voterPhone) === voteVerifiedPhone);
+    if(idx >= 0){
+      // Someone already voted under this phone since we checked (e.g. from
+      // another device) — enforce one vote per person, don't overwrite.
+      $('#voteBallotPanel').style.display = 'none';
+      showVoteThanksPanel('already');
+      return;
+    }
+    const voteRecord = { voterPhone: voteVerifiedPhone, candidateId, candidateName, submittedAt: new Date().toISOString() };
+    semesterVotes.push(voteRecord);
     await saveSemesterVotes();
     $('#voteBallotPanel').style.display = 'none';
-    $('#voteThanksPanel').style.display = '';
+    showVoteThanksPanel('submitted');
+    renderLiveResults();
   }catch(e){
     msg.textContent = t('vote_error');
     msg.className = 'msg show err';
@@ -1664,90 +4060,6 @@ $('#voteSubmitBtn').addEventListener('click', async ()=>{
     btn.textContent = original;
   }
 });
-
-$('#voteChangeBtn').addEventListener('click', async ()=>{
-  $('#voteThanksPanel').style.display = 'none';
-  await loadSemesterVotes();
-  renderVoteBallot();
-});
-
-/* ---------------------------------------------------------------------
-   RESULTS (STAFF) — weighted leaderboard from semesterVotes.
-   Gated by a simple PIN (not real security, just keeps casual browsers
-   out on this public-facing page). Change RESULTS_STAFF_PIN below.
---------------------------------------------------------------------- */
-const RESULTS_STAFF_PIN = "2026";
-
-function computeResultsLeaderboard(){
-  const points = {}; // candidateId (string) -> points
-  const nameById = {};
-  customers.forEach(c => { nameById[String(c.id)] = c.name; });
-  const weights = [5,4,3,2,1]; // 1st..5th place
-  semesterVotes.forEach(v=>{
-    (v.rankings || []).forEach((id, idx)=>{
-      if(!id) return;
-      points[id] = (points[id] || 0) + (weights[idx] || 0);
-    });
-  });
-  return Object.keys(points)
-    .map(id => ({ id, name: nameById[id] || id, points: points[id] }))
-    .sort((a,b)=> b.points - a.points)
-    .slice(0, 25);
-}
-
-function renderResultsBoard(){
-  const board = computeResultsLeaderboard();
-  $('#resultsBoardMeta').textContent = t('results_votes_count').replace('{n}', semesterVotes.length);
-  if(board.length === 0){
-    $('#resultsBoardList').innerHTML = `<div class="empty">${t('results_no_votes')}</div>`;
-    return;
-  }
-  $('#resultsBoardList').innerHTML = board.map((r,i)=>`
-    <div class="order-card" style="animation-delay:${Math.min(i,10)*0.03}s;">
-      <div class="oc-top">
-        <div class="oc-title">${i+1}. ${r.name}</div>
-        <span class="status-pill paid">${r.points} ${t('results_points_label')}</span>
-      </div>
-    </div>
-  `).join('');
-}
-
-function renderResultsScreen(){
-  $('#resultsPin').value = '';
-  $('#resultsPinMsg').className = 'msg';
-  $('#resultsPinPanel').style.display = '';
-  $('#resultsBoardPanel').style.display = 'none';
-}
-
-$('#resultsUnlockBtn').addEventListener('click', async ()=>{
-  const btn = $('#resultsUnlockBtn');
-  const msg = $('#resultsPinMsg');
-  const pin = $('#resultsPin').value.trim();
-  if(pin !== RESULTS_STAFF_PIN){
-    msg.textContent = t('results_wrong_pin');
-    msg.className = 'msg show err';
-    return;
-  }
-  btn.disabled = true;
-  const original = btn.textContent;
-  btn.textContent = t('checking');
-  try{
-    await Promise.all([loadCustomers(), loadSemesterVotes()]);
-    msg.className = 'msg';
-    renderResultsBoard();
-    $('#resultsPinPanel').style.display = 'none';
-    $('#resultsBoardPanel').style.display = '';
-  }catch(e){
-    msg.textContent = t('generic_error') + e.message;
-    msg.className = 'msg show err';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = original;
-  }
-});
-$('#resultsPin').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#resultsUnlockBtn').click(); });
-
-$('#resultsLockBtn').addEventListener('click', renderResultsScreen);
 
 /* ---------------------------------------------------------------------
    Init
@@ -1763,7 +4075,21 @@ function startPosItemsLiveSync(){
 }
 startPosItemsLiveSync();
 applyStaticTranslations();
-renderOrderScreen();
+
+// During the voting window, land people on the Vote tab by default instead
+// of Order — otherwise keep Order as the default landing tab as before.
+(async function initDefaultTab(){
+  await loadVotingWindow();
+  if(getVotingWindowStatus() === 'open'){
+    $$('.nav-item').forEach(t=>t.classList.remove('active'));
+    $$('.section').forEach(s=>s.classList.remove('active'));
+    $('.nav-item[data-section="vote"]').classList.add('active');
+    $('#section-vote').classList.add('active');
+    renderVoteScreen();
+  } else {
+    renderOrderScreen();
+  }
+})();
 </script>
 </body>
 </html>
