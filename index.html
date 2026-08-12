@@ -1193,18 +1193,7 @@
           <div id="semesterLotteryResult" class="hint" style="margin-bottom:10px;"></div>
           <button class="secondary" id="semesterLotteryRunBtn" style="width:100%;">🎰 Run Semester Lottery</button>
           <div class="msg" id="semesterLotteryMsg"></div>
-
-          <div class="field" style="margin-top:14px;">
-            <label for="lotteryRewardTotal">Lottery Reward — Total ($)</label>
-            <input type="text" id="lotteryRewardTotal" placeholder="e.g. 600" inputmode="numeric">
-          </div>
-          <p class="hint" style="margin-top:4px;">Paid to the winner in 6 equal parts.</p>
-          <button class="secondary" id="lotteryRewardSaveBtn" style="margin-top:6px;width:100%;">Save Lottery Reward</button>
-          <div class="msg" id="lotteryRewardMsg"></div>
-
-          <div id="lotteryPayoutTracker" style="margin-top:10px;"></div>
-
-          <button class="secondary" id="semesterLotteryResetBtn" style="margin-top:14px;width:100%;color:var(--debit);border-color:var(--debit);">Reset for New Semester</button>
+          <button class="secondary" id="semesterLotteryResetBtn" style="margin-top:10px;width:100%;color:var(--debit);border-color:var(--debit);">Reset for New Semester</button>
           <div class="msg" id="semesterLotteryResetMsg"></div>
         </div>
 
@@ -10831,14 +10820,12 @@ function isoToLocalInputValue(iso){
 }
 
 async function renderElectionResults(){
-  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes(), loadVotingWindow(), loadRewardPool(), loadSemesterLottery(), loadLotteryReward()]);
+  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes(), loadVotingWindow(), loadRewardPool(), loadSemesterLottery()]);
   renderElectionBoard();
   renderElectionCongratsBlock();
   renderElectionWindowSettings();
   renderElectionRewardPoolSettings();
   renderSemesterLotteryResult();
-  renderLotteryRewardSettings();
-  renderLotteryPayoutTracker();
 }
 
 /* ---------------- Semester Lottery ----------------
@@ -10926,104 +10913,9 @@ $('#semesterLotteryResetBtn').addEventListener('click', async ()=>{
   try{
     semesterLottery = null;
     await saveSemesterLottery();
-    // A new semester means a fresh reward and payout tracker too — the old
-    // winner's reward/payout progress shouldn't carry over to whoever's next.
-    lotteryReward = null;
-    await saveLotteryReward();
     msg.textContent = 'Reset — ready for a new semester draw.';
     msg.className = 'msg show ok';
     renderSemesterLotteryResult();
-    renderLotteryRewardSettings();
-    renderLotteryPayoutTracker();
-  }catch(e){
-    msg.textContent = 'Something went wrong: ' + e.message;
-    msg.className = 'msg show err';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = original;
-  }
-});
-
-/* ---------------- Lottery Reward (6-part payout) ----------------
-   The semester lottery winner's reward is a single total amount, paid out
-   to them in 6 equal parts/installments over the semester. Staff set the
-   total here and tick off each part as it's actually paid. */
-const LOTTERY_REWARD_KEY = "ubcafe_lottery_reward";
-const LOTTERY_REWARD_PARTS = 6;
-let lotteryReward = null; // { totalAmount, partsPaid: [bool x6] }
-
-async function loadLotteryReward(){
-  const val = await storageGet(LOTTERY_REWARD_KEY, true);
-  try{ lotteryReward = val ? JSON.parse(val) : null; }catch(e){ lotteryReward = null; }
-}
-async function saveLotteryReward(){ await storageSet(LOTTERY_REWARD_KEY, lotteryReward ? JSON.stringify(lotteryReward) : '', true); }
-
-function renderLotteryRewardSettings(){
-  $('#lotteryRewardTotal').value = (lotteryReward && lotteryReward.totalAmount) ? lotteryReward.totalAmount : '';
-}
-
-function renderLotteryPayoutTracker(){
-  const el = $('#lotteryPayoutTracker');
-  if(!semesterLottery){
-    el.innerHTML = '';
-    return;
-  }
-  if(!lotteryReward || !lotteryReward.totalAmount){
-    el.innerHTML = `<div class="hint">Set a reward amount above to start tracking payouts to ${semesterLottery.name}.</div>`;
-    return;
-  }
-  const partAmount = lotteryReward.totalAmount / LOTTERY_REWARD_PARTS;
-  const paidCount = lotteryReward.partsPaid.filter(Boolean).length;
-  let html = `<div class="hint" style="margin-bottom:8px;">${semesterLottery.name}'s reward: $${lotteryReward.totalAmount} in ${LOTTERY_REWARD_PARTS} parts of $${partAmount.toFixed(2)} each — ${paidCount}/${LOTTERY_REWARD_PARTS} paid.</div>`;
-  html += '<div class="congrats-list">';
-  for(let i=0;i<LOTTERY_REWARD_PARTS;i++){
-    const paid = !!lotteryReward.partsPaid[i];
-    html += `
-    <div class="congrats-row">
-      <div>
-        <div class="cg-name">Part ${i+1}</div>
-        <div class="cg-rank">$${partAmount.toFixed(2)}</div>
-      </div>
-      <button class="secondary lottery-part-toggle" data-index="${i}" style="${paid ? 'background:var(--credit);color:#fff;border-color:var(--credit);' : ''}">${paid ? '✓ Paid' : 'Mark Paid'}</button>
-    </div>`;
-  }
-  html += '</div>';
-  el.innerHTML = html;
-  $$('.lottery-part-toggle').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const i = Number(btn.dataset.index);
-      lotteryReward.partsPaid[i] = !lotteryReward.partsPaid[i];
-      await saveLotteryReward();
-      renderLotteryPayoutTracker();
-    });
-  });
-}
-
-$('#lotteryRewardSaveBtn').addEventListener('click', async ()=>{
-  const btn = $('#lotteryRewardSaveBtn');
-  const msg = $('#lotteryRewardMsg');
-  const raw = $('#lotteryRewardTotal').value.trim().replace(/,/g,'');
-  const amount = Number(raw);
-  if(!raw || isNaN(amount) || amount < 0){
-    msg.textContent = 'Please enter a valid reward amount.';
-    msg.className = 'msg show err';
-    return;
-  }
-  btn.disabled = true;
-  const original = btn.textContent;
-  btn.textContent = 'Saving…';
-  try{
-    await loadLotteryReward();
-    // Keep existing paid-part progress if the amount is just being adjusted;
-    // only start a fresh all-unpaid tracker the first time a reward is set.
-    const partsPaid = (lotteryReward && Array.isArray(lotteryReward.partsPaid) && lotteryReward.partsPaid.length === LOTTERY_REWARD_PARTS)
-      ? lotteryReward.partsPaid
-      : new Array(LOTTERY_REWARD_PARTS).fill(false);
-    lotteryReward = { totalAmount: amount, partsPaid };
-    await saveLotteryReward();
-    msg.textContent = 'Lottery reward saved.';
-    msg.className = 'msg show ok';
-    renderLotteryPayoutTracker();
   }catch(e){
     msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg show err';
