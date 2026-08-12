@@ -576,6 +576,11 @@ body{ zoom: 1.15; }
       <span class="nav-label" data-i18n="nav_vote">Vote</span>
       <span class="nav-desc" data-i18n="nav_vote_desc">Top 5 of the semester</span>
     </div>
+    <div class="nav-item" data-section="lottery">
+      <span class="nav-icon">🎰</span>
+      <span class="nav-label" data-i18n="nav_lottery">Lottery</span>
+      <span class="nav-desc" data-i18n="nav_lottery_desc">Semester draw</span>
+    </div>
     <div class="nav-item" data-section="rate">
       <span class="nav-icon">⭐</span>
       <span class="nav-label" data-i18n="nav_rate">Rate Us</span>
@@ -749,6 +754,21 @@ body{ zoom: 1.15; }
         <h2 id="voteThanksTitle">Vote Submitted!</h2>
         <p id="voteThanksBody" style="color:var(--ink-soft);font-size:13.5px;">Thanks for voting — your top 5 has been recorded for this semester.</p>
       </div>
+    </div>
+  </div>
+
+  <!-- ===================== SEMESTER LOTTERY ===================== -->
+  <div class="section narrow" id="section-lottery">
+    <div class="panel">
+      <div class="field" style="margin-bottom:4px;"><label data-i18n="lottery_title">🎰 Semester Lottery</label></div>
+      <p class="hint" style="margin-top:0;" data-i18n="lottery_intro">Every registered customer is automatically entered — no signup needed. Enter your phone number to check if you're this semester's winner.</p>
+      <div class="field">
+        <label for="lotteryPhone" data-i18n="lottery_phone_label">Your Phone Number</label>
+        <input type="text" id="lotteryPhone" placeholder="e.g. 0634449111" inputmode="tel" autocomplete="tel" data-i18n-placeholder="lottery_phone_placeholder">
+      </div>
+      <button class="primary" id="lotteryCheckBtn" data-i18n="lottery_check_btn">Check if I Won</button>
+      <div class="msg" id="lotteryMsg"></div>
+      <div id="lotteryResult" style="margin-top:14px;"></div>
     </div>
   </div>
 
@@ -2522,6 +2542,18 @@ const I18N = {
     vote_thanks_body: "Thanks for voting — your top 5 has been recorded for this semester.",
     vote_already_voted_title: "You've Already Voted",
     vote_already_voted_body: "Only one vote per person is allowed. Your earlier vote for this semester has already been recorded.",
+    nav_lottery: "Lottery", nav_lottery_desc: "Semester draw",
+    lottery_title: "🎰 Semester Lottery",
+    lottery_intro: "Every registered customer is automatically entered — no signup needed. Enter your phone number to check if you're this semester's winner.",
+    lottery_phone_label: "Your Phone Number",
+    lottery_phone_placeholder: "e.g. 0634449111",
+    lottery_check_btn: "Check if I Won",
+    lottery_checking: "Checking…",
+    lottery_not_eligible: "We couldn't find that phone number on file. Double-check it, or contact UB Cafe.",
+    lottery_not_drawn: "The semester winner hasn't been drawn yet — check back soon!",
+    lottery_win: "🎉🏆 Congratulations! You're this semester's Lottery winner!",
+    lottery_lose: "😔 Not this time — 🍀 better luck next semester!",
+    lottery_reward_line: "🎁 Your reward: ${total}, paid in {parts} equal parts of ${part} each.",
     nav_results: "Results", nav_results_desc: "Staff only",
     results_title: "Vote Results",
     results_staff_only: "Staff only — enter the results PIN to view the current standings.",
@@ -2656,6 +2688,18 @@ const I18N = {
     vote_thanks_body: "Waad ku mahadsan tahay codeynta — 5-tan aad doorateen ayaa loo diiwaan geliyay simistarkan.",
     vote_already_voted_title: "Horeba Waad Codaysay",
     vote_already_voted_body: "Hal cod oo qofkiiba ayaa la ogol yahay. Codkaagii hore ee simistarkan waa la diiwaan geliyay.",
+    nav_lottery: "Lottery", nav_lottery_desc: "Qaybta Simistarka",
+    lottery_title: "🎰 Lottery Simistarka",
+    lottery_intro: "Macaamiil kasta oo diiwaan gashan si toos ah ayuu ugu jiraa — isdiiwaan gelin lama baahna. Geli lambarkaaga taleefanka si aad u hubiso in aad tahay guuleystaha simistarkan.",
+    lottery_phone_label: "Lambarka Taleefankaaga",
+    lottery_phone_placeholder: "Geli Numberkaga TIJAABI NASIIBKAAGA!",
+    lottery_check_btn: "Hubi Haddii Aan Guuleystay",
+    lottery_checking: "Xaqiijinaya…",
+    lottery_not_eligible: "Uma helin lambarkaas taleefanka diiwaanka. Hubi lambarka, ama la xiriir UB Cafe.",
+    lottery_not_drawn: "Guuleystaha simistarkan weli lama xushin — dib u soo hubi dhawaan!",
+    lottery_win: "🎉🏆 Hambalyo! Waxaad tahay guuleystaha Boholnimada simistarkan!",
+    lottery_lose: "😔 Markan ma aha — 🍀 nasiib wanaagsan simistarka soo socda!",
+    lottery_reward_line: "🎁 Abaalmarintaada: ${total}, waxaa lagu bixinayaa {parts} qaybood oo siman oo mid kastaa ${part}.",
     nav_results: "Natiijada", nav_results_desc: "Shaqaalaha oo keliya",
     results_title: "Natiijada Codbixinta",
     results_staff_only: "Shaqaalaha oo keliya — geli PIN-ka natiijooyinka si aad u aragto xaaladda hadda.",
@@ -2791,6 +2835,18 @@ const I18N = {
     vote_thanks_body: "شكرًا لتصويتك — تم تسجيل أفضل 5 لديك لهذا الفصل الدراسي.",
     vote_already_voted_title: "لقد قمت بالتصويت مسبقًا",
     vote_already_voted_body: "يُسمح بصوت واحد فقط لكل شخص. تم تسجيل تصويتك السابق لهذا الفصل بالفعل.",
+    nav_lottery: "اليانصيب", nav_lottery_desc: "سحب الفصل الدراسي",
+    lottery_title: "🎰 يانصيب الفصل الدراسي",
+    lottery_intro: "كل عميل مسجّل مشارك تلقائيًا — لا حاجة للتسجيل. أدخل رقم هاتفك للتحقق مما إذا كنت الفائز بهذا الفصل.",
+    lottery_phone_label: "رقم هاتفك",
+    lottery_phone_placeholder: "مثال: 0634449111",
+    lottery_check_btn: "تحقق إذا فزت",
+    lottery_checking: "جارٍ التحقق…",
+    lottery_not_eligible: "لم نجد رقم الهاتف هذا في السجلات. تحقق من الرقم أو تواصل مع UB Cafe.",
+    lottery_not_drawn: "لم يتم سحب الفائز بهذا الفصل بعد — تحقق مرة أخرى قريبًا!",
+    lottery_win: "🎉🏆 تهانينا! أنت الفائز بيانصيب هذا الفصل الدراسي!",
+    lottery_lose: "😔 ليس هذه المرة — 🍀 حظًا أوفر في الفصل القادم!",
+    lottery_reward_line: "🎁 مكافأتك: ${total}، تُدفع على {parts} أجزاء متساوية بقيمة ${part} لكل جزء.",
     nav_results: "النتائج", nav_results_desc: "للموظفين فقط",
     results_title: "نتائج التصويت",
     results_staff_only: "للموظفين فقط — أدخل رمز PIN لعرض الترتيب الحالي.",
@@ -2990,6 +3046,11 @@ $$('.nav-item').forEach(tab=>{
     if(tab.dataset.section==='place') renderOrderScreen();
     if(tab.dataset.section==='rate') renderRateScreen();
     if(tab.dataset.section==='vote') renderVoteScreen();
+    if(tab.dataset.section==='lottery'){
+      $('#lotteryPhone').value = '';
+      $('#lotteryMsg').className = 'msg';
+      $('#lotteryResult').innerHTML = '';
+    }
   });
 });
 
@@ -3386,6 +3447,75 @@ function waPhone(p){
   const core = canonicalPhone(p);
   return core ? '252' + core : null;
 }
+/* ---------------------------------------------------------------------
+   SEMESTER LOTTERY (customer-facing check)
+   Everyone is automatically entered — no separate signup. Staff draw the
+   winner from index.html; this just lets a customer verify their phone
+   number (same canonicalization as Vote/Balance) and see if it matches.
+   Read-only: never writes to SEMESTER_LOTTERY_KEY from this page.
+--------------------------------------------------------------------- */
+const SEMESTER_LOTTERY_KEY = "ubcafe_semester_lottery";
+const LOTTERY_REWARD_KEY = "ubcafe_lottery_reward";
+const LOTTERY_REWARD_PARTS = 6;
+async function loadSemesterLotteryPublic(){
+  const val = await storageGet(SEMESTER_LOTTERY_KEY, true);
+  try{ return val ? JSON.parse(val) : null; }catch(e){ return null; }
+}
+async function loadLotteryRewardPublic(){
+  const val = await storageGet(LOTTERY_REWARD_KEY, true);
+  try{ return val ? JSON.parse(val) : null; }catch(e){ return null; }
+}
+
+$('#lotteryCheckBtn').addEventListener('click', async ()=>{
+  const btn = $('#lotteryCheckBtn');
+  const msg = $('#lotteryMsg');
+  const result = $('#lotteryResult');
+  const phone = $('#lotteryPhone').value.trim();
+  result.innerHTML = '';
+  if(!phone){
+    msg.textContent = t('enter_phone_first');
+    msg.className = 'msg show err';
+    return;
+  }
+  btn.disabled = true;
+  const original = btn.textContent;
+  btn.textContent = t('lottery_checking');
+  try{
+    await loadCustomers(); // refresh in case the customer list was just updated
+    if(!customers.some(c => canonicalPhone(c.phone) === canonicalPhone(phone))){
+      msg.textContent = t('lottery_not_eligible');
+      msg.className = 'msg show err';
+      return;
+    }
+    const winner = await loadSemesterLotteryPublic();
+    msg.className = 'msg';
+    if(!winner){
+      result.innerHTML = `<div class="hint">${t('lottery_not_drawn')}</div>`;
+      return;
+    }
+    const won = canonicalPhone(winner.phone) === canonicalPhone(phone);
+    if(!won){
+      result.innerHTML = `<div class="hint">${t('lottery_lose')}</div>`;
+      return;
+    }
+    const reward = await loadLotteryRewardPublic();
+    const rewardLine = (reward && reward.totalAmount)
+      ? `<p class="hint">${t('lottery_reward_line')
+          .replace('{total}', reward.totalAmount)
+          .replace('{parts}', LOTTERY_REWARD_PARTS)
+          .replace('{part}', (reward.totalAmount / LOTTERY_REWARD_PARTS).toFixed(2))}</p>`
+      : '';
+    result.innerHTML = `<div class="confirm-wrap"><div class="confirm-seal confirm-seal-gold">🎰</div><h2>${t('lottery_win')}</h2>${rewardLine}</div>`;
+  }catch(e){
+    msg.textContent = t('generic_error') + e.message;
+    msg.className = 'msg show err';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+});
+$('#lotteryPhone').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#lotteryCheckBtn').click(); });
+
 function invoiceBalance(inv){
   const paid = (inv.payments||[]).reduce((s,p)=>s+p.amount, 0);
   const owed = (inv.grandTotal !== undefined) ? inv.grandTotal : inv.total;
@@ -3626,15 +3756,17 @@ function renderVotingWindowState(){
   const end = votingWindow ? formatVotingDateTime(votingWindow.endAt) : '';
 
   // While voting is actively open, hide every other tab so people are
-  // focused on voting — only Vote stays reachable. Restore them the
-  // moment it's not open (not started yet, or closed).
-  const otherTabs = $$('.nav-item').filter(t => t.dataset.section !== 'vote');
+  // focused on voting — only Vote stays reachable. Lottery stays visible
+  // throughout (it's not part of the election), everything else hides.
+  // Restore the rest the moment voting isn't open (not started, or closed).
+  const otherTabs = $$('.nav-item').filter(t => t.dataset.section !== 'vote' && t.dataset.section !== 'lottery');
   if(status === 'open'){
     otherTabs.forEach(t => t.style.display = 'none');
     // If a now-hidden tab was active (e.g. window opened while someone was
     // on Order), snap the view over to Vote instead of leaving a blank tab.
+    // Lottery is exempt — it stays visible, so someone already there is left alone.
     const activeTab = $('.nav-item.active');
-    if(activeTab && activeTab.dataset.section !== 'vote'){
+    if(activeTab && activeTab.dataset.section !== 'vote' && activeTab.dataset.section !== 'lottery'){
       $$('.nav-item').forEach(t=>t.classList.remove('active'));
       $$('.section').forEach(s=>s.classList.remove('active'));
       $('.nav-item[data-section="vote"]').classList.add('active');
