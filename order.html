@@ -3882,8 +3882,11 @@ function scrollToVotePhoneField(){
 // picking and staff can administer the vote properly.
 function maskCandidateName(name){
   const trimmed = String(name||'').trim();
-  if(trimmed.length <= 3) return trimmed;
-  return trimmed.slice(0, 3) + '***';
+  if(!trimmed) return trimmed;
+  const parts = trimmed.split(/\s+/);
+  const firstName = parts[0];
+  if(parts.length === 1) return firstName; // single-word name — nothing left to mask
+  return firstName + ' ***';
 }
 
 function buildResultsListHTML(scored, unmasked, showReward){
