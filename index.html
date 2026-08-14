@@ -585,6 +585,16 @@
   .congrats-row .cg-send:hover{opacity:.9;}
   .congrats-row .cg-no-phone{font-size:11px;color:var(--ink-soft);font-style:italic;}
 
+  .voter-list-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px;}
+  .voter-list-table th{
+    text-align:left;padding:8px 10px;background:var(--ink);color:var(--paper);
+    font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .voter-list-table td{padding:8px 10px;border-bottom:1px solid var(--paper-line);}
+  .voter-list-table tr:nth-child(even) td{background:rgba(0,0,0,0.02);}
+  .voter-list-table td.vl-phone{font-family:'IBM Plex Mono',monospace;}
+  .voter-list-table td.vl-time{color:var(--ink-soft);white-space:nowrap;}
+
   /* ---------- Letterhead (professional report header) ---------- */
   .letterhead{
     display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px;
@@ -1181,20 +1191,17 @@
         <button class="secondary" id="electionClearVotesBtn" style="margin-top:10px;width:100%;color:var(--debit);border-color:var(--debit);">Clear All Votes</button>
         <div class="msg" id="electionClearVotesMsg"></div>
 
+        <div class="results-window-block">
+          <div class="top5-title" style="margin-bottom:2px;">Voter List</div>
+          <p class="hint">Every ballot submitted so far — phone number, who they voted for, and when.</p>
+          <div id="electionVoterListMeta" class="hint" style="margin-bottom:8px;"></div>
+          <div id="electionVoterListTable"></div>
+        </div>
+
         <div class="results-window-block" id="electionCongratsBlock" style="display:none;">
           <div class="top5-title" style="margin-bottom:2px;">Congratulate Winners</div>
           <p class="hint">Voting has closed. Send each winner a congratulations message on WhatsApp — opens with the message pre-filled so you can review before sending.</p>
           <div id="electionCongratsList" class="congrats-list"></div>
-        </div>
-
-        <div class="results-window-block">
-          <div class="top5-title" style="margin-bottom:2px;">🎰 Semester Lottery</div>
-          <p class="hint">Draws one random winner for the semester from all registered customers, regardless of activity. One draw per semester — running it again just shows the same winner until you reset for a new semester.</p>
-          <div id="semesterLotteryResult" class="hint" style="margin-bottom:10px;"></div>
-          <button class="secondary" id="semesterLotteryRunBtn" style="width:100%;">🎰 Run Semester Lottery</button>
-          <div class="msg" id="semesterLotteryMsg"></div>
-          <button class="secondary" id="semesterLotteryResetBtn" style="margin-top:10px;width:100%;color:var(--debit);border-color:var(--debit);">Reset for New Semester</button>
-          <div class="msg" id="semesterLotteryResetMsg"></div>
         </div>
 
         <div class="results-window-block">
@@ -10820,110 +10827,43 @@ function isoToLocalInputValue(iso){
 }
 
 async function renderElectionResults(){
-  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes(), loadVotingWindow(), loadRewardPool(), loadSemesterLottery()]);
+  await Promise.all([loadCustomers(), loadInvoices(), loadSemesterVotes(), loadVotingWindow(), loadRewardPool()]);
   renderElectionBoard();
   renderElectionCongratsBlock();
+  renderElectionVoterList();
   renderElectionWindowSettings();
   renderElectionRewardPoolSettings();
-  renderSemesterLotteryResult();
 }
 
-/* ---------------- Semester Lottery ----------------
-   Picks ONE random winner for the whole semester from ALL registered
-   customers, regardless of activity — separate from the vote-based Top 5.
-   Stored as a single { customerId, name, phone, drawnAt } object (not
-   date-keyed), so the draw is idempotent for the semester: running it
-   again just shows the existing winner until staff resets for a new
-   semester via the Reset button. */
-const SEMESTER_LOTTERY_KEY = "ubcafe_semester_lottery";
-let semesterLottery = null;
-
-async function loadSemesterLottery(){
-  const val = await storageGet(SEMESTER_LOTTERY_KEY, true);
-  try{ semesterLottery = val ? JSON.parse(val) : null; }catch(e){ semesterLottery = null; }
-}
-async function saveSemesterLottery(){ await storageSet(SEMESTER_LOTTERY_KEY, semesterLottery ? JSON.stringify(semesterLottery) : '', true); }
-
-function renderSemesterLotteryResult(){
-  const el = $('#semesterLotteryResult');
-  if(!semesterLottery){
-    el.textContent = "No winner drawn yet this semester.";
+function renderElectionVoterList(){
+  const meta = $('#electionVoterListMeta');
+  const table = $('#electionVoterListTable');
+  meta.textContent = `${semesterVotes.length} ballot(s) on file.`;
+  if(semesterVotes.length === 0){
+    table.innerHTML = `<div class="empty">No votes have been submitted yet.</div>`;
     return;
   }
-  const wa = waPhone(semesterLottery.phone);
-  const action = wa
-    ? ` <a class="cg-send" style="margin-left:8px;" href="https://wa.me/${wa}?text=${encodeURIComponent(`🎉 Congratulations ${semesterLottery.name}! You're this semester's UB Cafe Lottery winner! 🎰`)}" target="_blank" rel="noopener">💬 Message Winner</a>`
-    : '';
-  el.innerHTML = `Semester winner: <strong>${semesterLottery.name}</strong>${semesterLottery.phone ? ' (' + semesterLottery.phone + ')' : ''}${action}`;
+  const nameById = {};
+  customers.forEach(c => { nameById[String(c.id)] = c.name; });
+
+  // Newest first
+  const sorted = [...semesterVotes].sort((a,b)=> new Date(b.submittedAt||0) - new Date(a.submittedAt||0));
+
+  const rows = sorted.map(v=>{
+    const choice = getVoteChoice(v);
+    const votedFor = choice ? (choice.name || nameById[choice.id] || 'Unknown customer') : '—';
+    const phone = v.voterPhone || '—';
+    const when = v.submittedAt ? formatVotingDateTime(v.submittedAt) : '—';
+    return `<tr><td class="vl-phone">${phone}</td><td>${votedFor}</td><td class="vl-time">${when}</td></tr>`;
+  }).join('');
+
+  table.innerHTML = `
+    <table class="voter-list-table">
+      <thead><tr><th>Phone</th><th>Voted For</th><th>Submitted</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
 }
-
-$('#semesterLotteryRunBtn').addEventListener('click', async ()=>{
-  const btn = $('#semesterLotteryRunBtn');
-  const msg = $('#semesterLotteryMsg');
-  btn.disabled = true;
-  const original = btn.textContent;
-  btn.textContent = 'Drawing…';
-  try{
-    await Promise.all([loadCustomers(), loadSemesterLottery()]);
-    if(semesterLottery){
-      msg.textContent = "This semester's winner has already been drawn.";
-      msg.className = 'msg show ok';
-    }else{
-      if(customers.length === 0){
-        msg.textContent = 'No registered customers to draw from.';
-        msg.className = 'msg show err';
-        return;
-      }
-      const winner = customers[Math.floor(Math.random() * customers.length)];
-      semesterLottery = {
-        customerId: winner.id,
-        name: winner.name,
-        phone: winner.phone || '',
-        drawnAt: new Date().toISOString(),
-        poolSize: customers.length
-      };
-      await saveSemesterLottery();
-      msg.textContent = `Winner drawn from ${customers.length} customer(s)!`;
-      msg.className = 'msg show ok';
-    }
-    renderSemesterLotteryResult();
-  }catch(e){
-    msg.textContent = 'Something went wrong: ' + e.message;
-    msg.className = 'msg show err';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = original;
-  }
-});
-
-$('#semesterLotteryResetBtn').addEventListener('click', async ()=>{
-  const btn = $('#semesterLotteryResetBtn');
-  const msg = $('#semesterLotteryResetMsg');
-  await loadSemesterLottery();
-  if(!semesterLottery){
-    msg.textContent = 'No winner on file to reset.';
-    msg.className = 'msg show ok';
-    return;
-  }
-  const confirmed = window.confirm(`This will clear ${semesterLottery.name} as the current semester's lottery winner so a new draw can happen. Continue?`);
-  if(!confirmed) return;
-  btn.disabled = true;
-  const original = btn.textContent;
-  btn.textContent = 'Resetting…';
-  try{
-    semesterLottery = null;
-    await saveSemesterLottery();
-    msg.textContent = 'Reset — ready for a new semester draw.';
-    msg.className = 'msg show ok';
-    renderSemesterLotteryResult();
-  }catch(e){
-    msg.textContent = 'Something went wrong: ' + e.message;
-    msg.className = 'msg show err';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = original;
-  }
-});
 
 function renderElectionBoard(){
   const board = computeCandidateScores().slice(0, 25);
@@ -11031,6 +10971,7 @@ $('#electionCleanupBtn').addEventListener('click', async ()=>{
     }
     renderElectionBoard();
     renderElectionCongratsBlock();
+    renderElectionVoterList();
   }catch(e){
     msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg show err';
@@ -11080,6 +11021,7 @@ $('#electionMergeDupesBtn').addEventListener('click', async ()=>{
     }
     renderElectionBoard();
     renderElectionCongratsBlock();
+    renderElectionVoterList();
   }catch(e){
     msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg show err';
@@ -11111,6 +11053,7 @@ $('#electionClearVotesBtn').addEventListener('click', async ()=>{
     msg.className = 'msg show ok';
     renderElectionBoard();
     renderElectionCongratsBlock();
+    renderElectionVoterList();
   }catch(e){
     msg.textContent = 'Something went wrong: ' + e.message;
     msg.className = 'msg show err';

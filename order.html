@@ -211,6 +211,19 @@
   html[dir="rtl"] .ballot-ribbon{right:auto;left:-31px;transform:rotate(-40deg);}
 
   /* ---------- Live leaderboard: horizontal score bars with medal ranks ---------- */
+  /* ---------- Vote page: left info sidebar + responsive layout ---------- */
+  .vote-info-sidebar{margin-bottom:14px;}
+  .vote-info-sidebar .top5-title{margin-bottom:10px;}
+  .vote-info-steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:9px;}
+  html[dir="rtl"] .vote-info-steps{padding-left:0;padding-right:20px;}
+  .vote-info-steps li{font-size:12.5px;line-height:1.55;color:var(--ink-soft);}
+  .vote-info-steps li::marker{color:var(--brass-dark);font-weight:700;}
+  @media (min-width:860px){
+    #section-vote.narrow{max-width:920px;}
+    #section-vote{display:grid;grid-template-columns:250px 1fr;gap:24px;align-items:start;}
+    .vote-info-sidebar{position:sticky;top:16px;margin-bottom:0;}
+  }
+
   .top5-panel{margin-bottom:14px;}
   .top5-panel .top5-title{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:10px;text-align:center;}
   .top5-formula-hint{font-size:13px;font-weight:700;color:var(--ink-soft);text-align:center;margin:-4px 0 10px;font-style:italic;}
@@ -681,6 +694,21 @@ body{ zoom: 1.15; }
 
   <!-- ===================== VOTE: TOP 5 OF THE SEMESTER ===================== -->
   <div class="section narrow" id="section-vote">
+    <div class="vote-info-sidebar panel">
+      <div class="top5-title" data-i18n="vote_info_title">How to Vote</div>
+      <ol class="vote-info-steps">
+        <li data-i18n="vote_info_step1">The 5 candidates are chosen automatically — the biggest spenders this semester.</li>
+        <li data-i18n="vote_info_step2">Enter your phone number to verify you're a registered customer.</li>
+        <li data-i18n="vote_info_step3">Pick your one favorite from the 5.</li>
+        <li data-i18n="vote_info_step4">One vote per person — no changes after you submit.</li>
+        <li data-i18n="vote_info_step5">Results are visible live while voting is open.</li>
+        <li data-i18n="vote_info_step6">The phone number you vote with must be the Telesom number you used to order with last semester.</li>
+        <li data-i18n="vote_info_step7">New customer? Register first — then place an online order and pay for it before continuing with your registration.</li>
+        <li data-i18n="vote_info_step8">You must be a customer registered under UB Cafe's merchant numbers 409905 (Cafeteria 1) or 513112 (Cafeteria 2).</li>
+        <li data-i18n="vote_info_step9">Anyone who sent money last semester to numbers 513112 or 409905 can vote — or anyone who registers now while also placing an order.</li>
+      </ol>
+    </div>
+    <div class="vote-main-col">
     <div class="vote-header">
       <div class="vote-eyebrow">🎓 <span data-i18n="vote_eyebrow">UB Cafe Election</span></div>
       <h1 class="vote-heading" data-i18n="vote_title">Customer of the Semester</h1>
@@ -754,6 +782,7 @@ body{ zoom: 1.15; }
         <h2 id="voteThanksTitle">Vote Submitted!</h2>
         <p id="voteThanksBody" style="color:var(--ink-soft);font-size:13.5px;">Thanks for voting — your top 5 has been recorded for this semester.</p>
       </div>
+    </div>
     </div>
   </div>
 
@@ -2515,6 +2544,16 @@ const I18N = {
     congrats_message_template: "🎉 Congratulations {name}! You've been voted UB Cafe's #{rank} Customer of the Semester, earning {reward}% of the prize pool. Thank you for being part of our community! 🏆",
     vote_title: "Customer of the Semester",
     vote_eyebrow: "UB Cafe Election",
+    vote_info_title: "How to Vote",
+    vote_info_step1: "The 5 candidates are chosen automatically — the biggest spenders this semester.",
+    vote_info_step2: "Enter your phone number to verify you're a registered customer.",
+    vote_info_step3: "Pick your one favorite from the 5.",
+    vote_info_step4: "One vote per person — no changes after you submit.",
+    vote_info_step5: "Results are visible live while voting is open.",
+    vote_info_step6: "The phone number you vote with must be the Telesom number you used to order with last semester.",
+    vote_info_step7: "New customer? Register first — then place an online order and pay for it before continuing with your registration.",
+    vote_info_step8: "You must be a customer registered under UB Cafe's merchant numbers 409905 (Cafeteria 1) or 513112 (Cafeteria 2).",
+    vote_info_step9: "Anyone who sent money last semester to numbers 513112 or 409905 can vote — or anyone who registers now while also placing an order.",
     ballot_ribbon: "Official Ballot",
     vote_new_customer_link: "New here? Register to vote",
     vote_register_title: "Register to Vote",
@@ -2661,6 +2700,16 @@ const I18N = {
     congrats_message_template: "🎉 Hambalyo {name}! Waxaa lagaaga codeeyay inaad tahay Macaamiisha #{rank} ee UB Cafe Simistarkan, waxaadna heleysaa {reward}% kaydka abaalmarinta. Waad ku mahadsan tahay inaad ka mid tahay bulshadeena! 🏆",
     vote_title: "Macaamiisha Simistarka",
     vote_eyebrow: "Doorashada UB Cafe",
+    vote_info_title: "Sida Loo Codeeyo",
+    vote_info_step1: "5-ta musharraxa waxaa si toos ah loo doortaa — kuwa ugu kharashka badan simistarkan.",
+    vote_info_step2: "Gali lambarka taleefankaaga si aad u xaqiijiso inaad tahay macaamiil diiwaan gashan.",
+    vote_info_step3: "Dooro hal qof oo aad ugu jeceshahay 5-da.",
+    vote_info_step4: "Hal cod baa loo ogol yahay qof kasta — wax kama beddeli kartid marka aad dirto.",
+    vote_info_step5: "Natiijooyinka waa la arki karaa si toos ah intii codeyntu furan tahay.",
+    vote_info_step6: "Number-ka Tel aad ku Codaynaysaa Waa Numberkii aad Meherad Wax kaga iibsan Jirtay Semesterkii hore Waana Telesom.",
+    vote_info_step7: "Hadii aad Customer Cusub tahay isdiiwaan geli. Diiwaangelinta ka Hor na Dalab Online ah Samee. Lacagta Dalabkaaga markaad bixiso ku soco diiwaangelintaada.",
+    vote_info_step8: "Waa inaad tahay macaamiil ku diiwaan gashan lambarrada merchant-ka UB Cafe ee 409905 (Cafeteria 1) ama 513112 (Cafeteria 2).",
+    vote_info_step9: "Waxaa Codayn Kara qofkasta oo Semesterkii Hore Lacag u diray Numberadan 513112 ama 409905, Ama Qofkasta oo Hadda Isdiiwaangaliya isagoo dalab na samaynaya.",
     ballot_ribbon: "Waraaqda Codbixinta Rasmiga ah",
     vote_new_customer_link: "Cusub tahay? Isdiiwaan geli si aad u codeyso",
     vote_register_title: "Isdiiwaan Geli si aad u Codeyso",
@@ -2808,6 +2857,16 @@ const I18N = {
     congrats_message_template: "🎉 تهانينا {name}! تم اختيارك كعميل UB Cafe رقم {rank} لهذا الفصل الدراسي، وستحصل على {reward}% من صندوق الجائزة. شكرًا لكونك جزءًا من مجتمعنا! 🏆",
     vote_title: "عميل الفصل الدراسي",
     vote_eyebrow: "انتخابات UB Cafe",
+    vote_info_title: "كيفية التصويت",
+    vote_info_step1: "يتم اختيار المرشحين الخمسة تلقائيًا — الأعلى إنفاقًا هذا الفصل.",
+    vote_info_step2: "أدخل رقم هاتفك للتحقق من أنك عميل مسجّل.",
+    vote_info_step3: "اختر مفضّلك الوحيد من بين الخمسة.",
+    vote_info_step4: "صوت واحد لكل شخص — لا يمكن التغيير بعد الإرسال.",
+    vote_info_step5: "النتائج مرئية لحظيًا أثناء فتح التصويت.",
+    vote_info_step6: "رقم الهاتف الذي تصوّت به يجب أن يكون رقم Telesom الذي طلبت به في الفصل الدراسي الماضي.",
+    vote_info_step7: "عميل جديد؟ سجّل أولاً — ثم قدّم طلبًا عبر الإنترنت وادفع ثمنه قبل إكمال تسجيلك.",
+    vote_info_step8: "يجب أن تكون عميلاً مسجّلاً تحت أرقام تجار UB Cafe: 409905 (الكافتيريا 1) أو 513112 (الكافتيريا 2).",
+    vote_info_step9: "يمكن لأي شخص أرسل مالاً في الفصل الدراسي الماضي إلى الرقمين 513112 أو 409905 أن يصوّت — أو أي شخص يسجّل الآن مع تقديم طلب.",
     ballot_ribbon: "ورقة اقتراع رسمية",
     vote_new_customer_link: "زائر جديد؟ سجّل للتصويت",
     vote_register_title: "التسجيل للتصويت",
@@ -3884,9 +3943,10 @@ function maskCandidateName(name){
   const trimmed = String(name||'').trim();
   if(!trimmed) return trimmed;
   const parts = trimmed.split(/\s+/);
-  const firstName = parts[0];
-  if(parts.length === 1) return firstName; // single-word name — nothing left to mask
-  return firstName + ' ***';
+  if(parts.length === 1) return parts[0]; // single-word name — nothing left to mask
+  // First name in full, then just the initial of the second name + mask.
+  const secondInitial = parts[1].charAt(0);
+  return parts[0] + ' ' + secondInitial + '****';
 }
 
 function buildResultsListHTML(scored, unmasked, showReward){
