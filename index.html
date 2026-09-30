@@ -284,6 +284,8 @@
   .status-pill.pending{background:#FBF0D9;color:var(--brass-dark);}
   .status-pill.received{background:var(--ok-bg);color:var(--credit);}
   .status-pill.cancelled{background:var(--danger-bg);color:var(--debit);}
+  .status-pill.active{background:var(--ok-bg);color:var(--credit);}
+  .status-pill.inactive{background:var(--paper-line);color:var(--ink-soft);}
 
   /* ---------- Printable Invoice Document (matches uploaded template) ---------- */
   .invoice-doc-wrap{max-width:640px;width:100%;max-height:88vh;overflow-y:auto;}
@@ -1982,6 +1984,13 @@
             <button class="secondary" id="runPayrollAllBtn">Run for All Active Employees</button>
           </div>
         </div>
+
+        <div class="voucher" style="margin-top:22px;">
+          <div class="stmt-section-title" style="margin-top:0;">Accrue Salaries</div>
+          <div class="hint" style="margin-bottom:12px;">Posts each active, flat-monthly-salary employee's pay as a Salary Expense day by day, so each department's books show the real cost even before you run payroll — this doesn't pay anyone, it only recognizes the expense. Running payroll later settles it, so nothing is ever expensed twice. Daily-rate and commission-earning employees aren't included, since their pay depends on figures only known once the period ends.</div>
+          <button class="secondary" id="accrueSalariesBtn">📆 Accrue Salaries to Today</button>
+          <div class="msg" id="accrueSalariesMsg"></div>
+        </div>
       </div>
 
       <!-- Payroll History -->
@@ -3306,11 +3315,17 @@
     </div>
     <div class="voucher-row">
       <div class="field">
+        <label for="uEmployeeId">Link to Employee <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+        <select id="uEmployeeId"></select>
+      </div>
+    </div>
+    <div class="voucher-row">
+      <div class="field">
         <label for="uDepartment">Department</label>
         <select id="uDepartment"></select>
       </div>
     </div>
-    <div class="hint" style="margin-top:0;margin-bottom:10px;">Whatever department this user is assigned to, their POS sales are automatically attributed to it — no picker needed at checkout. The "Dept Staff" role logs straight into that department's page (with Purchasing for bill/PO requests) and can't see any other department or tab.</div>
+    <div class="hint" style="margin-top:0;margin-bottom:10px;">Whatever department this user is assigned to, their POS sales are automatically attributed to it — no picker needed at checkout. The "Dept Staff" role logs straight into that department's page (with Purchasing for bill/PO requests) and can't see any other department or tab. Linking to an HR employee fills in their department automatically and keeps it in sync if the employee's department changes later.</div>
     <div class="msg" id="manageUsersMsg"></div>
     <div class="modal-actions">
       <button class="primary" id="addUserBtn" style="flex:1;">Save User</button>
@@ -6251,6 +6266,42 @@ async function renderDepartments(){
   renderDepartmentDetail(activeDepartment);
 }
 
+// Staff assigned to this department (from HR > Employees) with their pay, so
+// an admin can see department headcount and payroll cost at a glance. This is
+// a roster, not the ledger — actual Salary Expense already appears in the
+// Expenses section above once payroll is run (each payroll entry is tagged
+// with the employee's department).
+function renderDeptStaffHtml(dept){
+  const staff = employees.filter(e=>(e.department||DEPARTMENTS[0])===dept);
+  let html = '<div class="stmt-section-title">Staff & Salaries</div>';
+  if(staff.length===0){
+    html += `<div class="stmt-row" style="color:var(--ink-soft);">No employees assigned to ${esc(dept)} yet — add one under HR &gt; Employees.</div>`;
+    return html;
+  }
+  let monthlyTotal = 0, dailyTotal = 0;
+  html += '<table><thead><tr><th>Name</th><th>Position</th><th>Status</th><th class="num">Pay</th></tr></thead><tbody>';
+  [...staff].sort((a,b)=>(a.fullName||'').localeCompare(b.fullName||'')).forEach(e=>{
+    const payType = e.payType||'Monthly';
+    const payLabel = payType==='Daily' ? `${fmt(e.dailyRate||0)}/day` : `${fmt(e.monthlySalary||0)}/mo`;
+    if(e.status==='Active'){
+      if(payType==='Daily') dailyTotal += (e.dailyRate||0); else monthlyTotal += (e.monthlySalary||0);
+    }
+    const commissionNote = e.hasCommission ? ` + ${e.commissionRate||0}% commission` : '';
+    html += `<tr>
+      <td>${esc(e.fullName||'')}</td>
+      <td>${esc(e.position||'')}</td>
+      <td>${e.status==='Active' ? '<span class="status-pill active">Active</span>' : '<span class="status-pill inactive">Inactive</span>'}</td>
+      <td class="num">${payLabel}${commissionNote}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  const parts = [];
+  if(monthlyTotal>0) parts.push(`${fmt(monthlyTotal)}/mo`);
+  if(dailyTotal>0) parts.push(`${fmt(dailyTotal)}/day`);
+  html += `<div class="hint" style="margin-top:6px;">Active base pay: ${parts.length?parts.join(' + '):'0'}${staff.some(e=>e.hasCommission&&e.status==='Active')?' (plus commission on sales)':''}. Doesn't include advances or one-off deductions — see Run Payroll for exact amounts.</div>`;
+  return html;
+}
+
 function renderDepartmentDetail(dept){
   const totals = computeLedger(d=>inPeriod(d,false), dept);
   const revenueAccounts = ACCOUNTS.filter(a=>a.type==='Revenue');
@@ -6285,6 +6336,7 @@ function renderDepartmentDetail(dept){
   html += `<div class="stmt-total ${netIncome>=0?'net-positive':'net-negative'}"><span>Net ${netIncome>=0?'Income':'Loss'}</span><span class="amt">${fmt(Math.abs(netIncome))}</span></div>`;
   html += '</div>';
 
+  html += renderDeptStaffHtml(dept);
   html += renderDeptReceivableHtml(dept);
 
   html += `<div class="stmt-section-title">Department Actions</div>
@@ -7318,6 +7370,31 @@ function renderEmployeesTable(){
   });
 }
 
+// Any login linked to this employee (via uEmployeeId) has this employee's department
+// as its single source of truth — push a change here out to those logins too, in both
+// the Firebase-Auth ("secure") and legacy plain-account user stores.
+async function syncUserDepartmentsForEmployee(emp){
+  if(SECURE_AUTH()){
+    let profiles;
+    try{ profiles = await listStaffProfiles(); }catch(e){ return; }
+    const linked = profiles.filter(u=>u.employeeId===emp.id && u.department!==(emp.department||null));
+    for(const u of linked){
+      try{
+        await firestoreDb.collection(STAFF_PROFILES).doc(u.uid).update({
+          department: emp.department || null, changedBy: currentUser, changedAt: new Date().toISOString()
+        });
+      }catch(e){ /* one login failing to sync shouldn't block the employee save */ }
+    }
+  }else{
+    const users = await getUsers();
+    let changed = false;
+    users.forEach(u=>{
+      if(u.employeeId===emp.id && u.department!==(emp.department||null)){ u.department = emp.department || null; changed = true; }
+    });
+    if(changed) await setUsers(users);
+  }
+}
+
 $('#saveEmpBtn').addEventListener('click', async ()=>{
   const fullName = $('#empName').value.trim();
   const msg = $('#empMsg');
@@ -7347,6 +7424,7 @@ $('#saveEmpBtn').addEventListener('click', async ()=>{
     employees.push(record);
   }
   await saveEmployees();
+  await syncUserDepartmentsForEmployee(record);
   populatePosWaiterDropdown();
   msg.textContent = 'Employee saved.';
   msg.className = 'msg show ok';
@@ -7813,6 +7891,18 @@ $('#calcDaysWorkedBtn').addEventListener('click', ()=>{
   updatePayrollFieldsForEmployee();
 });
 
+// Net credit balance in Salary Payable attributable to this employee: accrual entries
+// (see postSalaryAccrualEntry) credit it; the settlement lines in postPayrollEntry debit it
+// back down when they actually get paid. What's left is "accrued but not yet paid".
+function computeEmployeeSalaryPayableBalance(employeeId){
+  return entries
+    .filter(e => e.salaryAccrualEmployeeId === employeeId || e.payrollEmployeeId === employeeId)
+    .reduce((s,e)=>{
+      const line = e.lines.find(l=>l.account==='Salary Payable');
+      return line ? s + line.credit - line.debit : s;
+    }, 0);
+}
+
 function computeEmployeeAdvanceBalance(employeeId){
   // Sums every journal entry tagged to this employee's advance account — a "give advance"
   // entry debits Employee Advances (raises the balance owed back), a payroll deduction
@@ -8122,10 +8212,18 @@ function postPayrollEntry(emp, grossAmount, dateStr, method, advanceDeduct, othe
   const netAmount = Math.max(0, grossAmount - advanceDeduct - otherDeduct);
   const creditAccount = (method==='payable') ? 'Salary Payable' : method;
 
-  const lines = [
-    { account: 'Salary Expense', debit: grossAmount, credit: 0 },
-    { account: creditAccount, debit: 0, credit: netAmount }
-  ];
+  // If this employee already has accrued-but-unpaid Salary Payable (see
+  // postSalaryAccrualEntry), settle that portion of gross pay against the liability
+  // instead of expensing it again — the expense was already recognized when it accrued.
+  // Only the portion of gross pay beyond what's been accrued (if any) is new expense.
+  const accruedOwed = computeEmployeeSalaryPayableBalance(emp.id);
+  const settleFromAccrual = Math.min(Math.max(accruedOwed, 0), grossAmount);
+  const newExpense = grossAmount - settleFromAccrual;
+
+  const lines = [];
+  if(settleFromAccrual > 0.005) lines.push({ account: 'Salary Payable', debit: settleFromAccrual, credit: 0 });
+  if(newExpense > 0.005) lines.push({ account: 'Salary Expense', debit: newExpense, credit: 0 });
+  lines.push({ account: creditAccount, debit: 0, credit: netAmount });
   if(advanceDeduct > 0.005) lines.push({ account: 'Employee Advances', debit: 0, credit: advanceDeduct });
   if(otherDeduct > 0.005) lines.push({ account: 'Other Income', debit: 0, credit: otherDeduct });
 
@@ -8153,10 +8251,59 @@ function postPayrollEntry(emp, grossAmount, dateStr, method, advanceDeduct, othe
     payrollNet: netAmount,
     payrollMethod: creditAccount,
     payrollPeriodLabel: periodLabel || '',
-    payrollCommission: commissionInfo || null
+    payrollCommission: commissionInfo || null,
+    department: emp.department || undefined
   };
   entries.push(entry);
   return entry;
+}
+
+const MS_PER_DAY = 24*60*60*1000;
+function daysBetween(fromStr, toStr){
+  return Math.round((new Date(toStr+'T00:00:00') - new Date(fromStr+'T00:00:00')) / MS_PER_DAY);
+}
+
+/* ---------------------------------------------------------------------
+   Salary accrual — recognizes an active, flat-monthly-salary employee's pay
+   as a real expense day by day, instead of waiting for Run Payroll. This is
+   the SAME population "Run for All Active Employees" already targets (no
+   commission, no daily-rate — those depend on figures only known when the
+   period ends, so they still only expense when payroll actually runs).
+
+   To avoid ever double-counting: each accrual entry CREDITS Salary Payable
+   for the days elapsed since this employee's last accrual, tagged with
+   salaryAccrualEmployeeId; postPayrollEntry then DEBITS (settles) that same
+   balance when they're actually paid, and only expenses anything beyond it.
+   See computeEmployeeSalaryPayableBalance for the running total.
+
+   The FIRST time this runs for an employee, nothing is posted — it only
+   records today as the starting point (emp.salaryAccruedThroughDate), so
+   nothing from before you turned this on gets backdated into the books.
+--------------------------------------------------------------------- */
+function postSalaryAccrualEntry(emp, dateStr){
+  if(!emp.salaryAccruedThroughDate){
+    return { established: true, days: 0, amount: 0 };
+  }
+  const days = daysBetween(emp.salaryAccruedThroughDate, dateStr);
+  if(days <= 0) return { established: false, days: 0, amount: 0 };
+
+  const amount = Math.round((emp.monthlySalary||0) / 30 * days);
+  if(amount <= 0) return { established: false, days, amount: 0 };
+
+  const entry = {
+    id: Date.now() + Math.floor(Math.random()*1000),
+    no: nextEntryNo(),
+    date: dateStr,
+    desc: `Accrued Salary: ${emp.fullName} (${emp.position||'Staff'}) — ${days} day(s) through ${fmtDate(dateStr)}`,
+    lines: [
+      { account: 'Salary Expense', debit: amount, credit: 0 },
+      { account: 'Salary Payable', debit: 0, credit: amount }
+    ],
+    salaryAccrualEmployeeId: emp.id,
+    department: emp.department || undefined
+  };
+  entries.push(entry);
+  return { established: false, days, amount };
 }
 
 $('#runPayrollBtn').addEventListener('click', async ()=>{
@@ -8239,6 +8386,34 @@ $('#runPayrollAllBtn').addEventListener('click', async ()=>{
   renderPayrollHistory();
 });
 
+$('#accrueSalariesBtn').addEventListener('click', async ()=>{
+  const msg = $('#accrueSalariesMsg');
+  const eligible = employees.filter(e=>e.status==='Active' && (e.payType||'Monthly')==='Monthly' && !e.hasCommission && (e.monthlySalary||0)>0);
+  if(eligible.length===0){
+    msg.textContent = 'No active employees on plain monthly salary (no commission) to accrue.';
+    msg.className = 'msg show err';
+    return;
+  }
+  const dateStr = todayStr();
+  let established = 0, accrued = 0, accruedTotal = 0, current = 0;
+  eligible.forEach(emp=>{
+    const result = postSalaryAccrualEntry(emp, dateStr);
+    if(result.established){ emp.salaryAccruedThroughDate = dateStr; established++; }
+    else if(result.amount > 0){ emp.salaryAccruedThroughDate = dateStr; accrued++; accruedTotal += result.amount; }
+    else{ current++; }
+  });
+  await saveEntries();
+  await saveEmployees();
+  renderAll();
+  renderEmployeesTable();
+  const parts = [];
+  if(accrued>0) parts.push(`accrued ${fmt(accruedTotal)} Sl.sh across ${accrued} employee(s)`);
+  if(established>0) parts.push(`started tracking ${established} employee(s) from today (nothing backdated)`);
+  if(current>0) parts.push(`${current} already up to date`);
+  msg.textContent = parts.length ? parts.join('; ') + '.' : 'Nothing to accrue.';
+  msg.className = 'msg show ok';
+});
+
 /* ---------------- Payroll History ---------------- */
 function renderPayrollHistory(){
   const runs = entries.filter(e => e.desc && e.desc.startsWith('Payroll:'));
@@ -8248,10 +8423,9 @@ function renderPayrollHistory(){
   }
   let html = `<table><thead><tr><th style="width:70px;">No</th><th style="width:100px;">Date</th><th>Employee</th><th>Paid Via</th><th class="num">Amount</th><th></th></tr></thead><tbody>`;
   [...runs].sort((a,b)=>b.no-a.no).forEach(e=>{
-    const expLine = e.lines.find(l=>l.account==='Salary Expense');
     const creditLine = e.lines.find(l=>l.account!=='Salary Expense' && l.credit>0);
     const slipBtn = e.payrollEmployeeId ? `<button class="secondary" data-action="slip" data-id="${e.id}" style="font-size:11.5px;padding:4px 10px;">🖨 Slip</button>` : '';
-    html += `<tr><td>${e.no}</td><td>${fmtDate(e.date)}</td><td>${e.desc.replace('Payroll: ','')}</td><td>${creditLine?creditLine.account:''}</td><td class="num">${fmt(expLine?expLine.debit:0)}</td><td>${slipBtn}</td></tr>`;
+    html += `<tr><td>${e.no}</td><td>${fmtDate(e.date)}</td><td>${e.desc.replace('Payroll: ','')}</td><td>${creditLine?creditLine.account:(e.payrollMethod||'')}</td><td class="num">${fmt(e.payrollGross||0)}</td><td>${slipBtn}</td></tr>`;
   });
   html += '</tbody></table>';
   $('#payrollHistoryTable').innerHTML = html;
@@ -16460,6 +16634,28 @@ function populateUserDepartmentDropdown(){
   if(DEPARTMENTS.includes(prevValue)) sel.value = prevValue;
 }
 
+// Linking a login to an HR employee makes the employee's department the single
+// source of truth for that login's department (see syncUserDepartmentsForEmployee,
+// called whenever an employee is saved).
+function populateUserEmployeeDropdown(){
+  const sel = $('#uEmployeeId');
+  if(!sel) return;
+  const prevValue = sel.value;
+  sel.innerHTML = '<option value="">— Not linked — pick department manually —</option>' +
+    [...employees].sort((a,b)=>(a.fullName||'').localeCompare(b.fullName||''))
+      .map(e=>`<option value="${e.id}">${esc(e.fullName||'(unnamed)')}${e.position ? ' — '+esc(e.position) : ''}${e.department ? ' ('+esc(e.department)+')' : ''}</option>`).join('');
+  sel.value = employees.some(e=>String(e.id)===prevValue) ? prevValue : '';
+}
+function applyLinkedEmployeeDepartment(){
+  const empId = $('#uEmployeeId').value;
+  const deptSel = $('#uDepartment');
+  if(!empId){ deptSel.disabled = false; return; }
+  const emp = employees.find(e=>String(e.id)===empId);
+  deptSel.disabled = true;
+  if(emp) deptSel.value = DEPARTMENTS.includes(emp.department) ? emp.department : '';
+}
+$('#uEmployeeId').addEventListener('change', applyLinkedEmployeeDepartment);
+
 function clearUserForm(){
   editingUsername = null;
   editingUid = null;
@@ -16471,6 +16667,9 @@ function clearUserForm(){
   $('#uRole').value = 'Staff';
   populateUserDepartmentDropdown();
   $('#uDepartment').value = '';
+  $('#uDepartment').disabled = false;
+  populateUserEmployeeDropdown();
+  $('#uEmployeeId').value = '';
   $('#manageUsersMsg').className = 'msg';
 }
 
@@ -16509,7 +16708,9 @@ async function renderUsersListSecure(){
         $('#uFullName').value = u.fullName || ''; $('#uUsername').value = u.username; $('#uUsername').disabled = true;
         $('#uPassword').value = ''; $('#uPassword').disabled = true;
         $('#uPasswordHint').textContent = "Passwords are private. Staff change their own from the Welcome screen. If someone forgets theirs, remove their access and add them again with a new username.";
-        $('#uRole').value = u.role; populateUserDepartmentDropdown(); $('#uDepartment').value = u.department || ''; msg.className = 'msg';
+        $('#uRole').value = u.role; populateUserDepartmentDropdown(); $('#uDepartment').value = u.department || '';
+        populateUserEmployeeDropdown(); $('#uEmployeeId').value = u.employeeId || ''; applyLinkedEmployeeDepartment();
+        msg.className = 'msg';
         return;
       }
       const activeAdmins = profiles.filter(x => x.role === 'Admin' && !x.disabled);
@@ -16556,6 +16757,9 @@ async function renderUsersList(){
       $('#uRole').value = u.role;
       populateUserDepartmentDropdown();
       $('#uDepartment').value = u.department || '';
+      populateUserEmployeeDropdown();
+      $('#uEmployeeId').value = u.employeeId || '';
+      applyLinkedEmployeeDepartment();
       $('#manageUsersMsg').className = 'msg';
     });
   });
@@ -16915,7 +17119,8 @@ $('#cdClearBtn').addEventListener('click', async ()=>{
   }
 });
 
-function openManageUsersModal(){
+async function openManageUsersModal(){
+  await loadEmployees();   // make sure the Link to Employee list is current
   clearUserForm();
   $('#manageUsersModal').classList.add('active');
   renderUsersList();
@@ -16942,7 +17147,11 @@ $('#addUserBtn').addEventListener('click', async ()=>{
   const username = $('#uUsername').value.trim();
   const password = $('#uPassword').value;
   const role = $('#uRole').value;
-  const department = $('#uDepartment').value || null;
+  const employeeIdRaw = $('#uEmployeeId').value;
+  const linkedEmployee = employeeIdRaw ? employees.find(e=>String(e.id)===employeeIdRaw) : null;
+  const employeeId = linkedEmployee ? linkedEmployee.id : null;
+  // A linked employee is the source of truth for department, even if the (disabled) select is stale.
+  const department = linkedEmployee ? (linkedEmployee.department || null) : ($('#uDepartment').value || null);
   const msg = $('#manageUsersMsg');
 
   if(SECURE_AUTH()){
@@ -16954,7 +17163,7 @@ $('#addUserBtn').addEventListener('click', async ()=>{
         if(cur && cur.role === 'Admin' && role !== 'Admin' && profiles.filter(x => x.role === 'Admin' && !x.disabled).length <= 1){
           msg.textContent = "Can't demote the last Admin."; msg.className = 'msg show err'; return;
         }
-        await firestoreDb.collection(STAFF_PROFILES).doc(editingUid).update({ fullName, role, department, changedBy: currentUser, changedAt: new Date().toISOString() });
+        await firestoreDb.collection(STAFF_PROFILES).doc(editingUid).update({ fullName, role, department, employeeId, changedBy: currentUser, changedAt: new Date().toISOString() });
         if(editingUid === currentUid) currentUserDepartment = department;
         msg.textContent = 'User updated.'; msg.className = 'msg show ok';
       }else{
@@ -16970,7 +17179,7 @@ $('#addUserBtn').addEventListener('click', async ()=>{
             : 'Couldn\'t create the account: ' + e.message;
           msg.className = 'msg show err'; return;
         }
-        await firestoreDb.collection(STAFF_PROFILES).doc(cred.user.uid).set({ username, fullName, role, department, createdAt: new Date().toISOString(), createdBy: currentUser });
+        await firestoreDb.collection(STAFF_PROFILES).doc(cred.user.uid).set({ username, fullName, role, department, employeeId, createdAt: new Date().toISOString(), createdBy: currentUser });
         await helperAuth().signOut();
         msg.textContent = `User added. Give ${username} their password privately.`; msg.className = 'msg show ok';
       }
@@ -17009,7 +17218,7 @@ $('#addUserBtn').addEventListener('click', async ()=>{
       msg.className = 'msg show err';
       return;
     }
-    users[idx] = { username, password, fullName, role, department };
+    users[idx] = { username, password, fullName, role, department, employeeId };
     wasUpdate = true;
     if(currentUser === username) currentUserDepartment = department;
   }else{
@@ -17019,7 +17228,7 @@ $('#addUserBtn').addEventListener('click', async ()=>{
       msg.className = 'msg show err';
       return;
     }
-    users.push({ username, password, fullName, role, department });
+    users.push({ username, password, fullName, role, department, employeeId });
   }
   await setUsers(users);
   msg.textContent = wasUpdate ? 'User updated.' : 'User added.';
